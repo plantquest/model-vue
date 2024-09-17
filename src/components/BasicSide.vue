@@ -1,81 +1,60 @@
 <template>
-  <v-navigation-drawer
-    app
-    class="vxg-side"
-    :style="drawerStyle"
-    >
-    <v-sheet style="display: flex; flex-direction: column; height:100%;">
-      <div style="display: flex; justify-content: space-between;">
-        <div style="" v-html="logo"></div>
-
-        <v-icon
-          large
-          @click="closeDrawer"
-          style="width:48px;"
-          dark
-          >mdi-chevron-left</v-icon>
+  <v-navigation-drawer app class="vxg-side" :style="drawerStyle">
+    <v-sheet class="d-flex flex-column h-100">
+      <!-- Header -->
+      <div class="d-flex justify-space-between">
+        <div v-html="logo"></div>
+        <v-icon large @click="closeDrawer" class="drawer-toggle" dark>mdi-chevron-left</v-icon>
       </div>
 
-      <v-btn-toggle class="vxg-toggle" 
-        v-model="menuViewIndex"
-        mandatory
-        >
+      <!-- Menu Toggle -->
+      <v-btn-toggle v-model="menuViewIndex" mandatory class="vxg-toggle">
         <v-btn
           v-for="menuView in menuViewList"
           :key="menuView.name"
           @click="moveRoute(menuView)"
-          outlined 
+          outlined
           :ref="menuView.name"
-          class="pa-4 text-center secondary text-no-wrap rounded-sm btn-style text-capitalize" color= "white"
-          style="height: 70px;"
-          >
+          class="pa-4 text-center secondary text-no-wrap rounded-sm btn-style text-capitalize"
+          color="white"
+        >
           <div>
-          <v-icon style='color: white;'>
-            {{ menuView.name == custom.special.view.name ? 'mdi-fit-to-screen-outline' : 'mdi-dots-square'}}
-          </v-icon>
-          <span style="display: block;font-size: 13px; padding: 5px;"> {{ menuView.btnTitle }} </span>
+            <v-icon color="white">
+              {{ menuView.name === custom.special.view.name ? 'mdi-fit-to-screen-outline' : 'mdi-dots-square' }}
+            </v-icon>
+            <span class="d-block font-size-13 pt-2">{{ menuView.btnTitle }}</span>
           </div>
         </v-btn>
       </v-btn-toggle>
 
-      <!--
-      <h1 v-if="menuShowTitle">{{ menuView.title }} </h1>
-      -->
-      
-      <template
-        v-if="'standard' === menuView.mode"
-        v-for="item in menu">
-        <component
+      <!-- Menu Items -->
+      <template v-if="menuView.mode === 'standard'">
+        <router-link
+          v-for="item in menu"
           v-if="allow(item)"
-          :is="'router-link'"
-          :to="'/'+item.code"
           :key="item.code"
-          :class="item.klass"
-          style="flex-grow:1;"
-          >
+          :to="`/${item.code}`"
+          :class="['vxg-router-link', item.klass]"
+        >
           <v-icon>mdi-{{ item.icon }}</v-icon> {{ item.title }}
-        </component>
+        </router-link>
       </template>
 
       <component
-        v-if="'custom' === menuView.mode"
+        v-else-if="menuView.mode === 'custom'"
         :is="menuView.cmp"
         :spec="menuView.view.spec"
-        >
-      </component>
+      />
 
-      
-      <div style="flex-grow:100;"></div>
+      <v-spacer></v-spacer>
       <v-divider></v-divider>
 
+      <!-- Footer -->
       <component
         v-if="spec.footer.active"
         :is="spec.footer.cmp"
         :spec="spec.footer.spec"
-        >
-      </component>
-      
-           
+      />
     </v-sheet>
   </v-navigation-drawer>
 </template>
@@ -181,24 +160,14 @@ export default {
   
   computed: {
     menu () {
-      let active_item_code = this.$route.meta.view
+      if (this.menuView.mode !== 'standard') return [];
 
-      let ux_items = []
-      if('standard' === this.menuView.mode) {
-        let menu = this.menuView.menu
-        let spec_items = menu.items
-        let ordered_codes = menu.order.split(/\s*,\s*/)
-        ux_items =
-          ordered_codes
-          .reduce((a,c)=>(a.push(Object.assign({code:c},spec_items[c])),a),[])
-          .map(item=>{
-            item.klass = Object.assign({
-              'vxg-router-link': true,
-            })
-            return item
-          })
-      }
-      return ux_items
+      const { items, order } = this.menuView.menu;
+      return order.split(/\s*,\s*/).map(code => ({
+        ...items[code],
+        code,
+        klass: { 'vxg-router-link': true }
+      }));
     },
 
     drawerStyle() {
@@ -219,19 +188,12 @@ export default {
 
   methods: {
     moveRoute(menuView) {
-      let path = this.$route.name
+      const path = this.$route.name;
+      const targetPath = menuView.mode === 'standard' ? menuView.menu.default : menuView.name;
       
-      if(menuView.mode == 'standard') {
-        if(path != menuView.menu.default) {
-          this.$router.push('/'+menuView.menu.default)
-        }
+      if (path !== targetPath) {
+        this.$router.push(`/${targetPath}`);
       }
-      else if(menuView.mode == 'custom') {
-        if(path != menuView.name) {
-          this.$router.push('/'+menuView.name)
-        }
-      }
-      
     },
   
     defaultFound() {
@@ -297,6 +259,10 @@ nav.vxg-side {
 
 .vxg-toggle{
     background-color: rgb(var(--vxg-cb1)) !important;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    margin-right: 10px;
+
 }
 
 a.vxg-router-link {
@@ -323,5 +289,13 @@ a.vxg-router-link {
 .vxg-side-open {
     width: 48px;
     height: 48px;
+}
+
+.drawer-toggle {
+  width: 48px;
+}
+
+.font-size-13 {
+  font-size: 13px;
 }
 </style>

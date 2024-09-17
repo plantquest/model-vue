@@ -40,11 +40,22 @@ nav.vxg-side .v-divider {
   margin: 16px 8px;
 }
 .btn-style {
-  background-color: #00001a !important;
+  background-color: #283348 !important;
   width: 141px;
+  height: 281px;
+  padding: 42px 46px !important;
+  margin: 4px !important;
+}
+.btn-style.selected-btn {
+  background-color: rgb(var(--vxg-cb1)) !important;
+  color: rgb(var(--vxg-ct1)) !important;
+}
+.btn-style.selected-btn .v-icon {
+  color: rgb(var(--vxg-ct1)) !important;
 }
 .vxg-toggle {
   background-color: rgb(var(--vxg-cb1)) !important;
+  padding: 10px !important;
   padding-bottom: 10px;
   padding-top: 10px;
   margin-right: 10px;

@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="d-flex justify-space-between">
         <div v-html="logo"></div>
-        <v-icon large @click="closeDrawer" class="drawer-toggle" dark>mdi-chevron-left</v-icon>
+        <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>mdi-chevron-left</v-icon>
       </div>
 
       <!-- Menu Toggle -->
@@ -16,10 +16,11 @@
           outlined
           :ref="menuView.name"
           class="pa-4 text-center secondary text-no-wrap rounded-sm btn-style text-capitalize"
+          :class="{ 'selected-btn': menuViewIndex === menuViewList.indexOf(menuView) }"
           color="white"
         >
           <div>
-            <v-icon color="white">
+            <v-icon v-once color="white">
               {{ menuView.name === custom.special.view.name ? 'mdi-fit-to-screen-outline' : 'mdi-dots-square' }}
             </v-icon>
             <span class="d-block font-size-13 pt-2">{{ menuView.btnTitle }}</span>
@@ -36,7 +37,7 @@
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
         >
-          <v-icon>mdi-{{ item.icon }}</v-icon> {{ item.title }}
+          <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
         </router-link>
       </template>
 
@@ -171,7 +172,7 @@ export default {
     },
 
     drawerStyle() {
-      return {width: "282px"} // 250 px
+      return DRAWER_STYLE;
     },
     custom () {
       return this.$model.main.ux.custom
@@ -201,25 +202,18 @@ export default {
     },
     
     findRouteName(name) {
-      let subroutes
-
-      for(let route in this.custom.special) {
-
-        if(this.custom.special[route].name == name) {
-          return this.custom.special[route]
-        }
-        if(subroutes = this.custom.special[route].sub) {
-          for(let sub of subroutes) {
-            if(sub == name) {
-              return this.custom.special[route]
-            }
-          }
-        }
-
-      }
-
-      return {index: 1} // default index
-    },
+     const specialRoutes = this.custom.special;
+     for (let route in specialRoutes) {
+       const currentRoute = specialRoutes[route];
+       if (currentRoute.name === name) {
+         return currentRoute;
+       }
+       if (currentRoute.sub && currentRoute.sub.includes(name)) {
+         return currentRoute;
+       }
+     }
+     return { index: 1 }; // default index
+   },
     allow(item) {
       let out = (item && item.allow) ? this.$vxg.allow( item.allow ) : true
       return out
@@ -236,6 +230,10 @@ export default {
   }
 
 }
+
+const DRAWER_STYLE = Object.freeze({ width: "282px" });
+
+
 </script>
 
 
@@ -253,12 +251,23 @@ nav.vxg-side {
     }
 }
 .btn-style{
-    background-color: rgb(0, 0, 26) !important;
+    background-color: rgb(40, 51, 72) !important;
     width: 141px;
+    height: 281px;
+    padding: 42px 46px !important; // Added padding
+    margin: 4px !important; // Added margin for spacing between buttons
+    &.selected-btn {
+        background-color: rgb(var(--vxg-cb1)) !important;
+        color: rgb(var(--vxg-ct1)) !important;
+        .v-icon {
+            color: rgb(var(--vxg-ct1)) !important;
+        }
+    }
 }
 
 .vxg-toggle{
     background-color: rgb(var(--vxg-cb1)) !important;
+    padding: 10px !important; // Added padding to the toggle container
     padding-bottom: 10px;
     padding-top: 10px;
     margin-right: 10px;

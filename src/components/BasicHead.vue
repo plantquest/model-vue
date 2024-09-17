@@ -141,7 +141,7 @@
 
   <v-divider vertical v-if="show('print')"></v-divider>
 
-  <v-tooltip bottom v-if="show('print')">
+  <v-tooltip bottom v-if="show('print')" v-once> 
     <template v-slot:activator="{ on, attrs }">
       <v-btn v-if="tool.print.active && show('print')" v-bind="attrs" v-on="on"
         large elevation="0" class="pa-1 ma-1" color="white" style="height: 55px" @click="print()"
@@ -155,7 +155,7 @@
 
   <v-divider vertical v-if="show('print')"></v-divider>
 
-  <v-tooltip bottom v-if="show('bookmark')">
+  <v-tooltip bottom v-if="show('bookmark')" v-once>
     <template v-slot:activator="{ on, attrs }">
       <v-btn v-if="tool.bookmark.active && show('bookmark')" v-bind="attrs" v-on="on"
         large elevation="0" class="pa-1 ma-1" color="white" style="height: 55px" @click="showTags()" :disabled="!bookmarkVisible">
@@ -168,7 +168,7 @@
 
   <v-divider vertical v-if="show('bookmark')"></v-divider>
 
-  <v-tooltip bottom v-if="show('collect')">
+  <v-tooltip bottom v-if="show('collect')" v-once>
     <template v-slot:activator="{ on, attrs }">
       <v-btn v-if="tool['collect'].active && show('collect')" v-bind="attrs" v-on="on"
         large elevation="0" class="pa-1 ma-1" color="white" style="height: 55px" @click="collect()">

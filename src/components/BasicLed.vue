@@ -203,6 +203,8 @@
   
   <script>
   
+  import { memoize } from 'lodash'
+  
   export default {
     props: {
       spec: {
@@ -326,8 +328,9 @@
         return items
       },
   
-      fields () {
+      fields: memoize(function() {
         console.log('fields', this.spec.edit.layout.order)
+
         try {
           let fds = []
           let fns = this.spec.edit.layout.order.split(/,/)
@@ -351,7 +354,7 @@
           // console.error(e)
         }
         return []
-      },
+      }),
   
       showEditToolbar() {
         if(this.allow('edit')) {

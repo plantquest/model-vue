@@ -1,15 +1,13 @@
 import Patrun from 'patrun'
 import Jsonic from '@jsonic/jsonic-next'
 
-import './vxg.scss'
-
+// Import components statically to avoid chunk loading issues
 import VxgBasicAdmin from './components/BasicAdmin.vue'
 import VxgBasicHead from './components/BasicHead.vue'
 import VxgBasicFoot from './components/BasicFoot.vue'
 import VxgBasicMain from './components/BasicMain.vue'
 import VxgBasicSide from './components/BasicSide.vue'
 import VxgBasicLed from './components/BasicLed.vue'
-
 import VxgBasicFieldPick from './components/BasicFieldPick.vue'
 import VxgBasicAuth from './components/BasicAuth.vue'
 
@@ -28,7 +26,7 @@ class Vxg {
     }
     this.cmp = {}
     this.config(config)
-    this.util = util
+    this.memoizedAllow = new Map()
   }
 
   config(custom_config) {
@@ -45,46 +43,48 @@ class Vxg {
   }
 
   allow(match) {
-    let mm = Jsonic(match)
+    const key = JSON.stringify(match)
+    if (this.memoizedAllow.has(key)) {
+      return this.memoizedAllow.get(key)
+    }
 
-    // TODO: handle Aontu array workaround
+    let mm = Jsonic(match)
     let ms = Array.isArray(match) ? match : Object.keys(mm).map((x) => mm[x])
     let found = null
 
     for (let m of ms) {
       let pat = this.config.allow.modify({ ...(m || {}) })
       found = this.match.allow.find(pat)
-      if (found) {
-        break
-      }
+      if (found) break
     }
 
-    return found ? !!found.allow : false
+    const result = found ? !!found.allow : false
+    this.memoizedAllow.set(key, result)
+    return result
   }
 
   install(Vue, options) {
-    var co = {
+    const components = {
       VxgBasicAdmin,
-
       VxgBasicHead,
       VxgBasicFoot,
       VxgBasicMain,
       VxgBasicSide,
-
       VxgBasicLed,
-
       VxgBasicFieldPick,
       VxgBasicAuth,
     }
 
-    Object.keys(co).forEach((name) => {
-      Vue.component(name, co[name])
-      this.cmp[name] = co[name]
+    // Register components
+    Object.entries(components).forEach(([name, component]) => {
+      Vue.component(name, component)
+      this.cmp[name] = component
     })
 
-    Vue.prototype.$vxg = this
-
-    window.vxg = this
+    // Use a getter for $vxg
+    Object.defineProperty(Vue.prototype, '$vxg', {
+      get: () => this
+    })
   }
 }
 

@@ -1,0 +1,20 @@
+.vxg-icon {
+  padding: 20px;
+}
+.vxg-app-bar {
+  height: 64px;
+  background-color: white;
+  margin-left: 25px;
+}
+.vxg-head-btn {
+  height: 100%;
+  background-color: white !important;
+  color: rgb(var(--vxg-ct0));
+  text-transform: none !important;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  margin-left: 10px;
+}
+.vxg-head-btn .v-icon {
+  color: rgb(var(--vxg-ci0)) !important;
+}

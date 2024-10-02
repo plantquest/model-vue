@@ -27,7 +27,27 @@
           </div>
         </v-btn>
       </v-btn-toggle>
-
+      <v-combobox
+    ref="search"
+    v-model="search"
+    @keydown="changeSearch($event)"
+    @click:clear="changeSearch($event)"
+    :items="tag_items"
+    flat
+    hide-details
+    outlined
+    dense
+    clearable
+    placeholder="Search"
+    :append-icon="filterIcon?'mdi-tune':undefined">
+      </v-combobox> 
+      <!-- <v-combobox
+      
+    
+    @click:append="filter"
+    :filter="customFilter"
+    >
+  </v-combobox>  -->
       <!-- Menu Items -->
       <template v-if="menuView.mode === 'standard'">
         <router-link
@@ -81,6 +101,13 @@ const SpecShape = Gubu({
   logo: String,
 })
 
+function tag_alias(asset) {
+  if (null != asset.custom12) {
+    return asset.tag + '(' + asset.custom12 + ')'
+  }
+  return asset.tag
+}
+
 export default {
 
   props: {
@@ -99,6 +126,7 @@ export default {
       menuViewIndex: null,
       menuView: null,
       roomName: '',
+      search: '',
     }
   },
 
@@ -170,6 +198,9 @@ export default {
         klass: { 'vxg-router-link': true }
       }));
     },
+    filterIcon (){
+      return this.$store.state.vxg.cmp.BasicHead.show.filter
+    },
 
     drawerStyle() {
       return DRAWER_STYLE;
@@ -195,6 +226,27 @@ export default {
       if (path !== targetPath) {
         this.$router.push(`/${targetPath}`);
       }
+    },
+    changeSearch(event) {
+
+      setTimeout(async ()=> { // wait for input
+        let term
+        term = event.target ? event.target._value : null
+        if(term) {
+          let out = await this.$seneca.post('sys:search, cmd:search', 
+            { query: term, params: this.search_config }
+          )
+          // this.tag_items = out.data.hits.map(v => v.id)
+          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+        }
+        else {
+          // this.tag_items = this.items.map(v => v.tag)
+          if(this.items != undefined)
+          this.tag_items = this.items.map(tag_alias)
+        }
+        
+      }, 11)
+
     },
   
     defaultFound() {

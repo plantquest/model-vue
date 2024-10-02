@@ -28,18 +28,18 @@
         </v-btn>
       </v-btn-toggle>
       <v-combobox
-    ref="search"
-    v-model="search"
-    @keydown="changeSearch($event)"
-    @click:clear="changeSearch($event)"
-    :items="tag_items"
-    flat
-    hide-details
-    outlined
-    dense
-    clearable
-    placeholder="Search"
-    :append-icon="filterIcon?'mdi-tune':undefined">
+        ref="search"
+        v-model="search"
+        @keydown="changeSearch($event)"
+        @click:clear="changeSearch($event)"
+        :items="tag_items"
+        flat
+        hide-details
+        outlined
+        dense
+        clearable
+        placeholder="Search"
+        :append-icon="filterIcon?'mdi-tune':undefined">
       </v-combobox> 
       <!-- <v-combobox
       
@@ -127,6 +127,7 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
+      tag_items:[]
     }
   },
 
@@ -147,6 +148,18 @@ export default {
     this.menuView = this.menuViewList[route.index]
     this.menuViewIndex = route.index
     
+    let tool = {}
+
+    let load_assets = setInterval(async ()=>{
+      await this.$store.dispatch('vxg_get_assets', tool)
+      this.items = tool.assets
+      if(this.items.length != 0) {
+        // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
+        this.tag_items = this.items.map(tag_alias)
+        this.setupMiniSearch(this.items)
+        clearInterval(load_assets)
+      } 
+    }, 10011)
   },
 
 
@@ -227,6 +240,14 @@ export default {
         this.$router.push(`/${targetPath}`);
       }
     },
+
+    async setupMiniSearch(items) {
+      for(const item of items) {
+        // item = {...item}
+        this.$seneca.post('sys:search, cmd:add', { doc: item, })
+      }
+    },
+
     changeSearch(event) {
 
       setTimeout(async ()=> { // wait for input

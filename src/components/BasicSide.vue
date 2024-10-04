@@ -39,7 +39,11 @@
         dense
         clearable
         placeholder="Search"
-        :append-icon="filterIcon?'mdi-tune':undefined">
+        :append-icon="filterIcon?'mdi-tune':undefined"
+        @click:append="filter"
+        :filter="customFilter"
+        >
+        
       </v-combobox> 
       <!-- <v-combobox
       
@@ -159,7 +163,7 @@ export default {
         this.setupMiniSearch(this.items)
         clearInterval(load_assets)
       } 
-    }, 10011)
+    }, 111)
   },
 
 
@@ -185,6 +189,45 @@ export default {
       }
       */
     },
+
+    '$store.state.trigger.search.term' (term) {
+      if(term == '' && this.$refs.search) {
+        this.$refs.search.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items = this.items.map(tag_alias)
+      }
+    },
+    search (val) {
+      let term = val || ''
+      term.trim()
+      // Todo: Is it necessary?
+      // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
+      // if(m) {
+      //   term = m[1].trim()
+      // }
+      // this.$store.dispatch('trigger_search', {term:this.search})
+      this.$store.dispatch('trigger_search', {term})
+    },
+    select () {
+      this.$store.dispatch('trigger_select', {value:this.select})
+    },
+    '$store.state.trigger.select.value' (val) {
+      this.select = val
+    },
+    '$store.vxg.cmp.BasicHead.allow.add': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+    '$store.vxg.cmp.BasicHead.allow.remove': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+
+
+
+
     '$route.name': {
       immediate: true,
       handler (val) {
@@ -201,6 +244,11 @@ export default {
   
   
   computed: {
+    filterDisabled () {
+      return this.$store.state.trigger.filter_disabled.value
+    },
+
+
     menu () {
       if (this.menuView.mode !== 'standard') return [];
 
@@ -229,6 +277,10 @@ export default {
     portal () {
       return this.custom.special.portal
     },
+
+    search_config() {
+      return this.$model.main.ux.custom.search_config
+    }
   },
 
   methods: {
@@ -247,6 +299,11 @@ export default {
         this.$seneca.post('sys:search, cmd:add', { doc: item, })
       }
     },
+
+      // bypass default combobox filter
+      customFilter (item, queryText, itemText) {
+        return 1
+      },
 
     changeSearch(event) {
 
@@ -267,9 +324,11 @@ export default {
         }
         
       }, 11)
-
+      
     },
-  
+    filter() {
+      this.$store.dispatch('trigger_toggle_filter')
+    },
     defaultFound() {
       return this.menuView && this.menuView.menu && this.menuView.menu.default
     },

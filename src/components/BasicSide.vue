@@ -29,7 +29,31 @@
           </div>
         </v-btn>
       </v-btn-toggle>
-
+      <v-combobox
+        ref="search"
+        v-model="search"
+        @keydown="changeSearch($event)"
+        @click:clear="changeSearch($event)"
+        :items="tag_items"
+        flat
+        hide-details
+        outlined
+        dense
+        clearable
+        placeholder="Search"
+        :append-icon="filterIcon?'mdi-tune':undefined"
+        @click:append="filter"
+        :filter="customFilter"
+        >
+        
+      </v-combobox> 
+      <!-- <v-combobox
+      
+    
+    @click:append="filter"
+    :filter="customFilter"
+    >
+  </v-combobox>  -->
       <!-- Menu Items -->
       <template v-if="menuView.mode === 'standard'">
         <router-link
@@ -84,6 +108,13 @@ const SpecShape = Gubu({
   logo: String,
 })
 
+function tag_alias(asset) {
+  if (null != asset.custom12) {
+    return asset.tag + '(' + asset.custom12 + ')'
+  }
+  return asset.tag
+}
+
 export default {
 
   props: {
@@ -102,6 +133,8 @@ export default {
       menuViewIndex: null,
       menuView: null,
       roomName: '',
+      search: '',
+      tag_items:[]
     }
   },
 
@@ -122,6 +155,18 @@ export default {
     this.menuView = this.menuViewList[route.index]
     this.menuViewIndex = route.index
     
+    let tool = {}
+
+    let load_assets = setInterval(async ()=>{
+      await this.$store.dispatch('vxg_get_assets', tool)
+      this.items = tool.assets
+      if(this.items.length != 0) {
+        // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
+        this.tag_items = this.items.map(tag_alias)
+        this.setupMiniSearch(this.items)
+        clearInterval(load_assets)
+      } 
+    }, 111)
   },
 
 
@@ -147,6 +192,45 @@ export default {
       }
       */
     },
+
+    '$store.state.trigger.search.term' (term) {
+      if(term == '' && this.$refs.search) {
+        this.$refs.search.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items = this.items.map(tag_alias)
+      }
+    },
+    search (val) {
+      let term = val || ''
+      term.trim()
+      // Todo: Is it necessary?
+      // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
+      // if(m) {
+      //   term = m[1].trim()
+      // }
+      // this.$store.dispatch('trigger_search', {term:this.search})
+      this.$store.dispatch('trigger_search', {term})
+    },
+    select () {
+      this.$store.dispatch('trigger_select', {value:this.select})
+    },
+    '$store.state.trigger.select.value' (val) {
+      this.select = val
+    },
+    '$store.vxg.cmp.BasicHead.allow.add': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+    '$store.vxg.cmp.BasicHead.allow.remove': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+
+
+
+
     '$route.name': {
       immediate: true,
       handler (val) {
@@ -163,6 +247,11 @@ export default {
   
   
   computed: {
+    filterDisabled () {
+      return this.$store.state.trigger.filter_disabled.value
+    },
+
+
     menu () {
       if (this.menuView.mode !== 'standard') return [];
 
@@ -172,6 +261,9 @@ export default {
         code,
         klass: { 'vxg-router-link': true }
       }));
+    },
+    filterIcon (){
+      return this.$store.state.vxg.cmp.BasicHead.show.filter
     },
 
     drawerStyle() {
@@ -188,6 +280,10 @@ export default {
     portal () {
       return this.custom.special.portal
     },
+
+    search_config() {
+      return this.$model.main.ux.custom.search_config
+    }
   },
 
   methods: {
@@ -199,7 +295,43 @@ export default {
         this.$router.push(`/${targetPath}`);
       }
     },
-  
+
+    async setupMiniSearch(items) {
+      for(const item of items) {
+        // item = {...item}
+        this.$seneca.post('sys:search, cmd:add', { doc: item, })
+      }
+    },
+
+      // bypass default combobox filter
+      customFilter (item, queryText, itemText) {
+        return 1
+      },
+
+    changeSearch(event) {
+
+      setTimeout(async ()=> { // wait for input
+        let term
+        term = event.target ? event.target._value : null
+        if(term) {
+          let out = await this.$seneca.post('sys:search, cmd:search', 
+            { query: term, params: this.search_config }
+          )
+          // this.tag_items = out.data.hits.map(v => v.id)
+          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+        }
+        else {
+          // this.tag_items = this.items.map(v => v.tag)
+          if(this.items != undefined)
+          this.tag_items = this.items.map(tag_alias)
+        }
+        
+      }, 11)
+      
+    },
+    filter() {
+      this.$store.dispatch('trigger_toggle_filter')
+    },
     defaultFound() {
       return this.menuView && this.menuView.menu && this.menuView.menu.default
     },

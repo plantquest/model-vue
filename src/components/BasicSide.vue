@@ -370,6 +370,9 @@ const DRAWER_STYLE = Object.freeze({ width: "282px" });
 
 
 <style lang="scss">
+.v-navigation-drawer__content{
+  overflow-y: hidden;
+}
 nav.vxg-side {
     background-color: rgb(var(--vxg-cb1)) !important;
 
@@ -381,6 +384,7 @@ nav.vxg-side {
         border-color: rgb(var(--vxg-ct2)) !important;
         margin: 16px 8px;
     }
+    
 }
 .btn-style{
     background-color: rgb(40, 51, 72) !important;
@@ -436,7 +440,10 @@ a.vxg-router-link {
   width: 48px;
 }
 
+
 .font-size-13 {
   font-size: 13px;
 }
+
+
 </style>

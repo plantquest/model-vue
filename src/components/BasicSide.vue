@@ -45,6 +45,16 @@
           @click="clearFilter"
       >Clear</v-btn>
 
+
+<div>
+  <div >
+        <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
+        style="position:absolute; z-index:1; margin-top:7px; margin-left:16px"
+         />
+        
+      </div>
+
+ 
       <v-combobox
         ref="search"
         v-model="search"
@@ -56,28 +66,32 @@
         outlined
         dense
         clearable
-        placeholder = "Search"
-        
+        placeholder=""
         @click:append="filter"
         :filter="customFilter"
+        :prepend-inner-icon="prependIcon" 
+        @click="handleClick" 
+        @blur="handleBlur"
         
         >
-        <template v-slot:placeholder>
-          <img :src="`${publicPath}catppuccin-search.svg`" alt="catppuccin-search" class="catppuccin-search" />
-        </template>
+       
         <template v-slot:append>
           <!-- display Clip_path_groups svg here -->
           <!-- horizontal divided icons -->
+          
           <div class="searchIcons d-flex justify-space-between ">
-            <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5" />
+            <!-- <img :src="`${publicPath}catppuccin-search.svg`" alt="catppuccin-search" class="catppuccin-search" /> -->
+            
             <!-- divider -->
             <v-divider vertical></v-divider>
             <!-- insert svg from assets/svg/Clip_Path_group.svg -->
-            <img :src="`${publicPath}Clip_Path_group.svg`" alt="Clip_Path_group" class="clip-path-group" />
+            <img :src="`${publicPath}Clip_Path_group.svg`" alt="Clip_Path_group" class="clip-path-group"  />
           </div>
         </template>
         
       </v-combobox> 
+</div>
+   
       <!-- <v-combobox
       
     
@@ -168,6 +182,7 @@ export default {
     
       tag_items:[],
       publicPath: process.env.BASE_URL || '/',
+      showIcon: true, // Data property to control icon visibility
       
     }
   },
@@ -285,6 +300,10 @@ export default {
       return this.$store.state.trigger.filter_disabled.value
     },
 
+    prependIcon() {
+      return this.showIcon ? 'mdi-magnify style="color: white"' : ''; // Conditionally bind the icon
+    },
+
 
     menu () {
       if (this.menuView.mode !== 'standard') return [];
@@ -349,8 +368,15 @@ export default {
         return 1
       },
 
-    changeSearch(event) {
+      handleClick() {
+      this.showIcon = false; // Hide the icon when the combobox is clicked
+    },
+    
+    handleBlur() {
+      this.showIcon = true; // Show the icon when the combobox is blurred
+    },
 
+    changeSearch(event) {
       setTimeout(async ()=> { // wait for input
         let term
         term = event.target ? event.target._value : null
@@ -359,12 +385,12 @@ export default {
             { query: term, params: this.search_config }
           )
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
-        }
+          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc)) 
+        } 
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if(this.items != undefined)
-          this.tag_items = this.items.map(tag_alias)
+          this.tag_items = this.items.map(tag_alias) 
         }
         
       }, 11)
@@ -379,10 +405,13 @@ export default {
         this.$store.state.vxg.cmp.BasicHead.show[action] 
     },
 
+  
 
     filter() {
-      this.$store.dispatch('trigger_toggle_filter')
-    },
+      this.$store.dispatch('trigger_toggle_filter');
+    
+      },
+    
     defaultFound() {
       return this.menuView && this.menuView.menu && this.menuView.menu.default
     },
@@ -445,6 +474,7 @@ nav.vxg-side {
     .v-divider {
         border-color: rgb(var(--vxg-ct2)) !important;
         margin: 16px 8px;
+        height: 22px;
     }
     
 }
@@ -493,6 +523,7 @@ a.vxg-router-link {
     }
 
 }
+
 .vxg-side-open {
     width: 48px;
     height: 48px;
@@ -538,10 +569,17 @@ img{
     margin-left: 4px;
     margin-right: 4px;
 }
-
+.v-select__slot {
+    margin-left: 25px;
+    margin-bottom: 4px;
+}
 
 .catppuccin-search {
   width: 24px; /* Adjust size as needed */
   height: 24px; /* Adjust size as needed */
+}
+.v-input__icon{
+  position: absolute;
+  margin-left: 187px;
 }
 </style>

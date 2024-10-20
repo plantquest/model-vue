@@ -39,6 +39,7 @@ nav.vxg-side .v-sheet {
 nav.vxg-side .v-divider {
   border-color: rgb(var(--vxg-ct2)) !important;
   margin: 16px 8px;
+  height: 22px;
 }
 .btn-style {
   background-color: #283348 !important;
@@ -110,11 +111,19 @@ img.catppuccin-search {
   margin-left: 4px;
   margin-right: 4px;
 }
+.v-select__slot {
+  margin-left: 25px;
+  margin-bottom: 4px;
+}
 .catppuccin-search {
   width: 24px;
   /* Adjust size as needed */
   height: 24px;
   /* Adjust size as needed */
+}
+.v-input__icon {
+  position: absolute;
+  margin-left: 187px;
 }
 .vxg-form-field {
   text-align: right;

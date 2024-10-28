@@ -164,8 +164,9 @@
         <v-btn outlined @click="closeItem">Cancel</v-btn>
         <v-spacer />
         <v-btn outlined @click="remove.dialog = true" v-if="allow('edit')">Remove</v-btn>
+   
+        <v-btn outlined v-if="allow('edit')">Save</v-btn>
         <div style="padding: 5px;"></div>
-        <v-btn outlined @click="saveItem" v-if="allow('edit')">Save</v-btn>
       </v-toolbar>
     </div>
   </div>
@@ -244,10 +245,13 @@
     },
   
     mounted() {
+      console.log('mounted', this.spec,'KD')
+      
       
     },
   
     async created () {
+      console.log('mounted', this.spec,'KD')
     
       this.popup_dialogs = this.fields
         .reduce(((acc, field) => (field.popup ? acc[field.popup.name] = false : null, acc)), {})
@@ -428,15 +432,17 @@
           //this.$seneca.post('aim:web,on:user,cmd:registeruser', { user: this.item, })
             if(this.editing) {
               console.log('Editing!!!')
-              this.$store.dispatch('register_user', this.item)
+              
               this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
             } else {
-              this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
+              this.$store.dispatch('register_user', this.item)
+              //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
   
           }
         }
         else
         {
+          console.log('Saving Item 2: ', this.item, ' Here: ', this.spec.ent.store_name)
           this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
         }
   

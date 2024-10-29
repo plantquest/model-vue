@@ -428,16 +428,11 @@
         console.log(this.editing)
         if(this.spec.ent.store_name.includes('user') ) {
           
-          //this.$seneca.post('aim:web,on:user,cmd:registeruser', { user: this.item, })
-            if(this.editing) {
-              console.log('Editing!!!')
+          //this.$seneca.post('aim:web,on:user,cmd:registeruser', { user: this.item, })    
+          this.$store.dispatch('register_user', this.item)      
+          this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
               
-              this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
-            } else {
-              this.$store.dispatch('register_user', this.item)
-              //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
-  
-          }
+              
         }
         else
         {

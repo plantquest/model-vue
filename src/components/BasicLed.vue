@@ -427,9 +427,10 @@
         // TODO, if ent is user, then register the user
         console.log(this.editing)
         if(this.spec.ent.store_name.includes('user') ) {
-          
+          console.log('Registering User: ', this.item)
           //this.$seneca.post('aim:web,on:user,cmd:registeruser', { user: this.item, })    
           this.$store.dispatch('register_user', this.item)      
+          
           this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
               
               

@@ -433,9 +433,12 @@
             if(this.editing) {
               console.log('Editing!!!')
               
+              this.$store.dispatch('register_user', this.item)      
               this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
+              
             } else {
               this.$store.dispatch('register_user', this.item)
+              this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
               //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
   
           }

@@ -55,8 +55,9 @@
       </div>
 
  
-      <v-combobox
+      <v-combobox 
         ref="search"
+        class="comboxSearch d-flex justify-space-between"
         v-model="search"
         @keydown="changeSearch($event)"
         @click:clear="changeSearch($event)"
@@ -70,26 +71,29 @@
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 
+        
         @click="handleClick" 
         @blur="handleBlur"
         
         >
        
-        <template v-slot:append>
-          <!-- display Clip_path_groups svg here -->
-          <!-- horizontal divided icons -->
+        <!-- <template v-slot:append>
+         
           
           <div class="searchIcons d-flex justify-space-between ">
-            <!-- <img :src="`${publicPath}catppuccin-search.svg`" alt="catppuccin-search" class="catppuccin-search" /> -->
             
-            <!-- divider -->
+            
+            
             <v-divider vertical></v-divider>
-            <!-- insert svg from assets/svg/Clip_Path_group.svg -->
-            <img :src="`${publicPath}Clip_Path_group.svg`" alt="Clip_Path_group" class="clip-path-group"  />
+            
           </div>
-        </template>
+        </template> -->
         
       </v-combobox> 
+      <img :src="`${publicPath}Clip_Path_group.svg`" alt="Clip_Path_group" style="cursor: pointer;
+    cursor: pointer; position: relative; top: -33px; left: calc(100% - 33px); border-left: solid 1px;
+    padding-left: 2px;" class="clip-path-group" v-if="filterIcon" @click.stop.prevent="filter"   />
+
 </div>
    
       <!-- <v-combobox
@@ -301,7 +305,7 @@ export default {
     },
 
     prependIcon() {
-      return this.showIcon ? 'mdi-magnify style="color: white"' : ''; // Conditionally bind the icon
+      return this.showIcon ? 'mdi-magnify magnifierIcon' : ''; // Conditionally bind the icon
     },
 
 
@@ -407,7 +411,8 @@ export default {
 
   
 
-    filter() {
+    filter(event) {
+      // aaaaaaaaaaaa
       this.$store.dispatch('trigger_toggle_filter');
     
       },
@@ -533,6 +538,12 @@ a.vxg-router-link {
   width: 48px;
 }
 
+.magnifierIcon {
+  margin: 3px 0 0 40px;
+  font-size: large;
+ 
+  color: #141b2d;
+}
 
 
 img{
@@ -569,7 +580,7 @@ img{
     margin-left: 4px;
     margin-right: 4px;
 }
-.v-select__slot {
+.comboxSearch  .v-select__slot {
     margin-left: 25px;
     margin-bottom: 4px;
 }
@@ -578,8 +589,11 @@ img{
   width: 24px; /* Adjust size as needed */
   height: 24px; /* Adjust size as needed */
 }
-.v-input__icon{
+.comboxSearch .v-input__icon{
   position: absolute;
   margin-left: 187px;
+}
+.v-text-field{
+  padding: 0 34px;
 }
 </style>

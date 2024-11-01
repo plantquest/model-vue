@@ -243,7 +243,9 @@ export default {
     let load_assets = setInterval(async ()=>{
       await this.$store.dispatch('vxg_get_assets', tool)
       this.items = tool.assets
+      
       if(this.items.length != 0) {
+       
         // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
         this.tag_items = this.items.map(tag_alias)
         this.setupMiniSearch(this.items)

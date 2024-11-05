@@ -165,7 +165,7 @@
         <v-spacer />
         <v-btn outlined @click="remove.dialog = true" v-if="allow('edit')">Remove</v-btn>
    
-        <v-btn outlined v-if="allow('edit')">Save</v-btn>
+        <v-btn outlined @click="saveItem" v-if="allow('edit')">Save</v-btn>
         <div style="padding: 5px;"></div>
       </v-toolbar>
     </div>

@@ -412,7 +412,7 @@
         
         // Check if the item is new or existing
         this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
-        console.log('Editing mode active?',this.editing)
+        console.log('Editing mode:',this.editing)
 
         this.item = selitem;
         this.readitem = { ...this.item };
@@ -426,16 +426,12 @@
       },
   
       saveItem () {
-  
-        console.log('Saving Item: ', this.item, ' Here: ', this.spec.ent.store_name)
-        // TODO, if ent is user, then register the user
-        console.log(this.editing)
         if(this.spec.ent.store_name.includes('user') ) {
-          console.log('KD Test 1',this.editing)
-            if(this.editing) {
-              console.log('Editing!!!')   
+            if(this.editing ==false) {
+              console.log('Registering User: ')
               this.$store.dispatch('register_user', this.item)           
             } else {
+              console.log('Saving User: ')
               this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
               //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
   
@@ -443,7 +439,6 @@
         }
         else
         {
-          console.log('Saving Item 2: ', this.item, ' Here: ', this.spec.ent.store_name)
           this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
         }
   

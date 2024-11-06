@@ -406,20 +406,23 @@
       },
   
       openItem (selitem) {
-        if(false === this.spec.edit.active) { // || !this.allow('edit')) {
-          return
+        if (false === this.spec.edit.active) {
+          return;
         }
-        this.editing = true;
-        this.item = selitem
-  
-        this.readitem = {...this.item}
-  
-        // TODO: from spec!
-        this.readitem.last = this.formatdate(this.item.last)
-        this.readitem.when = this.formatdate(this.item.when)
         
-        this.show.table = false
-        this.show.item = true
+        // Check if the item is new or existing
+        this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
+        console.log('Editing mode active?',this.editing)
+
+        this.item = selitem;
+        this.readitem = { ...this.item };
+
+        // TODO: from spec!
+        this.readitem.last = this.formatdate(this.item.last);
+        this.readitem.when = this.formatdate(this.item.when);
+
+        this.show.table = false;
+        this.show.item = true;
       },
   
       saveItem () {
@@ -428,16 +431,11 @@
         // TODO, if ent is user, then register the user
         console.log(this.editing)
         if(this.spec.ent.store_name.includes('user') ) {
-          
-          //this.$seneca.post('aim:web,on:user,cmd:registeruser', { user: this.item, })
+          console.log('KD Test 1',this.editing)
             if(this.editing) {
-              console.log('Editing!!!')
-              
-              this.$store.dispatch('register_user', this.item)      
-              this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
-              
+              console.log('Editing!!!')   
+              this.$store.dispatch('register_user', this.item)           
             } else {
-              this.$store.dispatch('register_user', this.item)
               this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
               //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
   

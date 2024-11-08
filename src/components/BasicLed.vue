@@ -164,8 +164,9 @@
         <v-btn outlined @click="closeItem">Cancel</v-btn>
         <v-spacer />
         <v-btn outlined @click="remove.dialog = true" v-if="allow('edit')">Remove</v-btn>
-        <div style="padding: 5px;"></div>
+   
         <v-btn outlined @click="saveItem" v-if="allow('edit')">Save</v-btn>
+        <div style="padding: 5px;"></div>
       </v-toolbar>
     </div>
   </div>
@@ -244,10 +245,13 @@
     },
   
     mounted() {
+      console.log('mounted', this.spec,'KD')
+      
       
     },
   
     async created () {
+      console.log('mounted', this.spec,'KD')
     
       this.popup_dialogs = this.fields
         .reduce(((acc, field) => (field.popup ? acc[field.popup.name] = false : null, acc)), {})
@@ -402,36 +406,34 @@
       },
   
       openItem (selitem) {
-        if(false === this.spec.edit.active) { // || !this.allow('edit')) {
-          return
+        if (false === this.spec.edit.active) {
+          return;
         }
-        this.editing = true;
-        this.item = selitem
-  
-        this.readitem = {...this.item}
-  
-        // TODO: from spec!
-        this.readitem.last = this.formatdate(this.item.last)
-        this.readitem.when = this.formatdate(this.item.when)
         
-        this.show.table = false
-        this.show.item = true
+        // Check if the item is new or existing
+        this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
+        console.log('Editing mode:',this.editing)
+
+        this.item = selitem;
+        this.readitem = { ...this.item };
+
+        // TODO: from spec!
+        this.readitem.last = this.formatdate(this.item.last);
+        this.readitem.when = this.formatdate(this.item.when);
+
+        this.show.table = false;
+        this.show.item = true;
       },
   
       saveItem () {
-  
-        console.log('Saving Item: ', this.item, ' Here: ', this.spec.ent.store_name)
-        // TODO, if ent is user, then register the user
-        console.log(this.editing)
         if(this.spec.ent.store_name.includes('user') ) {
-          
-          //this.$seneca.post('aim:web,on:user,cmd:registeruser', { user: this.item, })
-            if(this.editing) {
-              console.log('Editing!!!')
-              this.$store.dispatch('register_user', this.item)
-              this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
+            if(this.editing ==false) {
+              console.log('Registering User: ')
+              this.$store.dispatch('register_user', this.item)           
             } else {
+              console.log('Saving User: ')
               this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
+              //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
   
           }
         }

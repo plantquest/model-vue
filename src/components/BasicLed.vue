@@ -106,12 +106,13 @@
             ></v-select>
           -->
           <br/>
-          <vxg-basic-field-pick
-            v-if="'status'===field.type"
-            :field="field"
-            :param="{item:item}"
-            ></vxg-basic-field-pick>
-          
+          <div v-if="!this.editing"></div>
+            <vxg-basic-field-pick
+              v-if="'status'===field.type && this.editing==true"
+              :field="field"
+              :param="{item:item}"
+              ></vxg-basic-field-pick>
+          </div>
           
           <v-text-field
             v-if="'datetime'===field.type"

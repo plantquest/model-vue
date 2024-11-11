@@ -69,6 +69,7 @@
           <a v-if="field.popup" @click="activatePopup(field.popup)" style="text-decoration: underline;"> 
             {{ field.popup.spec.title }} 
           </a>
+          
           <a v-else> &zwnj; </a>
   
           <v-text-field
@@ -105,12 +106,15 @@
             :disabled="field.readonly || !allow('edit')"
             ></v-select>
           -->
-          <br/>
-          <vxg-basic-field-pick
-            v-if="'status'===field.type"
-            :field="field"
-            :param="{item:item}"
-            ></vxg-basic-field-pick>
+     
+          <div v-if="this.editing">
+            <vxg-basic-field-pick
+              v-if="'status'===field.type"
+              :field="field"
+              :param="{item:item}"
+              ></vxg-basic-field-pick>
+          </div>
+        
           
           
           <v-text-field
@@ -159,7 +163,6 @@
         </v-card>
       </v-dialog>
     
-      </div>
       <v-toolbar flat>
         <v-btn outlined @click="closeItem">Cancel</v-btn>
         <v-spacer />
@@ -170,6 +173,22 @@
       </v-toolbar>
     </div>
   </div>
+
+      <v-dialog v-model="accessMatrixDialog" max-width="600" persistent>
+        <v-card>
+          <v-card-title class="headline">User Access Matrix</v-card-title>
+          <v-card-text>
+            <img src="/access_matrix.png" alt="Access Matrix" style="width: 100%;">
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="accessMatrixDialog = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      </div>
+   
   </template>
   
   <style lang="scss">
@@ -240,7 +259,7 @@
         },
         
         popup_dialogs: {},
-        
+        accessMatrixDialog: false,
       }
     },
   

@@ -106,14 +106,41 @@
             :disabled="field.readonly || !allow('edit')"
             ></v-select>
           -->
-     
-          <div v-if="this.editing">
-            <vxg-basic-field-pick
-              v-if="'status'===field.type"
-              :field="field"
-              :param="{item:item}"
+          <div v-if="(editing && (field.title=='Role' || field.title=='Status') )">
+            <div v-if="field.title=='Role'">
+              <a href="#" @click="toggleAccessMatrixDialog">User Access Matrix</a>
+            </div>
+            
+            <div style="position: relative;">
+              <vxg-basic-field-pick
+                v-if="field.type ==='status'"
+                :field="field"
+                :param="{item:item}"
+                :disabled="editing==false && (field.title=='Status')"
               ></vxg-basic-field-pick>
+
+             
+            </div>
           </div>
+          <div v-if="(editing==false && (field.title=='Role' || field.title=='Status') )">
+           
+            <div v-if="field.title!=='Role' && editing==false" 
+                   style="position: absolute;background-color: blue; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.5); z-index: 1;">
+                <!-- This div overlays the field when not editing -->
+              </div>
+            <div v-if="!editing && field.title=='Role'">
+         
+              <a href="#" @click="toggleAccessMatrixDialog">User Access Matrix</a>
+            </div>
+                <vxg-basic-field-pick
+                  v-if="'status'===field.type && !editing"
+                  :field="field"
+                  :param="{item:item}"
+                  :disabled="editing==false && field.title!=='Role'"
+                 
+                  ></vxg-basic-field-pick>
+          </div>
+
         
           
           
@@ -174,7 +201,7 @@
     </div>
   </div>
 
-      <v-dialog v-model="accessMatrixDialog" max-width="600" persistent>
+      <v-dialog v-model="accessMatrixDialog" max-width="800" persistent>
         <v-card>
           <v-card-title class="headline">User Access Matrix</v-card-title>
           <v-card-text>
@@ -182,7 +209,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="accessMatrixDialog = false">Close</v-btn>
+            <v-btn color="primary" text @click="toggleAccessMatrixDialog">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -553,6 +580,10 @@
       
       activatePopup(popup) {
         this.popup_dialogs[popup.name] = true
+      },
+  
+      toggleAccessMatrixDialog() {
+        this.accessMatrixDialog = !this.accessMatrixDialog;
       },
   
     }

@@ -124,21 +124,21 @@
           </div>
           <div v-if="(editing==false && (field.title=='Role' || field.title=='Status') )">
            
-            <div v-if="field.title!=='Role' && editing==false" 
-                   style="position: absolute;background-color: blue; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.5); z-index: 1;">
-                <!-- This div overlays the field when not editing -->
-              </div>
+          
             <div v-if="!editing && field.title=='Role'">
          
               <a href="#" @click="toggleAccessMatrixDialog">User Access Matrix</a>
             </div>
                 <vxg-basic-field-pick
-                  v-if="'status'===field.type && !editing"
+                  v-if="'status'===field.type && editing==false"
                   :field="field"
                   :param="{item:item}"
                   :disabled="editing==false && field.title!=='Role'"
                  
-                  ></vxg-basic-field-pick>
+                  >  <div v-if="field.title!=='Role' && editing==false" 
+                   style="position: absolute;background-color: blue; height:100%; width:100%; background-color: rgba(255, 255, 255, 0.5); z-index: 1;">
+                <!-- This div overlays the field when not editing -->
+              </div></vxg-basic-field-pick>
           </div>
 
         

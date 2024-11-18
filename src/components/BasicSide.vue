@@ -42,7 +42,7 @@
           v-if="show('clear') && tool.clear.active"
            text
             style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
-          @click="clearFilter"
+          @click="clearFilter();closeSideInfoCard()"
       >Clear</v-btn>
 
 
@@ -139,6 +139,7 @@
 <script>
 
 import Nua from 'nua'
+import {  mapActions } from 'vuex';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
 
@@ -351,6 +352,14 @@ export default {
   },
 
   methods: {
+    ...mapActions(['toggleSideInfoCardVisibility']),
+    closeSideInfoCard() {
+        this.toggleSideInfoCardVisibility(false);
+        
+      },
+
+
+
     moveRoute(menuView) {
       const path = this.$route.name;
       const targetPath = menuView.mode === 'standard' ? menuView.menu.default : menuView.name;

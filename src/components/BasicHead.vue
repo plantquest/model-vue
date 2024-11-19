@@ -13,20 +13,20 @@
     vertical style="margin:0px 16px;"></v-divider>
 
 
-  <v-btn
+  <!-- <v-btn
     v-if="show('clear') && tool.clear.active"
     outlined
     style="max-width:16%;display:inline-block;margin-left:2px;"
     @click="clearFilter"
-  >Clear</v-btn>
+  >Clear</v-btn> -->
 
-  <v-btn
+  <!-- <v-btn
     v-if="show('go') && tool.go.active"
     style="max-width:16%;display:inline-block;margin-left:6px;"
     outlined
     :disabled="filterDisabled"
     @click="filterAssets"
-  >Go</v-btn>
+  >Go</v-btn> -->
 
   <v-select
     v-if="show('select') && tool.select.active"
@@ -43,9 +43,9 @@
   </v-select>
 
   
-  <v-divider
+  <!-- <v-divider
     v-if="(show('select') && tool.select.active) || (show('go') && tool.go.active)"
-    vertical style="margin:0px 16px;"></v-divider>
+    vertical style="margin:0px 16px;"></v-divider> -->
 
 
   <v-btn
@@ -93,7 +93,7 @@
     v-if="show('remove') && tool.remove.active"
     vertical style="margin:0px 16px;"></v-divider>
 
-  <v-combobox
+  <!-- <v-combobox
     ref="search"
     v-if="tool.search.active && show('search')"
     v-model="search"
@@ -110,7 +110,7 @@
     @click:append="filter"
     :filter="customFilter"
     >
-  </v-combobox> 
+  </v-combobox>  -->
 
 
   <v-spacer

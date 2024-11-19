@@ -42,7 +42,7 @@
           v-if="show('clear') && tool.clear.active"
            text
             style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
-          @click="clearFilter();closeSideInfoCard()"
+          @click="clearFilter"
       >Clear</v-btn>
 
 

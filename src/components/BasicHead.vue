@@ -1,6 +1,6 @@
 <template>
 <v-app-bar app class="vxg-app-bar">
-
+<h2>Hello4</h2>
   <v-icon
     v-if="!drawerOpen && tool.expandSide.active"
     large
@@ -27,7 +27,7 @@
     :disabled="filterDisabled"
     @click="filterAssets"
   >Go</v-btn> -->
-
+<h2 style="margin-left: 10px;">{{ $store.state.vxg.ent.meta.name }}</h2>
   <v-select
     v-if="show('select') && tool.select.active"
     style="max-width:20%;display:inline-block;margin-left:10px;"
@@ -39,7 +39,8 @@
     outlined
     hide-details
     dense
-    >
+    > 
+
   </v-select>
 
   

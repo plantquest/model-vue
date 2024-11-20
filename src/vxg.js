@@ -90,7 +90,7 @@ class Vxg {
 
 Vxg.info = {
   version: Pkg.version,
-  note: 'aaa',
+  note: 'KD 2',
 }
 
 export default Vxg

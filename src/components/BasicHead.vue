@@ -1,6 +1,6 @@
 <template>
 <v-app-bar app class="vxg-app-bar">
-
+<h2>Hello4</h2>
   <v-icon
     v-if="!drawerOpen && tool.expandSide.active"
     large
@@ -13,21 +13,21 @@
     vertical style="margin:0px 16px;"></v-divider>
 
 
-  <v-btn
+  <!-- <v-btn
     v-if="show('clear') && tool.clear.active"
     outlined
     style="max-width:16%;display:inline-block;margin-left:2px;"
     @click="clearFilter"
-  >Clear</v-btn>
+  >Clear</v-btn> -->
 
-  <v-btn
+  <!-- <v-btn
     v-if="show('go') && tool.go.active"
     style="max-width:16%;display:inline-block;margin-left:6px;"
     outlined
     :disabled="filterDisabled"
     @click="filterAssets"
-  >Go</v-btn>
-
+  >Go</v-btn> -->
+<h2 style="margin-left: 10px;">{{ $store.state.vxg.ent.meta.name }}</h2>
   <v-select
     v-if="show('select') && tool.select.active"
     style="max-width:20%;display:inline-block;margin-left:10px;"
@@ -39,13 +39,14 @@
     outlined
     hide-details
     dense
-    >
+    > 
+
   </v-select>
 
   
-  <v-divider
+  <!-- <v-divider
     v-if="(show('select') && tool.select.active) || (show('go') && tool.go.active)"
-    vertical style="margin:0px 16px;"></v-divider>
+    vertical style="margin:0px 16px;"></v-divider> -->
 
 
   <v-btn
@@ -93,7 +94,7 @@
     v-if="show('remove') && tool.remove.active"
     vertical style="margin:0px 16px;"></v-divider>
 
-  <v-combobox
+  <!-- <v-combobox
     ref="search"
     v-if="tool.search.active && show('search')"
     v-model="search"
@@ -110,7 +111,7 @@
     @click:append="filter"
     :filter="customFilter"
     >
-  </v-combobox> 
+  </v-combobox>  -->
 
 
   <v-spacer
@@ -243,7 +244,9 @@ export default {
     let load_assets = setInterval(async ()=>{
       await this.$store.dispatch('vxg_get_assets', tool)
       this.items = tool.assets
+      
       if(this.items.length != 0) {
+       
         // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
         this.tag_items = this.items.map(tag_alias)
         this.setupMiniSearch(this.items)

@@ -1,6 +1,6 @@
 <template>
   <div v-if="allow('list')">
-    ::::: 
+   
     <v-data-table
       v-if="show.table"
       dense

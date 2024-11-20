@@ -1,6 +1,6 @@
 <template>
 <v-app-bar app class="vxg-app-bar">
-<h2>Hello4</h2>
+
   <v-icon
     v-if="!drawerOpen && tool.expandSide.active"
     large

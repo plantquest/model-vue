@@ -19,10 +19,17 @@
   color: rgb(var(--vxg-ci0)) !important;
 }
 .basic-footer[data-v-d93f7088] {
-  padding: 1rem;
   text-align: center;
-  background-color: #f5f5f5;
   color: #333;
+  position: absolute;
+  bottom: 0;
+  z-index: 9999;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  height: 23px;
+  right: 0;
+  background: transparent;
 }
 .v-navigation-drawer {
   background: #141B2D;

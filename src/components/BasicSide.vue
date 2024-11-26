@@ -369,13 +369,11 @@ export default {
       }
     },
 
-    async setupMiniSearch(items) {
-      for(const item of items) {
-        // item = {...item}
-        this.$seneca.post('sys:search, cmd:add', { doc: item, })
-      }
+    async setupMiniSearch() {
+      
     },
 
+    
       // bypass default combobox filter
       customFilter (item, queryText, itemText) {
         return 1
@@ -592,6 +590,15 @@ img{
 .comboxSearch  .v-select__slot {
     margin-left: 25px;
     margin-bottom: 4px;
+}
+
+.comboxSearch .v-input__slot{
+  
+  width: calc(100% - 30px);
+}
+
+.comboxSearch fieldset {
+  border: none !important;
 }
 
 .catppuccin-search {

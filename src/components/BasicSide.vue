@@ -49,7 +49,7 @@
 <div>
   <div >
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
-        style="position:absolute; z-index:1; margin-top:7px; margin-left:16px"
+        style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
          />
         
       </div>
@@ -588,8 +588,8 @@ img{
     margin-right: 4px;
 }
 .comboxSearch  .v-select__slot {
+    margin: 4px 0;
     margin-left: 25px;
-    margin-bottom: 4px;
 }
 
 .comboxSearch .v-input__slot{

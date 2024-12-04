@@ -262,7 +262,7 @@ export default {
   
 
   watch: {
-    '$store.state.trigger.search.term' (term) {
+    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
         // this.tag_items = this.items.map(v => v.tag)
@@ -278,7 +278,7 @@ export default {
       //   term = m[1].trim()
       // }
       // this.$store.dispatch('trigger_search', {term:this.search})
-      this.$store.dispatch('trigger_search', {term})
+      this.$store.dispatch('trigger_search', {a: term})
     },
     select () {
       this.$store.dispatch('trigger_select', {value:this.select})
@@ -370,6 +370,7 @@ export default {
           let out = await this.$seneca.post('sys:search, cmd:search', 
             { query: term, params: this.search_config }
           )
+          console.log('Search result:', out);
           // this.tag_items = out.data.hits.map(v => v.id)
           this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
         }
@@ -380,6 +381,10 @@ export default {
         
       }, 11)
       
+    },
+    tag_alias(item) {
+      // Define your tag_alias function here
+      return item.tag; // Example implementation
     },
     
     filterAssets () {

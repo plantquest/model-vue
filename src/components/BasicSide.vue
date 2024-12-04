@@ -10,54 +10,20 @@
         <v-icon v-once large @click="openDrawer" class="drawer-toggle"  style="color: white ;font-size: 29px;">
           mdi-chevron-left-circle-outline
         </v-icon>
-        <!-- <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>
-          mdi-chevron-left
-          </v-icon> -->
-         
+       
       </div>
 
-      <!-- Menu Toggle -->
-      <!-- <v-btn-toggle v-model="menuViewIndex" mandatory class="vxg-toggle">
-        <v-btn
-          v-for="menuView in menuViewList"
-          :key="menuView.name"
-          @click="moveRoute(menuView)"
-          outlined
-          :ref="menuView.name"
-          class="pa-4 text-center secondary text-no-wrap rounded-sm btn-style text-capitalize"
-          :class="{ 'selected-btn': menuViewIndex === menuViewList.indexOf(menuView) }"
-          color="white"
-        >
-          <div>
-            
-            <v-icon v-once color="white">
-              {{ menuView.name === custom.special.view.name ? 'mdi-fit-to-screen-outline' : 'mdi-dots-square' }}
-            </v-icon>
-            <span class="d-block font-size-13 pt-2">{{ menuView.btnTitle }}</span>
-          </div>
-        </v-btn>
-      </v-btn-toggle> -->
 
-      <v-btn
-          v-if="show('clear') && tool.clear.active"
-           text
-            style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
-          @click="clearFilter"
-      >Clear</v-btn>
-
-
-<div>
-  <div >
-        <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
-        style="position:absolute; z-index:1; margin-top:7px; margin-left:16px"
-         />
-        
-      </div>
-
- 
-      <v-combobox 
+      <template
+  v-if="'standard' === menuView.mode"
+  v-for="item in menu">
+  <component :is="item.component">
+    <!-- Your component content here -->
+  </component>
+</template>
+      
+      <v-combobox
         ref="search"
-        class="comboxSearch d-flex justify-space-between"
         v-model="search"
         @keydown="changeSearch($event)"
         @click:clear="changeSearch($event)"
@@ -67,43 +33,32 @@
         outlined
         dense
         clearable
-        placeholder=""
+        placeholder="Search Point"
+        :append-icon="filterIcon?'mdi-tune':undefined"
         @click:append="filter"
         :filter="customFilter"
-        :prepend-inner-icon="prependIcon" 
-        
-        @click="handleClick" 
-        @blur="handleBlur"
-        
         >
        
-        <!-- <template v-slot:append>
-         
-          
-          <div class="searchIcons d-flex justify-space-between ">
-            
-            
-            
-            <v-divider vertical></v-divider>
-            
-          </div>
-        </template> -->
+      </v-combobox> 
+      <v-combobox
+        ref="search2"
+        v-model="search2"
+        @keydown="changeSearch2($event)"
+        @click:clear="changeSearch2($event)"
+        :items="tag_items2"
+        flat
+        hide-details
+        outlined
+        dense
+        clearable
+        placeholder="Search Destination"
+        :append-icon="filterIcon?'mdi-tune':undefined"
+        @click:append="filter"
+        :filter="customFilter"
+        >
         
       </v-combobox> 
-      <img :src="`${publicPath}Clip_path_group.svg`" alt="Clip_Path_group" style="cursor: pointer;
-    cursor: pointer; position: relative; top: -33px; left: calc(100% - 33px); border-left: solid 1px;
-    padding-left: 2px;" class="clip-path-group" v-if="filterIcon" @click.stop.prevent="filter"   />
-
-</div>
-   
-      <!-- <v-combobox
-      
-    
-    @click:append="filter"
-    :filter="customFilter"
-    >
-  </v-combobox>  -->
-      <!-- Menu Items -->
+     
       <template v-if="menuView.mode === 'standard'">
         <router-link
           v-for="item in menu"
@@ -184,11 +139,9 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-    
+      search2:'',
       tag_items:[],
-      publicPath: process.env.BASE_URL || '/',
-      showIcon: true, // Data property to control icon visibility
-      
+      tag_items2:[],
     }
   },
 
@@ -214,10 +167,13 @@ export default {
     let load_assets = setInterval(async ()=>{
       await this.$store.dispatch('vxg_get_assets', tool)
       this.items = tool.assets
+      this.items2 = [...tool.assets]
       if(this.items.length != 0) {
         // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
         this.tag_items = this.items.map(tag_alias)
+        this.tag_items2 = this.items2.map(tag_alias)
         this.setupMiniSearch(this.items)
+        this.setupMiniSearch(this.items2)
         clearInterval(load_assets)
       } 
     }, 111)
@@ -246,24 +202,33 @@ export default {
       }
       */
     },
-
-    '$store.state.trigger.search.term' (term) {
+    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
         // this.tag_items = this.items.map(v => v.tag)
         this.tag_items = this.items.map(tag_alias)
+        console.log('search is being triggerecd')
+      }
+    },
+
+    '$store.state.trigger.search.b' (term) {
+      if(term == '' && this.$refs.search2) {
+        this.$refs.search2.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items2 = this.items2.map(tag_alias)
       }
     },
     search (val) {
       let term = val || ''
       term.trim()
-      // Todo: Is it necessary?
-      // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
-      // if(m) {
-      //   term = m[1].trim()
-      // }
-      // this.$store.dispatch('trigger_search', {term:this.search})
-      this.$store.dispatch('trigger_search', {term})
+     
+      this.$store.dispatch('trigger_search', {a: term})
+    },
+    search2 (val) {
+      let term = val || ''
+      term.trim()
+    
+      this.$store.dispatch('trigger_search', {b: term})
     },
     select () {
       this.$store.dispatch('trigger_select', {value:this.select})
@@ -320,6 +285,7 @@ export default {
         klass: { 'vxg-router-link': true }
       }));
     },
+
     filterIcon (){
       return this.$store.state.vxg.cmp.BasicHead.show.filter
     },
@@ -352,14 +318,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['toggleSideInfoCardVisibility']),
-    closeSideInfoCard() {
-        this.toggleSideInfoCardVisibility(false);
-        
-      },
-
-
-
+ 
     moveRoute(menuView) {
       const path = this.$route.name;
       const targetPath = menuView.mode === 'standard' ? menuView.menu.default : menuView.name;
@@ -369,25 +328,20 @@ export default {
       }
     },
 
-    async setupMiniSearch() {
-      
+    async setupMiniSearch(items) {
+      for(const item of items) {
+        // item = {...item}
+        this.$seneca.post('sys:search, cmd:add', { doc: item, })
+      }
     },
 
-    
       // bypass default combobox filter
       customFilter (item, queryText, itemText) {
         return 1
       },
 
-      handleClick() {
-      this.showIcon = false; // Hide the icon when the combobox is clicked
-    },
-    
-    handleBlur() {
-      this.showIcon = true; // Show the icon when the combobox is blurred
-    },
-
     changeSearch(event) {
+
       setTimeout(async ()=> { // wait for input
         let term
         term = event.target ? event.target._value : null
@@ -395,35 +349,48 @@ export default {
           let out = await this.$seneca.post('sys:search, cmd:search', 
             { query: term, params: this.search_config }
           )
+         
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc)) 
-        } 
+          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+          console.log('tag items are ', this.tag_items)
+        }
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if(this.items != undefined)
-          this.tag_items = this.items.map(tag_alias) 
+          this.tag_items = this.items.map(tag_alias)
         }
+       
         
       }, 11)
       
     },
+    changeSearch2(event) {
 
-    clearFilter () {
-      this.$store.dispatch('vxg_trigger_clear')
-    },
-    show(action) {
-      return this.allow(action) &&
-        this.$store.state.vxg.cmp.BasicHead.show[action] 
-    },
-
-  
-
-    filter(event) {
-      // aaaaaaaaaaaa
-      this.$store.dispatch('trigger_toggle_filter');
+    setTimeout(async ()=> { // wait for input
+      let term
+      term = event.target ? event.target._value : null
+      if(term) {
+        let out = await this.$seneca.post('sys:search, cmd:search', 
+          { query: term, params: this.search_config }
+        )
+      
+      
+        this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
+        console.log('tag items are ', this.tag_items2)
+      }
+      else {
+       
+        if(this.items2 != undefined)
+        this.tag_items2 = this.items2.map(tag_alias)
+      }
     
-      },
-    
+      
+    }, 11)
+
+    },
+    filter() {
+      this.$store.dispatch('trigger_toggle_filter')
+    },
     defaultFound() {
       return this.menuView && this.menuView.menu && this.menuView.menu.default
     },
@@ -453,7 +420,7 @@ export default {
     },
     action(name) {
       this.$emit('action', name)
-    }
+    },
   }
 
 }

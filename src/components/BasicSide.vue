@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer app class="vxg-side" :style="drawerStyle">
-    
+
     <v-sheet class="d-flex flex-column h-100">
       <!-- Header -->
       <div class="d-flex justify-space-between">
@@ -10,18 +10,11 @@
 
       <!-- Menu Toggle -->
       <v-btn-toggle v-model="menuViewIndex" mandatory class="vxg-toggle">
-        <v-btn
-          v-for="menuView in menuViewList"
-          :key="menuView.name"
-          @click="moveRoute(menuView)"
-          outlined
-          :ref="menuView.name"
-          class="pa-4 text-center secondary text-no-wrap rounded-sm btn-style text-capitalize"
-          :class="{ 'selected-btn': menuViewIndex === menuViewList.indexOf(menuView) }"
-          color="white"
-        >
+        <v-btn v-for="menuView in menuViewList" :key="menuView.name" @click="moveRoute(menuView)" outlined
+          :ref="menuView.name" class="pa-4 text-center secondary text-no-wrap rounded-sm btn-style text-capitalize"
+          :class="{ 'selected-btn': menuViewIndex === menuViewList.indexOf(menuView) }" color="white">
           <div>
-            
+
             <v-icon v-once color="white">
               {{ menuView.name === custom.special.view.name ? 'mdi-fit-to-screen-outline' : 'mdi-dots-square' }}
             </v-icon>
@@ -31,34 +24,37 @@
       </v-btn-toggle>
 
       <!-- Menu Items -->
+
+      <v-icon v-once large @click="openDrawer" class="drawer-toggle" style="color: white ;font-size: 29px;">
+        mdi-chevron-left-circle-outline
+      </v-icon>
+
+      <v-combobox ref="search" v-model="search" @keydown="changeSearch($event)" @click:clear="changeSearch($event)"
+        :items="tag_items" flat hide-details outlined dense clearable placeholder="Search Point"
+        :append-icon="filterIcon ? 'mdi-tune' : undefined" @click:append="filter" :filter="customFilter">
+
+      </v-combobox>
+      <v-combobox ref="search2" v-model="search2" @keydown="changeSearch2($event)" @click:clear="changeSearch2($event)"
+        :items="tag_items2" flat hide-details outlined dense clearable placeholder="Search Destination"
+        :append-icon="filterIcon ? 'mdi-tune' : undefined" @click:append="filter" :filter="customFilter">
+
+      </v-combobox>
+
       <template v-if="menuView.mode === 'standard'">
-        <router-link
-          v-for="item in menu"
-          v-if="allow(item)"
-          :key="item.code"
-          :to="`/${item.code}`"
-          :class="['vxg-router-link', item.klass]"
-        >
+        <router-link v-for="item in menu" v-if="allow(item)" :key="item.code" :to="`/${item.code}`"
+          :class="['vxg-router-link', item.klass]">
           <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
         </router-link>
       </template>
 
-      <component
-        v-else-if="menuView.mode === 'custom'"
-        :is="menuView.cmp"
-        :spec="menuView.view.spec"
-      />
+      <component v-else-if="menuView.mode === 'custom'" :is="menuView.cmp" :spec="menuView.view.spec" />
 
       <v-spacer></v-spacer>
       <v-divider></v-divider>
 
-      
+
       <!-- Footer -->
-      <component
-        v-if="spec.footer.active"
-        :is="spec.footer.cmp"
-        :spec="spec.footer.spec"
-      />
+      <component v-if="spec.footer.active" :is="spec.footer.cmp" :spec="spec.footer.spec" />
     </v-sheet>
   </v-navigation-drawer>
 </template>
@@ -67,7 +63,12 @@
 
 import Nua from 'nua'
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
-
+function tag_alias(asset) {
+  if (null != asset.custom12) {
+    return asset.tag + '(' + asset.custom12 + ')'
+  }
+  return asset.tag
+}
 
 const SpecShape = Gubu({
   spec: Required(Open({
@@ -79,7 +80,7 @@ const SpecShape = Gubu({
 
     view: Value(Open({
       mode: String
-    }),Open({}))
+    }), Open({}))
   })),
   logo: String,
 })
@@ -93,8 +94,8 @@ export default {
     },
     logo: String,
   },
-  
-  data () {
+
+  data() {
     return {
       open: true,
       menuShowTitle: false,
@@ -102,26 +103,45 @@ export default {
       menuViewIndex: null,
       menuView: null,
       roomName: '',
+      search: '',
+      search2:'',
+      tag_items:[],
+      tag_items2:[],
     }
   },
 
   beforeCreate() {
     Nua(this.$options.propsData, SpecShape(this.$options.propsData))
   },
-  
-  created () {
+
+  created() {
     let menuViewList = []
-    for(let name in this.spec.view) {
+    for (let name in this.spec.view) {
       let menuView = this.spec.view[name]
       menuView.name = name
       menuViewList.push(menuView)
     }
     this.menuViewList = menuViewList
-    let route = this.findRouteName(this.$route.name) 
+    let route = this.findRouteName(this.$route.name)
 
     this.menuView = this.menuViewList[route.index]
     this.menuViewIndex = route.index
-    
+
+    let tool = {}
+
+    let load_assets = setInterval(async ()=>{
+      await this.$store.dispatch('vxg_get_assets', tool)
+      this.items = tool.assets
+      this.items2 = [...tool.assets]
+      if(this.items.length != 0) {
+        // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
+        this.tag_items = this.items.map(tag_alias)
+        this.tag_items2 = this.items2.map(tag_alias)
+        this.setupMiniSearch(this.items)
+        this.setupMiniSearch(this.items2)
+        clearInterval(load_assets)
+      }
+    }, 111)
   },
 
 
@@ -147,23 +167,71 @@ export default {
       }
       */
     },
+    '$store.state.trigger.search.a' (term) {
+      if(term == '' && this.$refs.search) {
+        this.$refs.search.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items = this.items.map(tag_alias)
+        console.log('search is being triggerecd')
+      }
+    },
+
+    '$store.state.trigger.search.b' (term) {
+      if(term == '' && this.$refs.search2) {
+        this.$refs.search2.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items2 = this.items2.map(tag_alias)
+      }
+    },
+    search (val) {
+      let term = val || ''
+      term.trim()
+
+      this.$store.dispatch('trigger_search', {a: term})
+    },
+    search2 (val) {
+      let term = val || ''
+      term.trim()
+
+      this.$store.dispatch('trigger_search', {b: term})
+    },
+    select () {
+      this.$store.dispatch('trigger_select', {value:this.select})
+    },
+    '$store.state.trigger.select.value' (val) {
+      this.select = val
+    },
+    '$store.vxg.cmp.BasicHead.allow.add': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+    '$store.vxg.cmp.BasicHead.allow.remove': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+
+
+
+
     '$route.name': {
       immediate: true,
-      handler (val) {
-        if(!val && this.defaultFound()) {
+      handler(val) {
+        if (!val && this.defaultFound()) {
           this.$router.push(this.menuView.menu.default)
         }
-        
+
         let route = this.findRouteName(val)
-        
+
         this.menuView = this.menuViewList[route.index]
-      } 
+      }
     },
   },
-  
-  
+
+
   computed: {
-    menu () {
+    menu() {
       if (this.menuView.mode !== 'standard') return [];
 
       const { items, order } = this.menuView.menu;
@@ -174,62 +242,131 @@ export default {
       }));
     },
 
+    filterIcon (){
+      return this.$store.state.vxg.cmp.BasicHead.show.filter
+    },
+
     drawerStyle() {
       return DRAWER_STYLE;
     },
-    custom () {
+    custom() {
       return this.$model.main.ux.custom
     },
 
-    view () {
+    view() {
       return this.custom.special.view
     },
 
-    portal () {
+    portal() {
       return this.custom.special.portal
     },
   },
 
   methods: {
+
     moveRoute(menuView) {
       const path = this.$route.name;
       const targetPath = menuView.mode === 'standard' ? menuView.menu.default : menuView.name;
-      
+
       if (path !== targetPath) {
         this.$router.push(`/${targetPath}`);
       }
     },
-  
+
+
+    async setupMiniSearch(items) {
+      for(const item of items) {
+        // item = {...item}
+        this.$seneca.post('sys:search, cmd:add', { doc: item, })
+      }
+    },
+
+      // bypass default combobox filter
+      customFilter (item, queryText, itemText) {
+        return 1
+      },
+
+    changeSearch(event) {
+
+      setTimeout(async ()=> { // wait for input
+        let term
+        term = event.target ? event.target._value : null
+        if(term) {
+          let out = await this.$seneca.post('sys:search, cmd:search',
+            { query: term, params: this.search_config }
+          )
+
+          // this.tag_items = out.data.hits.map(v => v.id)
+          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+          console.log('tag items are ', this.tag_items)
+        }
+        else {
+          // this.tag_items = this.items.map(v => v.tag)
+          if(this.items != undefined)
+          this.tag_items = this.items.map(tag_alias)
+        }
+
+
+      }, 11)
+
+    },
+    changeSearch2(event) {
+
+    setTimeout(async ()=> { // wait for input
+      let term
+      term = event.target ? event.target._value : null
+      if(term) {
+        let out = await this.$seneca.post('sys:search, cmd:search',
+          { query: term, params: this.search_config }
+        )
+
+
+        this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
+        console.log('tag items are ', this.tag_items2)
+      }
+      else {
+
+        if(this.items2 != undefined)
+        this.tag_items2 = this.items2.map(tag_alias)
+      }
+
+
+    }, 11)
+
+    },
+    filter() {
+      this.$store.dispatch('trigger_toggle_filter')
+    },
     defaultFound() {
       return this.menuView && this.menuView.menu && this.menuView.menu.default
     },
-    
+
     findRouteName(name) {
-     const specialRoutes = this.custom.special;
-     for (let route in specialRoutes) {
-       const currentRoute = specialRoutes[route];
-       if (currentRoute.name === name) {
-         return currentRoute;
-       }
-       if (currentRoute.sub && currentRoute.sub.includes(name)) {
-         return currentRoute;
-       }
-     }
-     return { index: 1 }; // default index
-   },
+      const specialRoutes = this.custom.special;
+      for (let route in specialRoutes) {
+        const currentRoute = specialRoutes[route];
+        if (currentRoute.name === name) {
+          return currentRoute;
+        }
+        if (currentRoute.sub && currentRoute.sub.includes(name)) {
+          return currentRoute;
+        }
+      }
+      return { index: 1 }; // default index
+    },
     allow(item) {
-      let out = (item && item.allow) ? this.$vxg.allow( item.allow ) : true
+      let out = (item && item.allow) ? this.$vxg.allow(item.allow) : true
       return out
     },
     openDrawer() {
-      this.$store.dispatch('set_cmp_flags',{name:'BasicSide', flags:{show:true}})
+      this.$store.dispatch('set_cmp_flags', { name: 'BasicSide', flags: { show: true } })
     },
     closeDrawer() {
-      this.$store.dispatch('set_cmp_flags',{name:'BasicSide', flags:{show:false}})
+      this.$store.dispatch('set_cmp_flags', { name: 'BasicSide', flags: { show: false } })
     },
     action(name) {
       this.$emit('action', name)
-    }
+    },
   }
 
 }
@@ -242,65 +379,70 @@ const DRAWER_STYLE = Object.freeze({ width: "282px" });
 
 <style lang="scss">
 nav.vxg-side {
+  background-color: rgb(var(--vxg-cb1)) !important;
+
+  .v-sheet {
     background-color: rgb(var(--vxg-cb1)) !important;
+  }
 
-    .v-sheet {
-        background-color: rgb(var(--vxg-cb1)) !important;
-    }
-
-    .v-divider {
-        border-color: rgb(var(--vxg-ct2)) !important;
-        margin: 16px 8px;
-    }
-}
-.btn-style{
-    background-color: rgb(40, 51, 72) !important;
-    width: 141px;
-    height: 281px;
-
-    margin: 4px !important; // Added margin for spacing between buttons
-    &.selected-btn {
-        background-color: rgb(var(--vxg-cb1)) !important;
-        color: rgb(var(--vxg-ct1)) !important;
-        .v-icon {
-            color: rgb(var(--vxg-ct1)) !important;
-        }
-    }
+  .v-divider {
+    border-color: rgb(var(--vxg-ct2)) !important;
+    margin: 16px 8px;
+  }
 }
 
-.vxg-toggle{
+.btn-style {
+  background-color: rgb(40, 51, 72) !important;
+  width: 141px;
+  height: 281px;
+
+  margin: 4px !important; // Added margin for spacing between buttons
+
+  &.selected-btn {
     background-color: rgb(var(--vxg-cb1)) !important;
-    padding: 10px !important; // Added padding to the toggle container
-    padding-bottom: 10px;
-    padding-top: 10px;
-    margin-right: 10px;
+    color: rgb(var(--vxg-ct1)) !important;
+
+    .v-icon {
+      color: rgb(var(--vxg-ct1)) !important;
+    }
+  }
+}
+
+.vxg-toggle {
+  background-color: rgb(var(--vxg-cb1)) !important;
+  padding: 10px !important; // Added padding to the toggle container
+  padding-bottom: 10px;
+  padding-top: 10px;
+  margin-right: 10px;
 
 }
 
 a.vxg-router-link {
-    display: block;
-    margin: 0px 8px;
-    padding: 16px 8px;
-    text-decoration: none !important;
+  display: block;
+  margin: 0px 8px;
+  padding: 16px 8px;
+  text-decoration: none !important;
+  color: rgb(var(--vxg-ct1)) !important;
+  border-radius: 8px;
+
+  .v-icon {
+    color: rgb(var(--vxg-ct2)) !important;
+  }
+
+  &.router-link-active {
+    background-color: rgb(var(--vxg-cb2)) !important;
     color: rgb(var(--vxg-ct1)) !important;
-    border-radius: 8px;
-    
+
     .v-icon {
-        color: rgb(var(--vxg-ct2)) !important;
+      color: rgb(var(--vxg-ct1)) !important;
     }
-    
-    &.router-link-active {
-        background-color: rgb(var(--vxg-cb2)) !important;
-        color: rgb(var(--vxg-ct1)) !important;
-        .v-icon {
-            color: rgb(var(--vxg-ct1)) !important;
-        }
-    }
+  }
 
 }
+
 .vxg-side-open {
-    width: 48px;
-    height: 48px;
+  width: 48px;
+  height: 48px;
 }
 
 .drawer-toggle {

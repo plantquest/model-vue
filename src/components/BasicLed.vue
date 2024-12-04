@@ -1,6 +1,6 @@
 <template>
   <div v-if="allow('list')">
-    ::::: 
+   
     <v-data-table
       v-if="show.table"
       dense
@@ -70,6 +70,7 @@
           <a v-if="field.popup" @click="activatePopup(field.popup)" style="text-decoration: underline;"> 
             {{ field.popup.spec.title }} 
           </a>
+          
           <a v-else> &zwnj; </a>
   
           <v-text-field
@@ -106,12 +107,42 @@
             :disabled="field.readonly || !allow('edit')"
             ></v-select>
           -->
-          <br/>
-          <vxg-basic-field-pick
-            v-if="'status'===field.type"
-            :field="field"
-            :param="{item:item}"
-            ></vxg-basic-field-pick>
+          <div v-if="(editing && (field.title=='Role' || field.title=='Status') )">
+            <div v-if="field.title=='Role'">
+              <a href="#" @click="toggleAccessMatrixDialog">User Access Matrix</a>
+            </div>
+            
+            <div style="position: relative;">
+              <vxg-basic-field-pick
+                v-if="field.type ==='status'"
+                :field="field"
+                :param="{item:item}"
+                :disabled="editing==false && (field.title=='Status')"
+              ></vxg-basic-field-pick>
+
+             
+            </div>
+          </div>
+          <div v-if="(editing==false && (field.title=='Role' || field.title=='Status') )">
+           
+          
+            <div v-if="!editing && field.title=='Role'">
+         
+              <a href="#" @click="toggleAccessMatrixDialog">User Access Matrix</a>
+            </div>
+                <vxg-basic-field-pick
+                  v-if="'status'===field.type && editing==false"
+                  :field="field"
+                  :param="{item:item}"
+                  :disabled="editing==false && field.title!=='Role'"
+                 
+                  >  <div v-if="field.title!=='Role' && editing==false" 
+                   style="position: absolute;background-color: blue; height:100%; width:100%; background-color: rgba(255, 255, 255, 0.5); z-index: 1;">
+                <!-- This div overlays the field when not editing -->
+              </div></vxg-basic-field-pick>
+          </div>
+
+        
           
           
           <v-text-field
@@ -160,16 +191,32 @@
         </v-card>
       </v-dialog>
     
-      </div>
       <v-toolbar flat>
         <v-btn outlined @click="closeItem">Cancel</v-btn>
         <v-spacer />
         <v-btn outlined @click="remove.dialog = true" v-if="allow('edit')">Remove</v-btn>
-        <div style="padding: 5px;"></div>
+   
         <v-btn outlined @click="saveItem" v-if="allow('edit')">Save</v-btn>
+        <div style="padding: 5px;"></div>
       </v-toolbar>
     </div>
   </div>
+
+      <v-dialog v-model="accessMatrixDialog" max-width="800" persistent>
+        <v-card>
+          <v-card-title class="headline">User Access Matrix</v-card-title>
+          <v-card-text>
+            <img src="/access_matrix.png" alt="Access Matrix" style="width: 100%;">
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="toggleAccessMatrixDialog">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      </div>
+   
   </template>
   
   <style lang="scss">
@@ -240,15 +287,18 @@
         },
         
         popup_dialogs: {},
-        
+        accessMatrixDialog: false,
       }
     },
   
     mounted() {
+      console.log('mounted', this.spec,'KD')
+      
       
     },
   
     async created () {
+      console.log('mounted', this.spec,'KD')
     
       this.popup_dialogs = this.fields
         .reduce(((acc, field) => (field.popup ? acc[field.popup.name] = false : null, acc)), {})
@@ -403,36 +453,34 @@
       },
   
       openItem (selitem) {
-        if(false === this.spec.edit.active) { // || !this.allow('edit')) {
-          return
+        if (false === this.spec.edit.active) {
+          return;
         }
-        this.editing = true;
-        this.item = selitem
-  
-        this.readitem = {...this.item}
-  
-        // TODO: from spec!
-        this.readitem.last = this.formatdate(this.item.last)
-        this.readitem.when = this.formatdate(this.item.when)
         
-        this.show.table = false
-        this.show.item = true
+        // Check if the item is new or existing
+        this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
+        console.log('Editing mode:',this.editing)
+
+        this.item = selitem;
+        this.readitem = { ...this.item };
+
+        // TODO: from spec!
+        this.readitem.last = this.formatdate(this.item.last);
+        this.readitem.when = this.formatdate(this.item.when);
+
+        this.show.table = false;
+        this.show.item = true;
       },
   
       saveItem () {
-  
-        console.log('Saving Item: ', this.item, ' Here: ', this.spec.ent.store_name)
-        // TODO, if ent is user, then register the user
-        console.log(this.editing)
         if(this.spec.ent.store_name.includes('user') ) {
-          
-          //this.$seneca.post('aim:web,on:user,cmd:registeruser', { user: this.item, })
-            if(this.editing) {
-              console.log('Editing!!!')
-              this.$store.dispatch('register_user', this.item)
-              this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
+            if(this.editing ==false) {
+              console.log('Registering User: ')
+              this.$store.dispatch('register_user', this.item)           
             } else {
+              console.log('Saving User: ')
               this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
+              //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
   
           }
         }
@@ -533,6 +581,10 @@
       
       activatePopup(popup) {
         this.popup_dialogs[popup.name] = true
+      },
+  
+      toggleAccessMatrixDialog() {
+        this.accessMatrixDialog = !this.accessMatrixDialog;
       },
   
     }

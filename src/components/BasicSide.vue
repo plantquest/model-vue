@@ -90,7 +90,7 @@
         </template> -->
         
       </v-combobox> 
-      <img :src="`${publicPath}Clip_Path_group.svg`" alt="Clip_Path_group" style="cursor: pointer;
+      <img :src="`${publicPath}Clip_path_group.svg`" alt="Clip_Path_group" style="cursor: pointer;
     cursor: pointer; position: relative; top: -33px; left: calc(100% - 33px); border-left: solid 1px;
     padding-left: 2px;" class="clip-path-group" v-if="filterIcon" @click.stop.prevent="filter"   />
 

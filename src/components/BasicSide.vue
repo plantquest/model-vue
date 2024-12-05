@@ -46,7 +46,7 @@
       >Clear</v-btn>
 
 
-<div>
+<div v-if="$route.name == 'pqview'">
   <div >
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"

@@ -2,7 +2,7 @@ name: Notify Slack on PR Creation
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, ready_for_review, edited, review_requested,synchronize]
 
 jobs:
   notify-slack:
@@ -16,6 +16,6 @@ jobs:
           echo "Sending PR details to Slack..."
           curl -X POST -H 'Content-type: application/json' \
           --data "{
-            \"text\": \"|----------------\n*New PR Created!*\n\n*Origin Branch:* ${{ github.event.pull_request.head.ref }}\n*Merging into:* ${{ github.event.pull_request.base.ref }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Title:* ${{ github.event.pull_request.title }}\n*Summary:* ${{ github.event.pull_request.body }}\n*URL:* <${{ github.event.pull_request.html_url }}|View Pull Request>\n----------------|\"
+            \"text\": \"|----------------\n*New PR Event: ${{ github.event.action }}*\n\n*Origin Branch:* ${{ github.event.pull_request.head.ref }}\n*Merging into:* ${{ github.event.pull_request.base.ref }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Title:* ${{ github.event.pull_request.title }}\n*Summary:* ${{ github.event.pull_request.body }}\n*URL:* <${{ github.event.pull_request.html_url }}|View Pull Request>\n----------------|\"
           }" \
           "$SLACK_WEBHOOK"

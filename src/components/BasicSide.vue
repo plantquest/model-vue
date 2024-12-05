@@ -53,6 +53,7 @@
 
 
 <div>
+  
   <div >
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
@@ -60,13 +61,13 @@
         
       </div>
 
- 
+
       <v-combobox 
         ref="search"
         class="comboxSearch d-flex justify-space-between"
         v-model="search"
-        @keydown="changeSearch($event)"
-        @click:clear="changeSearch($event)"
+        @keydown="changeSearch($event,'start')"
+        @click:clear="changeSearch($event,'start')"
         :items="tag_items"
         flat
         hide-details
@@ -115,12 +116,12 @@
         mdi-chevron-left-circle-outline
       </v-icon>
 
-      <v-combobox ref="search" v-model="search" @keydown="changeSearch($event)" @click:clear="changeSearch($event)"
+      <v-combobox ref="search" v-model="search" @keydown="changeSearch($event,'start')" @click:clear="changeSearch($event,'start')"
         :items="tag_items" flat hide-details outlined dense clearable placeholder="Search Point"
         :append-icon="filterIcon ? 'mdi-tune' : undefined" @click:append="filter" :filter="customFilter">
 
       </v-combobox>
-      <v-combobox ref="search2" v-model="search2" @keydown="changeSearch2($event)" @click:clear="changeSearch2($event)"
+      <v-combobox ref="search2" v-model="search2" @keydown="changeSearch($event,'destination')" @click:clear="changeSearch($event,'destination')"
         :items="tag_items2" flat hide-details outlined dense clearable placeholder="Search Destination"
         :append-icon="filterIcon ? 'mdi-tune' : undefined" @click:append="filter" :filter="customFilter">
 
@@ -287,11 +288,22 @@ export default {
         this.tag_items2 = this.items2.map(tag_alias)
       }
     },
-    search (val) {
-      let term = val || ''
-      term.trim()
+    search (val,mode='start') {
+      if(mode == 'start'){
+        let term = val || ''
+        term.trim()
+        this.tag_items = this.items.map(tag_alias)
+        this.$store.dispatch('trigger_search', {a: term})
+      }
+      else{
+        let term = val || ''
+        term.trim()
+        this.tag_items2 = this.items2.map(tag_alias)
+        this.$store.dispatch('trigger_search', {b: term})
+      }
+    
 
-      this.$store.dispatch('trigger_search', {a: term})
+    
     },
     search2 (val) {
       let term = val || ''
@@ -439,7 +451,7 @@ export default {
       this.showIcon = true; // Show the icon when the combobox is blurred
     },
 
-    changeSearch(event) {
+    changeSearch(event,mode='start') {
       setTimeout(async ()=> { // wait for input
         let term
         term = event.target ? event.target._value : null
@@ -449,41 +461,30 @@ export default {
           )
 
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
-          console.log('tag items are ', this.tag_items)
+          if(mode == 'start'){
+            this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+          console.log('Start Point Items ', this.tag_items)
+          }
+          else{
+            this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
+            console.log('Destination Items ', this.tag_items2)
+          }
+          
         }
         else {
           // this.tag_items = this.items.map(v => v.tag)
-          if(this.items != undefined)
-          this.tag_items = this.items.map(tag_alias)
+          if(mode == 'start'){
+            if(this.items != undefined)
+            this.tag_items = this.items.map(tag_alias)
+          }
+          else{
+            if(this.items2 != undefined)
+            this.tag_items2 = this.items2.map(tag_alias)
+          }
         }
 
 
       }, 11)
-
-    },
-    changeSearch2(event) {
-
-    setTimeout(async ()=> { // wait for input
-      let term
-      term = event.target ? event.target._value : null
-      if(term) {
-        let out = await this.$seneca.post('sys:search, cmd:search',
-          { query: term, params: this.search_config }
-        )
-
-
-        this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
-        console.log('tag items are ', this.tag_items2)
-      }
-      else {
-
-        if(this.items2 != undefined)
-        this.tag_items2 = this.items2.map(tag_alias)
-      }
-
-
-    }, 11)
 
     },
     filter() {

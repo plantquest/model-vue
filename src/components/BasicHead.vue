@@ -94,7 +94,7 @@
     v-if="show('remove') && tool.remove.active"
     vertical style="margin:0px 16px;"></v-divider>
 
-  <!-- <v-combobox
+  <v-combobox
     ref="search"
     v-if="tool.search.active && show('search')"
     v-model="search"
@@ -111,7 +111,7 @@
     @click:append="filter"
     :filter="customFilter"
     >
-  </v-combobox>  -->
+  </v-combobox> 
 
 
   <v-spacer

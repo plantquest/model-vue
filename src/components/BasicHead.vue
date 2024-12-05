@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <template>
 <v-app-bar app class="vxg-app-bar">
 <h2>Hello4</h2>
@@ -461,7 +460,6 @@ export default {
   }
 };
 </script>
-=======
 <template>
 <v-app-bar app class="vxg-app-bar">
 
@@ -924,4 +922,3 @@ export default {
   }
 };
 </script>
->>>>>>> 94d697c79595b8d649d5fdabc73b215f7d23cef6

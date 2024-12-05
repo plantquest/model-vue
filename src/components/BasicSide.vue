@@ -104,16 +104,21 @@
     >
   </v-combobox>  -->
       <!-- Menu Items -->
-      <template v-if="menuView.mode === 'standard'">
-        <router-link
+      <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
+        <template v-if="menuView.mode === 'standard'" >
+          <div class="router_items">
+            <router-link 
           v-for="item in menu"
-          v-if="allow(item)"
+          v-if="allow(item) && item.code !== 'admin'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
+
         >
           <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
         </router-link>
+          </div>
+       
       </template>
 
       <component
@@ -121,18 +126,23 @@
         :is="menuView.cmp"
         :spec="menuView.view.spec"
       />
+      </div>
+    <div>
+      
+    </div>
 
       <v-spacer></v-spacer>
-      <v-divider></v-divider>
+      <v-divider style="margin-top: 65px;"></v-divider>
 
       
       <!-- Footer -->
-      <component
+      <component  
         v-if="spec.footer.active"
         :is="spec.footer.cmp"
         :spec="spec.footer.spec"
       />
     </v-sheet>
+ 
   </v-navigation-drawer>
 </template>
 
@@ -203,6 +213,7 @@ export default {
       menuView.name = name
       menuViewList.push(menuView)
     }
+    console.log('menuViewList:', menuViewList);
     this.menuViewList = menuViewList
     let route = this.findRouteName(this.$route.name) 
 
@@ -332,7 +343,10 @@ export default {
     },
 
     view () {
-      return this.custom.special.view
+      //return this.custom.special.view
+      const result = this.custom.special.view;
+    console.log('view:', result);
+    return result;
     },
 
     portal () {
@@ -361,6 +375,8 @@ export default {
 
 
     moveRoute(menuView) {
+      console.log('menuView.mode:', menuView.mode);
+
       const path = this.$route.name;
       const targetPath = menuView.mode === 'standard' ? menuView.menu.default : menuView.name;
       
@@ -513,6 +529,8 @@ nav.vxg-side {
     margin-right: 10px;
 
 }
+
+
 
 a.vxg-router-link {
     display: block;

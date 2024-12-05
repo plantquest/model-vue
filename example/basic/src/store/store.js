@@ -32,7 +32,8 @@ function makeStore(Vue) {
           add: 0
         },
         search: {
-          term: ''
+          a: '',
+          b: ''
         },
       },
 

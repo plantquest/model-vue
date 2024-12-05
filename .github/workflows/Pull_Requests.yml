@@ -16,15 +16,6 @@ jobs:
           echo "Sending PR details to Slack..."
           curl -X POST -H 'Content-type: application/json' \
           --data "{
-            \"text\": \"A new Pull Request has been created!\",
-            \"blocks\": [
-              {
-                \"type\": \"section\",
-                \"text\": {
-                  \"type\": \"mrkdwn\",
-                  \"text\": \"*New PR Created!*\n\n*Origin Branch:* ${{ github.event.pull_request.head.ref }}\n*Merging into:* ${{ github.event.pull_request.base.ref }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Title:* ${{ github.event.pull_request.title }}\n*Summary:* ${{ github.event.pull_request.body }}\n*URL:* <${{ github.event.pull_request.html_url }}|View Pull Request>\"
-                }
-              }
-            ]
+            \"text\": \"|----------------\n*New PR Created!*\n\n*Origin Branch:* ${{ github.event.pull_request.head.ref }}\n*Merging into:* ${{ github.event.pull_request.base.ref }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Title:* ${{ github.event.pull_request.title }}\n*Summary:* ${{ github.event.pull_request.body }}\n*URL:* <${{ github.event.pull_request.html_url }}|View Pull Request>\n----------------|\"
           }" \
           "$SLACK_WEBHOOK"

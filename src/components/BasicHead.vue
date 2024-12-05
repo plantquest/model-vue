@@ -489,7 +489,7 @@ export default {
     :disabled="filterDisabled"
     @click="filterAssets"
   >Go</v-btn> -->
-<h2 style="margin-left: 10px;">{{ $store.state.vxg.ent.meta.name }}</h2>
+<!-- <h2 style="margin-left: 10px;">{{ $store.state.vxg.ent.meta.name }}</h2>-->
   <v-select
     v-if="show('select') && tool.select.active"
     style="max-width:20%;display:inline-block;margin-left:10px;"
@@ -522,6 +522,7 @@ export default {
     </v-icon>
     Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
   </v-btn>
+
   
   <v-btn
     v-if="show('addmobile') && tool.add.active"
@@ -556,7 +557,7 @@ export default {
     v-if="show('remove') && tool.remove.active"
     vertical style="margin:0px 16px;"></v-divider>
 
-  <!-- <v-combobox
+  <v-combobox
     ref="search"
     v-if="tool.search.active && show('search')"
     v-model="search"
@@ -573,7 +574,7 @@ export default {
     @click:append="filter"
     :filter="customFilter"
     >
-  </v-combobox>  -->
+  </v-combobox> 
 
 
   <v-spacer
@@ -794,6 +795,15 @@ export default {
       return !this.$store.state.vxg.cmp.BasicMain.show
     },
     itemName() {
+      if(this.$store.state.vxg.ent.meta.name == 'Item')
+      {
+      //check the url route e.g. /device
+      if(this.$route.path.includes('/device')){ return 'Device'
+      }
+      if(this.$route.path.includes('/user')){
+        return 'User'
+      }
+    }
       return this.$store.state.vxg.ent.meta.name
     },
     tool() {

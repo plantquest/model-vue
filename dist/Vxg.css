@@ -24,8 +24,15 @@
   background-color: #f5f5f5;
   color: #333;
 }
+.v-navigation-drawer {
+  background: #141B2D;
+}
+.v-navigation-drawer__content {
+  overflow-y: hidden;
+}
 nav.vxg-side {
   background-color: rgb(var(--vxg-cb1)) !important;
+  background-color: #141B2D !important;
 }
 nav.vxg-side .v-sheet {
   background-color: rgb(var(--vxg-cb1)) !important;
@@ -33,6 +40,27 @@ nav.vxg-side .v-sheet {
 nav.vxg-side .v-divider {
   border-color: rgb(var(--vxg-ct2)) !important;
   margin: 16px 8px;
+}
+nav.vxg-side .v-sheet {
+  background-color: #141B2D !important;
+}
+nav.vxg-side .v-divider {
+  border-color: rgb(var(--vxg-ct2)) !important;
+  margin: 16px 8px;
+  height: 22px;
+}
+.btn-style {
+  background-color: #283348 !important;
+  width: 141px;
+  height: 281px;
+  margin: 4px !important;
+}
+.btn-style.selected-btn {
+  background-color: rgb(var(--vxg-cb1)) !important;
+  color: rgb(var(--vxg-ct1)) !important;
+}
+.btn-style.selected-btn .v-icon {
+  color: rgb(var(--vxg-ct1)) !important;
 }
 .btn-style {
   background-color: #283348 !important;
@@ -79,8 +107,58 @@ a.vxg-router-link.router-link-active .v-icon {
 .drawer-toggle {
   width: 48px;
 }
+.magnifierIcon {
+  margin: 3px 0 0 40px;
+  font-size: large;
+  color: #141b2d;
+}
+img.clip-path-group {
+  width: 20px;
+}
+img.Layer_5 {
+  width: 20px;
+}
+img.catppuccin-search {
+  width: 20px;
+}
 .font-size-13 {
   font-size: 13px;
+}
+.searchIcons hr {
+  margin: 0 5px !important;
+}
+.searchIcons svg {
+  width: 20px;
+  height: 20px;
+}
+.v-input__control {
+  background: white;
+  margin-top: auto;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+.comboxSearch .v-select__slot {
+  margin: 4px 0;
+  margin-left: 25px;
+}
+.comboxSearch .v-input__slot {
+  width: calc(100% - 30px);
+}
+.comboxSearch fieldset {
+  border: none !important;
+}
+.catppuccin-search {
+  width: 24px;
+  /* Adjust size as needed */
+  height: 24px;
+  /* Adjust size as needed */
+}
+.comboxSearch .v-input__icon {
+  position: absolute;
+  margin-left: 187px;
+}
+.v-text-field {
+  padding: 0 34px;
 }
 .vxg-form-field {
   text-align: right;

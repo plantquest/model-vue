@@ -27,7 +27,7 @@
     :disabled="filterDisabled"
     @click="filterAssets"
   >Go</v-btn> -->
-<h2 style="margin-left: 10px;">{{ $store.state.vxg.ent.meta.name }}</h2>
+  <h2 class="text-capitalize" style="margin-left: 10px;">{{ $route.name == 'change' ? 'Changes Log' : $route.name == 'admin' ? $route.name : $route.name + 's' }}</h2>
   <v-select
     v-if="show('select') && tool.select.active"
     style="max-width:20%;display:inline-block;margin-left:10px;"

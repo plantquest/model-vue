@@ -47,12 +47,31 @@
 
 
 <div v-if="$route.name == 'pqview'">
-  <div >
+  <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
+        
          />
+
         
       </div>
+
+      
+      <div v-if="showSearch2" style="display: flex;
+          align-items: center;
+          position: absolute;
+          z-index: 10;
+          margin-top: 36px;">
+        <img :src="`${publicPath}navigation_1.svg`" alt="navigation_1" class="navigation_1"
+        style="position:absolute; z-index:1; margin:10px 0; margin-left:16px;height: 60px;padding-top: 4px;"
+         />
+         <div style="width: 253px;padding-left: 35px;" >
+          <hr aria-orientation="horizontal" style=" margin: 0 5px !important;"/>
+         </div>
+         
+         </div>
+
+      
 
  
       <v-combobox 
@@ -90,11 +109,13 @@
         </template> -->
         
       </v-combobox> 
-      <img :src="`${publicPath}Clip_path_group.svg`" alt="Clip_Path_group" style="cursor: pointer;
+      <img :src="`${publicPath}Clip_path_group.svg`" alt="Clip_Path_group"  style="cursor: pointer;
     cursor: pointer; position: relative; top: -33px; left: calc(100% - 33px); border-left: solid 1px;
     padding-left: 2px;" class="clip-path-group" v-if="filterIcon" @click.stop.prevent="filter"   />
     <v-combobox
+       class="comboxSearch2"
         ref="search2"
+        v-if="showSearch2"
         v-model="search2"
         @keydown="changeSearch2($event)"
         @click:clear="changeSearch2($event)"
@@ -104,7 +125,7 @@
         outlined
         dense
         clearable
-        placeholder="Search Destination"
+        
         :append-icon="filterIcon?'mdi-tune':undefined"
         @click:append="filter"
         :filter="customFilter"
@@ -218,7 +239,7 @@ export default {
       tag_items2:[],
       publicPath: process.env.BASE_URL || '/',
       showIcon: true, // Data property to control icon visibility
-      
+      showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
 
@@ -256,7 +277,6 @@ export default {
       } 
     }, 111)
   },
-
 
   watch: {
     menuViewIndex(index) {
@@ -410,7 +430,7 @@ export default {
         
       },
 
-
+ 
 
     moveRoute(menuView) {
       console.log('menuView.mode:', menuView.mode);
@@ -491,7 +511,13 @@ export default {
       return this.allow(action) &&
         this.$store.state.vxg.cmp.BasicHead.show[action] 
     },
-
+    handleClickOutside(event) {
+    const search = this.$refs.search.$el;
+    const search2 = this.$refs.search2 ? this.$refs.search2.$el : null;
+    if (!search.contains(event.target) && (!search2 || !search2.contains(event.target))) {
+      this.showSearch2 = true;
+    }
+  },
   
 
     filter(event) {
@@ -530,9 +556,20 @@ export default {
     action(name) {
       this.$emit('action', name)
     }
+  },
+
+  mounted() {
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleClickOutside);
   }
 
+  
+
 }
+
+
 
 const DRAWER_STYLE = Object.freeze({ width: "282px"});
 
@@ -689,5 +726,11 @@ img{
 }
 .v-text-field{
   padding: 0 34px;
+}
+.comboxSearch2 .v-input__control {
+  margin-top: -29px;
+}
+.comboxSearch2 fieldset {
+    color: transparent !important;
 }
 </style>

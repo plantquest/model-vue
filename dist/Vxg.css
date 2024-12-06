@@ -166,6 +166,12 @@ img.catppuccin-search {
 .v-text-field {
   padding: 0 34px;
 }
+.comboxSearch2 .v-input__control {
+  margin-top: -29px;
+}
+.comboxSearch2 fieldset {
+  color: transparent !important;
+}
 .vxg-form-field {
   text-align: right;
   padding: 0px 8px 0px 0px;

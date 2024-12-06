@@ -3,13 +3,21 @@
     
     <v-sheet class="d-flex flex-column h-100">
       <!-- Header -->
-      <div class="d-flex justify-space-between">
+      <div class="d-flex justify-space-between "
+       style="background:#27324A" >
         <div v-html="logo"></div>
-        <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>mdi-chevron-left</v-icon>
+        
+        <v-icon v-once large @click="openDrawer" class="drawer-toggle"  style="color: white ;font-size: 29px;">
+          mdi-chevron-left-circle-outline
+        </v-icon>
+        <!-- <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>
+          mdi-chevron-left
+          </v-icon> -->
+         
       </div>
 
       <!-- Menu Toggle -->
-      <v-btn-toggle v-model="menuViewIndex" mandatory class="vxg-toggle">
+      <!-- <v-btn-toggle v-model="menuViewIndex" mandatory class="vxg-toggle">
         <v-btn
           v-for="menuView in menuViewList"
           :key="menuView.name"
@@ -28,8 +36,73 @@
             <span class="d-block font-size-13 pt-2">{{ menuView.btnTitle }}</span>
           </div>
         </v-btn>
-      </v-btn-toggle>
+      </v-btn-toggle> -->
 
+      <v-btn
+          v-if="show('clear') && tool.clear.active"
+           text
+            style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
+          @click="clearFilter"
+      >Clear</v-btn>
+
+
+<div v-if="$route.name == 'pqview'">
+  <div >
+        <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
+        style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
+         />
+        
+      </div>
+
+ 
+      <v-combobox 
+        ref="search"
+        class="comboxSearch d-flex justify-space-between"
+        v-model="search"
+        @keydown="changeSearch($event)"
+        @click:clear="changeSearch($event)"
+        :items="tag_items"
+        flat
+        hide-details
+        outlined
+        dense
+        clearable
+        placeholder=""
+        @click:append="filter"
+        :filter="customFilter"
+        :prepend-inner-icon="prependIcon" 
+        
+        @click="handleClick" 
+        @blur="handleBlur"
+        
+        >
+       
+        <!-- <template v-slot:append>
+         
+          
+          <div class="searchIcons d-flex justify-space-between ">
+            
+            
+            
+            <v-divider vertical></v-divider>
+            
+          </div>
+        </template> -->
+        
+      </v-combobox> 
+      <img :src="`${publicPath}Clip_path_group.svg`" alt="Clip_Path_group" style="cursor: pointer;
+    cursor: pointer; position: relative; top: -33px; left: calc(100% - 33px); border-left: solid 1px;
+    padding-left: 2px;" class="clip-path-group" v-if="filterIcon" @click.stop.prevent="filter"   />
+
+</div>
+   
+      <!-- <v-combobox
+      
+    
+    @click:append="filter"
+    :filter="customFilter"
+    >
+  </v-combobox>  -->
       <!-- Menu Items -->
       <template v-if="menuView.mode === 'standard'">
         <router-link
@@ -66,6 +139,7 @@
 <script>
 
 import Nua from 'nua'
+import {  mapActions } from 'vuex';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
 
@@ -83,6 +157,13 @@ const SpecShape = Gubu({
   })),
   logo: String,
 })
+
+function tag_alias(asset) {
+  if (null != asset.custom12) {
+    return asset.tag + '(' + asset.custom12 + ')'
+  }
+  return asset.tag
+}
 
 export default {
 
@@ -102,6 +183,12 @@ export default {
       menuViewIndex: null,
       menuView: null,
       roomName: '',
+      search: '',
+    
+      tag_items:[],
+      publicPath: process.env.BASE_URL || '/',
+      showIcon: true, // Data property to control icon visibility
+      
     }
   },
 
@@ -122,6 +209,18 @@ export default {
     this.menuView = this.menuViewList[route.index]
     this.menuViewIndex = route.index
     
+    let tool = {}
+
+    let load_assets = setInterval(async ()=>{
+      await this.$store.dispatch('vxg_get_assets', tool)
+      this.items = tool.assets
+      if(this.items.length != 0) {
+        // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
+        this.tag_items = this.items.map(tag_alias)
+        this.setupMiniSearch(this.items)
+        clearInterval(load_assets)
+      } 
+    }, 111)
   },
 
 
@@ -147,6 +246,45 @@ export default {
       }
       */
     },
+
+    '$store.state.trigger.search.term' (term) {
+      if(term == '' && this.$refs.search) {
+        this.$refs.search.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items = this.items.map(tag_alias)
+      }
+    },
+    search (val) {
+      let term = val || ''
+      term.trim()
+      // Todo: Is it necessary?
+      // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
+      // if(m) {
+      //   term = m[1].trim()
+      // }
+      // this.$store.dispatch('trigger_search', {term:this.search})
+      this.$store.dispatch('trigger_search', {term})
+    },
+    select () {
+      this.$store.dispatch('trigger_select', {value:this.select})
+    },
+    '$store.state.trigger.select.value' (val) {
+      this.select = val
+    },
+    '$store.vxg.cmp.BasicHead.allow.add': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+    '$store.vxg.cmp.BasicHead.allow.remove': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+
+
+
+
     '$route.name': {
       immediate: true,
       handler (val) {
@@ -163,6 +301,15 @@ export default {
   
   
   computed: {
+    filterDisabled () {
+      return this.$store.state.trigger.filter_disabled.value
+    },
+
+    prependIcon() {
+      return this.showIcon ? 'mdi-magnify magnifierIcon' : ''; // Conditionally bind the icon
+    },
+
+
     menu () {
       if (this.menuView.mode !== 'standard') return [];
 
@@ -172,6 +319,9 @@ export default {
         code,
         klass: { 'vxg-router-link': true }
       }));
+    },
+    filterIcon (){
+      return this.$store.state.vxg.cmp.BasicHead.show.filter
     },
 
     drawerStyle() {
@@ -188,9 +338,28 @@ export default {
     portal () {
       return this.custom.special.portal
     },
+    tool() {
+      // TODO: better if main.app.web.parts.head was provided directly
+      let headtool = this.$model.main.app.web.parts.head.tool
+      let viewtool = this.view.tool
+      let tool = this.$main.seneca.util.deep(headtool, viewtool)
+      return tool
+    },
+
+    search_config() {
+      return this.$model.main.ux.custom.search_config
+    }
   },
 
   methods: {
+    ...mapActions(['toggleSideInfoCardVisibility']),
+    closeSideInfoCard() {
+        this.toggleSideInfoCardVisibility(false);
+        
+      },
+
+
+
     moveRoute(menuView) {
       const path = this.$route.name;
       const targetPath = menuView.mode === 'standard' ? menuView.menu.default : menuView.name;
@@ -199,7 +368,62 @@ export default {
         this.$router.push(`/${targetPath}`);
       }
     },
+
+    async setupMiniSearch() {
+      
+    },
+
+    
+      // bypass default combobox filter
+      customFilter (item, queryText, itemText) {
+        return 1
+      },
+
+      handleClick() {
+      this.showIcon = false; // Hide the icon when the combobox is clicked
+    },
+    
+    handleBlur() {
+      this.showIcon = true; // Show the icon when the combobox is blurred
+    },
+
+    changeSearch(event) {
+      setTimeout(async ()=> { // wait for input
+        let term
+        term = event.target ? event.target._value : null
+        if(term) {
+          let out = await this.$seneca.post('sys:search, cmd:search', 
+            { query: term, params: this.search_config }
+          )
+          // this.tag_items = out.data.hits.map(v => v.id)
+          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc)) 
+        } 
+        else {
+          // this.tag_items = this.items.map(v => v.tag)
+          if(this.items != undefined)
+          this.tag_items = this.items.map(tag_alias) 
+        }
+        
+      }, 11)
+      
+    },
+
+    clearFilter () {
+      this.$store.dispatch('vxg_trigger_clear')
+    },
+    show(action) {
+      return this.allow(action) &&
+        this.$store.state.vxg.cmp.BasicHead.show[action] 
+    },
+
   
+
+    filter(event) {
+      // aaaaaaaaaaaa
+      this.$store.dispatch('trigger_toggle_filter');
+    
+      },
+    
     defaultFound() {
       return this.menuView && this.menuView.menu && this.menuView.menu.default
     },
@@ -234,24 +458,37 @@ export default {
 
 }
 
-const DRAWER_STYLE = Object.freeze({ width: "282px" });
+const DRAWER_STYLE = Object.freeze({ width: "282px"});
 
 
 </script>
 
 
 <style lang="scss">
+
+.v-navigation-drawer{
+  background: #141B2D;
+}
+
+
+
+.v-navigation-drawer__content{
+  overflow-y: hidden;
+  
+}
 nav.vxg-side {
-    background-color: rgb(var(--vxg-cb1)) !important;
+    background-color: #141B2D !important;
 
     .v-sheet {
-        background-color: rgb(var(--vxg-cb1)) !important;
+        background-color: #141B2D !important;
     }
 
     .v-divider {
         border-color: rgb(var(--vxg-ct2)) !important;
         margin: 16px 8px;
+        height: 22px;
     }
+    
 }
 .btn-style{
     background-color: rgb(40, 51, 72) !important;
@@ -298,6 +535,7 @@ a.vxg-router-link {
     }
 
 }
+
 .vxg-side-open {
     width: 48px;
     height: 48px;
@@ -307,7 +545,71 @@ a.vxg-router-link {
   width: 48px;
 }
 
+.magnifierIcon {
+  margin: 3px 0 0 40px;
+  font-size: large;
+ 
+  color: #141b2d;
+}
+
+
+img{
+  &.clip-path-group {
+    width: 20px;
+  }
+  &.Layer_5 {
+    width: 20px;
+  }
+  &.catppuccin-search{
+    width: 20px;
+  }
+
+
+
+
+
+}
 .font-size-13 {
   font-size: 13px;
+}
+
+.searchIcons hr {
+  margin: 0 5px !important;
+}
+
+.searchIcons svg{
+  width: 20px;
+  height: 20px;
+}
+.v-input__control {
+    background: white;
+    margin-top: auto;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+.comboxSearch  .v-select__slot {
+    margin: 4px 0;
+    margin-left: 25px;
+}
+
+.comboxSearch .v-input__slot{
+  
+  width: calc(100% - 30px);
+}
+
+.comboxSearch fieldset {
+  border: none !important;
+}
+
+.catppuccin-search {
+  width: 24px; /* Adjust size as needed */
+  height: 24px; /* Adjust size as needed */
+}
+.comboxSearch .v-input__icon{
+  position: absolute;
+  margin-left: 187px;
+}
+.v-text-field{
+  padding: 0 34px;
 }
 </style>

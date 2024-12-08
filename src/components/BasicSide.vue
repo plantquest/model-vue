@@ -50,6 +50,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
+        @click="showSearch2 = true"
         
          />
 
@@ -111,7 +112,10 @@
       </v-combobox> 
       <img :src="`${publicPath}Clip_path_group.svg`" alt="Clip_Path_group"  style="cursor: pointer;
     cursor: pointer; position: relative; top: -33px; left: calc(100% - 33px); border-left: solid 1px;
-    padding-left: 2px;" class="clip-path-group" v-if="filterIcon" @click.stop.prevent="filter"   />
+    padding-left: 2px;" class="clip-path-group" v-if="filterIcon && !showSearch2" @click.stop.prevent="filter"   />
+
+
+
     <v-combobox
        class="comboxSearch2"
         ref="search2"
@@ -126,12 +130,32 @@
         dense
         clearable
         
-        :append-icon="filterIcon?'mdi-tune':undefined"
+        
         @click:append="filter"
         :filter="customFilter"
         >
         
       </v-combobox> 
+      <div v-if="showSearch2" >
+        
+        <img :src="`${publicPath}two-opposite-arrows-side-by-side.svg`" alt="two-opposite-arrows-side-by-side"
+       style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
+        />
+        <button @click="showSearch2 = false" style="">
+          <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 255px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
+        </button>
+      </div>
+      
+
+       <button
+          v-if="showSearch2"
+          style="cursor: pointer;position: relative;color: white;top:-24px; size:9px; font-size: 10px; left: 65%;"
+          
+      >Add Destination +</button>
+
+
+
+    
 
 </div>
    
@@ -375,7 +399,8 @@ export default {
     },
 
     prependIcon() {
-      return this.showIcon ? 'mdi-magnify magnifierIcon' : ''; // Conditionally bind the icon
+      
+      return !(this.showSearch2) && this.showIcon ? 'mdi-magnify magnifierIcon' : ''; // Conditionally bind the icon
     },
 
 
@@ -429,6 +454,10 @@ export default {
         this.toggleSideInfoCardVisibility(false);
         
       },
+
+      toggleSearch2() {
+          this.showSearch2 = !this.showSearch2;
+        },
 
  
 
@@ -511,13 +540,15 @@ export default {
       return this.allow(action) &&
         this.$store.state.vxg.cmp.BasicHead.show[action] 
     },
-    handleClickOutside(event) {
-    const search = this.$refs.search.$el;
-    const search2 = this.$refs.search2 ? this.$refs.search2.$el : null;
-    if (!search.contains(event.target) && (!search2 || !search2.contains(event.target))) {
-      this.showSearch2 = true;
-    }
-  },
+
+
+  //   handleClickOutside(event) {
+  //   const search = this.$refs.search.$el;
+  //   const search2 = this.$refs.search2 ? this.$refs.search2.$el : null;
+  //   if (!search.contains(event.target) && (!search2 || !search2.contains(event.target))) {
+  //     this.showSearch2 = true;
+  //   }
+  // },
   
 
     filter(event) {
@@ -558,12 +589,12 @@ export default {
     }
   },
 
-  mounted() {
-    document.addEventListener('click', this.handleClickOutside);
-  },
-  beforeDestroy() {
-    document.removeEventListener('click', this.handleClickOutside);
-  }
+  // mounted() {
+  //   document.addEventListener('click', this.handleClickOutside);
+  // },
+  // beforeDestroy() {
+  //   document.removeEventListener('click', this.handleClickOutside);
+  // }
 
   
 
@@ -728,9 +759,17 @@ img{
   padding: 0 34px;
 }
 .comboxSearch2 .v-input__control {
-  margin-top: -29px;
+  margin-top: -6px;
 }
 .comboxSearch2 fieldset {
     color: transparent !important;
+}
+
+.comboxSearch2 .v-input__append-inner {
+    visibility: hidden;
+}
+.comboxSearch2 .v-select__slot {
+    margin-left: 25px;
+    margin-bottom: 4px;
 }
 </style>

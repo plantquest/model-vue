@@ -153,6 +153,11 @@
           
       >Add Destination +</button>
 
+      <BasicNavStages
+        v-if="showSearch2"
+        :spec="spec"
+    />
+
 
 
     
@@ -213,6 +218,7 @@
 
 import Nua from 'nua'
 import {  mapActions } from 'vuex';
+import BasicNavStages from './BasicNavStages.vue';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
 
@@ -239,6 +245,10 @@ function tag_alias(asset) {
 }
 
 export default {
+
+  components: {
+    BasicNavStages
+  },
 
   props: {
     spec: {

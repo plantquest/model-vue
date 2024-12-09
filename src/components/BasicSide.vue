@@ -138,11 +138,11 @@
       </v-combobox> 
       <div v-if="showSearch2" >
         
-        <img :src="`${publicPath}two-opposite-arrows-side-by-side.svg`" alt="two-opposite-arrows-side-by-side"
+        <img :src="`${publicPath}two-opposite-up-and-down-arrows-side-by-side.svg`" alt="two-opposite-arrows-side-by-side"
        style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
         />
         <button @click="showSearch2 = false" style="">
-          <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 255px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
+          <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
         </button>
       </div>
       
@@ -153,11 +153,11 @@
           
       >Add Destination +</button>
 
-      <BasicNavStages
+      <!-- <BasicNavStages
         v-if="showSearch2"
         :spec="spec"
     />
-
+ -->
 
 
     

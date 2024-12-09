@@ -67,7 +67,42 @@
         outlined
         dense
         clearable
-        placeholder=""
+        placeholder="test3"
+        @click:append="filter"
+        :filter="customFilter"
+        :prepend-inner-icon="prependIcon" 
+        
+        @click="handleClick" 
+        @blur="handleBlur"
+        
+        >
+       
+        <!-- <template v-slot:append>
+         
+          
+          <div class="searchIcons d-flex justify-space-between ">
+            
+            
+            
+            <v-divider vertical></v-divider>
+            
+          </div>
+        </template> -->
+        
+      </v-combobox> 
+      <v-combobox 
+        ref="search"
+        class="comboxSearch d-flex justify-space-between"
+        v-model="search2"
+        @keydown="changeSearch2($event)"
+        @click:clear="changeSearch2($event)"
+        :items="tag_items2"
+        flat
+        hide-details
+        outlined
+        dense
+        clearable
+        placeholder="test3"
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 
@@ -184,8 +219,9 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-    
+      search2:'',
       tag_items:[],
+      tag_items2:[],
       publicPath: process.env.BASE_URL || '/',
       showIcon: true, // Data property to control icon visibility
       
@@ -217,7 +253,9 @@ export default {
       if(this.items.length != 0) {
         // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
         this.tag_items = this.items.map(tag_alias)
+        this.tag_items2 = this.items.map(tag_alias)
         this.setupMiniSearch(this.items)
+        this.setupMiniSearch(this.items2)
         clearInterval(load_assets)
       } 
     }, 111)
@@ -254,6 +292,23 @@ export default {
         this.tag_items = this.items.map(tag_alias)
       }
     },
+  
+    '$store.state.trigger.search.a' (term) {
+      if(term == '' && this.$refs.search) {
+        this.$refs.search.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items = this.items.map(tag_alias)
+        console.log('search is being triggerecd')
+      }
+    },
+      '$store.state.trigger.search.b' (term) {
+      if(term == '' && this.$refs.search2) {
+        this.$refs.search2.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items2 = this.items2.map(tag_alias)
+      }
+    },
+  
     search (val) {
       let term = val || ''
       term.trim()
@@ -263,7 +318,13 @@ export default {
       //   term = m[1].trim()
       // }
       // this.$store.dispatch('trigger_search', {term:this.search})
-      this.$store.dispatch('trigger_search', {term})
+      this.$store.dispatch('trigger_search', {a:term})
+    },
+     search2 (val) {
+      let term = val || ''
+      term.trim()
+
+      this.$store.dispatch('trigger_search', {b: term})
     },
     select () {
       this.$store.dispatch('trigger_select', {value:this.select})
@@ -407,6 +468,30 @@ export default {
       }, 11)
       
     },
+    changeSearch2(event) {
+
+      setTimeout(async ()=> { // wait for input
+        let term
+        term = event.target ? event.target._value : null
+        if(term) {
+          let out = await this.$seneca.post('sys:search, cmd:search',
+            { query: term, params: this.search_config }
+          )
+
+
+          this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
+          console.log('tag items are ', this.tag_items2)
+        }
+        else {
+
+          if(this.items2 != undefined)
+          this.tag_items2 = this.items2.map(tag_alias)
+        }
+
+
+      }, 11)
+
+    },
 
     clearFilter () {
       this.$store.dispatch('vxg_trigger_clear')
@@ -505,34 +590,34 @@ nav.vxg-side {
     }
 }
 
-.vxg-toggle{
-    background-color: rgb(var(--vxg-cb1)) !important;
-    padding: 10px !important; // Added padding to the toggle container
-    padding-bottom: 10px;
-    padding-top: 10px;
-    margin-right: 10px;
+.vxg-toggle {
+  background-color: rgb(var(--vxg-cb1)) !important;
+  padding: 10px !important; // Added padding to the toggle container
+  padding-bottom: 10px;
+  padding-top: 10px;
+  margin-right: 10px;
 
 }
 
 a.vxg-router-link {
-    display: block;
-    margin: 0px 8px;
-    padding: 16px 8px;
-    text-decoration: none !important;
+  display: block;
+  margin: 0px 8px;
+  padding: 16px 8px;
+  text-decoration: none !important;
+  color: rgb(var(--vxg-ct1)) !important;
+  border-radius: 8px;
+
+  .v-icon {
+    color: rgb(var(--vxg-ct2)) !important;
+  }
+
+  &.router-link-active {       
+    background-color: rgb(var(--vxg-cb2)) !important;
     color: rgb(var(--vxg-ct1)) !important;
-    border-radius: 8px;
-    
     .v-icon {
-        color: rgb(var(--vxg-ct2)) !important;
+      color: rgb(var(--vxg-ct1)) !important;
     }
-    
-    &.router-link-active {
-        background-color: rgb(var(--vxg-cb2)) !important;
-        color: rgb(var(--vxg-ct1)) !important;
-        .v-icon {
-            color: rgb(var(--vxg-ct1)) !important;
-        }
-    }
+  }
 
 }
 

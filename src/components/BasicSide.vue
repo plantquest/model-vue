@@ -553,6 +553,7 @@ export default {
       this.search = '';
       this.search2 = '';
       this.$root.$emit('clear-nav-stages');
+      this.showSearch2 = false
     },
     show(action) {
       return this.allow(action) &&

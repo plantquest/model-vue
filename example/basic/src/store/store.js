@@ -37,7 +37,10 @@ function makeStore(Vue) {
           b: ''
         },
       },
-
+      
+      values: {
+        pathDetails: [],
+      }
     },
     
     mutations: {

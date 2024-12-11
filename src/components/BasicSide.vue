@@ -336,6 +336,14 @@ export default {
       */
     },
 
+    '$store.state.values.pathDetails': {
+      deep: true,
+      handler(val) {
+        // TODO: add code here
+        console.log('path details are ', val)
+      }
+    },
+    
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()

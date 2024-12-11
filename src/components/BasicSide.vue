@@ -46,7 +46,7 @@
       >Clear</v-btn>
 
 
-<div v-if="$route.name == 'pqview'">
+<div class="comboSearchInput" v-if="$route.name == 'pqview'">
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
@@ -178,7 +178,7 @@
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && item.code !== 'admin'"
+          v-if="allow(item) && item.title !== 'Devices'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
@@ -676,7 +676,10 @@ nav.vxg-side {
 
 }
 
-
+.comboSearchInput{
+  height: 40px;
+  margin-bottom: 10px;
+}
 
 a.vxg-router-link {
     display: block;

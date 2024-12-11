@@ -38,11 +38,18 @@
 </template>
 
 <script>
+<<<<<<< Updated upstream
+=======
+import axios from 'axios';
+>>>>>>> Stashed changes
 export default {
     name: 'BasicNavStages',
     data() {
         return {
+<<<<<<< Updated upstream
             showNav: true,
+=======
+>>>>>>> Stashed changes
             isExpanded: false,
             iconSrc: 'nav_in.svg', // Initial icon
             publicPath: process.env.BASE_URL || '/',
@@ -53,13 +60,27 @@ export default {
       this.toggleIcon();
     },
   },
+<<<<<<< Updated upstream
   methods: {
+=======
+ 
+
+  methods: {
+   
+   
+
+
+
+
+
+>>>>>>> Stashed changes
     toggleIcon() {
       this.iconSrc = this.isExpanded ? 'nav_in.svg' : 'nav_out.svg';
     },
     clearState() {
       this.isExpanded = false;
       this.iconSrc = 'nav_in.svg';
+<<<<<<< Updated upstream
     },
     toggleshowNav() {
           this.showNav = !this.showNav;
@@ -74,6 +95,16 @@ export default {
   },
     computed: {
         // Your computed properties go here
+=======
+    }
+  },
+  
+    computed: {
+        // Your computed properties go here
+    },
+    mounted() {
+     
+>>>>>>> Stashed changes
     }
 };
 </script>

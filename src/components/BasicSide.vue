@@ -107,7 +107,7 @@
       <template v-if="menuView.mode === 'standard'">
         <router-link
           v-for="item in menu"
-          v-if="allow(item)"
+          v-if="allow(item) && item.title !== 'Devices'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"

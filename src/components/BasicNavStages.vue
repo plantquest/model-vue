@@ -22,7 +22,7 @@
         <v-expansion-panel-content  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
             @click="selectStage(index)"
-              v-bind:class="{ 'activated': getselectedStage == index }">
+              v-bind:class="{ 'activated': selectStage == index }">
               <h3>STAGE {{ index+1 }}</h3>
               <p>{{ message }}</p>
         
@@ -35,16 +35,7 @@
          
         </v-expansion-panel-content>
 
-        <!-- <v-expansion-panel-content  >
-            <div v-if="routeMassages && routeMassages.length" class="route-massages">
-                    <div v-for="(message, index) in routeMassages" :key="index" class="message">
-                        <p>{{ message }}</p>
-                    </div>
-                    </div>
-            
-           
-         
-        </v-expansion-panel-content> -->
+       
       </v-expansion-panel>
     </v-expansion-panels>
       
@@ -86,34 +77,76 @@ export default {
       this.toggleIcon();
     },
     // create a watcher for changes in pathData
-    '$store.state.pathData' (data) {
-    
+    '$store.state.pathData': {
+    handler(data) {
       console.log('PathData12333: ', data.asset123);
-      this.pathData = data.asset123;
-      
+      this.pathData = data.asset123; 
       console.log('this.pathData', this.pathData);
-        console.log('JSON.parse', JSON.parse(this.pathData));
+
+      try {
         const parsedData = JSON.parse(this.pathData);
-          console.log('parsedData', parsedData);
+        console.log('parsedData', parsedData);
 
-          console.log('parsedData0', parsedData[0]);
-     this.pathArray = parsedData[0]
+        if (parsedData && parsedData.length > 0) { 
+          this.pathArray = parsedData[0]; 
+          console.log('pathArray', this.pathArray);
 
-     console.log('pathArray', this.pathArray);
-     
-     let parsedLines = this.parseLines(this.pathArray);
-     console.log('parsedLines', parsedLines);
-     let stages = this.getRouteSteps(parsedLines);
-     this.routeMassages = stages;
-     
-     console.log('stages', stages);
+          let parsedLines = this.parseLines(this.pathArray); 
+          console.log('parsedLines', parsedLines);
+          let stages = this.getRouteSteps(parsedLines); 
+          this.routeMassages = stages; 
+          console.log('stages', stages); 
+        } else {
+          console.warn("Invalid or empty pathData");
+          // Handle the case where parsedData is empty or invalid
+        }
 
+      } catch (error) {
+        console.error("Error parsing pathData:", error);
+        // Handle the error gracefully 
+      }
 
-      
+      // Dispatch the action (optional)
+      this.$store.dispatch('set_path_data', { pathDetails: data.asset123 })
+        .then(result => {
+          console.log('Dispatch result:', result);
+        })
+        .catch(error => {
+          console.error('Dispatch error:', error);
+        });
     },
+    deep: true // Watch for changes within nested objects 
+  }
+},
     
-  },
+    
+    
+    
+ 
   methods: {
+    // Dispatch the action to update the pathData in the store
+    // handlePathData(data) {
+    // this.$store.dispatch('set_path_data', { pathDetails: data })
+    //     .then(result => {
+    //       console.log('Dispatch result:', result);
+    //     })
+    //     .catch(error => {
+    //       console.error('Dispatch error:', error);
+    //     });
+    // },
+    // handlePathData(data) {
+    //     this.$store.commit('set_path_data', {pathDetails: data});
+              
+    //           this.$store.dispatch('set_path_data', { 
+    //       assetId: 'asset123', 
+    //       pathData: test});
+    // },
+    
+
+
+
+
+
     getselectedStage() {
      console.log('selectedStage', this.selectedStage);
       return this.selectedStage;

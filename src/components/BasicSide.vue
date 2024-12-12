@@ -3,13 +3,21 @@
     
     <v-sheet class="d-flex flex-column h-100">
       <!-- Header -->
-      <div class="d-flex justify-space-between">
+      <div class="d-flex justify-space-between "
+       style="background:#27324A" >
         <div v-html="logo"></div>
-        <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>mdi-chevron-left</v-icon>
+        
+        <v-icon v-once large @click="openDrawer" class="drawer-toggle"  style="color: white ;font-size: 29px;">
+          mdi-chevron-left-circle-outline
+        </v-icon>
+        <!-- <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>
+          mdi-chevron-left
+          </v-icon> -->
+         
       </div>
 
       <!-- Menu Toggle -->
-      <v-btn-toggle v-model="menuViewIndex" mandatory class="vxg-toggle">
+      <!-- <v-btn-toggle v-model="menuViewIndex" mandatory class="vxg-toggle">
         <v-btn
           v-for="menuView in menuViewList"
           :key="menuView.name"
@@ -28,19 +36,158 @@
             <span class="d-block font-size-13 pt-2">{{ menuView.btnTitle }}</span>
           </div>
         </v-btn>
-      </v-btn-toggle>
+      </v-btn-toggle> -->
 
+      <v-btn
+          v-if="show('clear') && tool.clear.active"
+           text
+            style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
+          @click="clearFilter"
+      >Clear</v-btn>
+
+
+<div v-if="$route.name == 'pqview'">
+  <div v-if="!showSearch2">
+        <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
+        style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
+        @click="showSearch2 = true"
+        
+         />
+
+        
+      </div>
+
+      
+      <div v-if="showSearch2" style="display: flex;
+          align-items: center;
+          position: absolute;
+          z-index: 10;
+          margin-top: 36px;">
+        <img :src="`${publicPath}navigation_1.svg`" alt="navigation_1" class="navigation_1"
+        style="position:absolute; z-index:1; margin:10px 0; margin-left:16px;height: 60px;padding-top: 4px;"
+         />
+         <div style="width: 253px;padding-left: 35px;" >
+          <hr aria-orientation="horizontal" style=" margin: 0 5px !important;"/>
+         </div>
+         
+         </div>
+
+      
+
+ 
+      <v-combobox 
+        ref="search"
+        class="comboxSearch d-flex justify-space-between"
+        v-model="search"
+        @keydown="changeSearch($event)"
+        @click:clear="changeSearch($event)"
+        :items="tag_items"
+        flat
+        hide-details
+        outlined
+        dense
+        clearable
+        placeholder=""
+        @click:append="filter"
+        :filter="customFilter"
+        :prepend-inner-icon="prependIcon" 
+        
+        @click="handleClick" 
+        @blur="handleBlur"
+        
+        >
+       
+        <!-- <template v-slot:append>
+         
+          
+          <div class="searchIcons d-flex justify-space-between ">
+            
+            
+            
+            <v-divider vertical></v-divider>
+            
+          </div>
+        </template> -->
+        
+      </v-combobox> 
+      <img :src="`${publicPath}Clip_path_group.svg`" alt="Clip_Path_group"  style="cursor: pointer;
+    cursor: pointer; position: relative; top: -33px; left: calc(100% - 33px); border-left: solid 1px;
+    padding-left: 2px;" class="clip-path-group" v-if="filterIcon && !showSearch2" @click.stop.prevent="filter"   />
+
+
+
+    <v-combobox
+       class="comboxSearch2"
+        ref="search2"
+        v-if="showSearch2"
+        v-model="search2"
+        @keydown="changeSearch2($event)"
+        @click:clear="changeSearch2($event)"
+        :items="tag_items2"
+        flat
+        hide-details
+        outlined
+        dense
+        clearable
+        
+        
+        @click:append="filter"
+        :filter="customFilter"
+        >
+        
+      </v-combobox> 
+      <div v-if="showSearch2" >
+        
+        <img :src="`${publicPath}two-opposite-up-and-down-arrows-side-by-side.svg`" alt="two-opposite-arrows-side-by-side"
+       style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
+       @click="reverseInputs"
+        />
+        <!-- <button @click="showSearch2 = false" style="">
+          <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
+        </button> -->
+      </div>
+      
+
+       <button
+          v-if="showSearch2"
+          style="cursor: pointer;position: relative;color: white;top:-24px; size:9px; font-size: 10px; left: 65%;"
+          
+      >Add Destination +</button>
+
+      <BasicNavStages
+        v-if="showSearch2"
+        :spec="spec"
+    />
+
+
+
+    
+
+</div>
+   
+      <!-- <v-combobox
+      
+    
+    @click:append="filter"
+    :filter="customFilter"
+    >
+  </v-combobox>  -->
       <!-- Menu Items -->
-      <template v-if="menuView.mode === 'standard'">
-        <router-link
+      <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
+        <template v-if="menuView.mode === 'standard'" >
+          <div class="router_items">
+            <router-link 
           v-for="item in menu"
-          v-if="allow(item)"
+          v-if="allow(item) && item.code !== 'admin'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
+
         >
           <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
         </router-link>
+          </div>
+       
       </template>
 
       <component
@@ -48,24 +195,31 @@
         :is="menuView.cmp"
         :spec="menuView.view.spec"
       />
+      </div>
+    <div>
+      
+    </div>
 
       <v-spacer></v-spacer>
-      <v-divider></v-divider>
+      <v-divider style="margin-top: 65px;"></v-divider>
 
       
       <!-- Footer -->
-      <component
+      <component  
         v-if="spec.footer.active"
         :is="spec.footer.cmp"
         :spec="spec.footer.spec"
       />
     </v-sheet>
+ 
   </v-navigation-drawer>
 </template>
 
 <script>
 
 import Nua from 'nua'
+import {  mapActions } from 'vuex';
+import BasicNavStages from './BasicNavStages.vue';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
 
@@ -84,7 +238,18 @@ const SpecShape = Gubu({
   logo: String,
 })
 
+function tag_alias(asset) {
+  if (null != asset.custom12) {
+    return asset.tag + '(' + asset.custom12 + ')'
+  }
+  return asset.tag
+}
+
 export default {
+
+  components: {
+    BasicNavStages
+  },
 
   props: {
     spec: {
@@ -102,6 +267,14 @@ export default {
       menuViewIndex: null,
       menuView: null,
       roomName: '',
+      search: '',
+    
+      tag_items:[],
+      search2:'',
+      tag_items2:[],
+      publicPath: process.env.BASE_URL || '/',
+      showIcon: true, // Data property to control icon visibility
+      showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
 
@@ -116,14 +289,29 @@ export default {
       menuView.name = name
       menuViewList.push(menuView)
     }
+    console.log('menuViewList:', menuViewList);
     this.menuViewList = menuViewList
     let route = this.findRouteName(this.$route.name) 
 
     this.menuView = this.menuViewList[route.index]
     this.menuViewIndex = route.index
     
-  },
+    let tool = {}
 
+    let load_assets = setInterval(async ()=>{
+      await this.$store.dispatch('vxg_get_assets', tool)
+      this.items = tool.assets
+      this.items2 = [ ...tool.assets]
+      if(this.items.length != 0) {
+        // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
+        this.tag_items = this.items.map(tag_alias)
+        this.tag_items2 = this.items2.map(tag_alias)
+        this.setupMiniSearch(this.items)
+        this.setupMiniSearch(this.items2)
+        clearInterval(load_assets)
+      } 
+    }, 111)
+  },
 
   watch: {
     menuViewIndex(index) {
@@ -147,6 +335,79 @@ export default {
       }
       */
     },
+
+   '$store.state.trigger.search.a' (term) {
+      if(term == '' && this.$refs.search) {
+        this.$refs.search.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items = this.items.map(tag_alias)
+        console.log('search is being triggerecd')
+      }
+    },
+    // create a watcher for changes in pathData
+
+    '$store.state.pathData' (data) {
+      console.log('PathData: ', data)
+    },
+    '$store.state.trigger.search.b' (term) {
+
+      const pathData = this.$store.dispatch('get_path_data', { 
+      assetId: 'asset123' 
+    }).then((data) => {
+      console.log('PathData: ', data)
+    })
+ 
+
+      console.log('search.b is being triggered')
+      if(term == '' && this.$refs.search2) {
+        this.$refs.search2.reset()
+        // this.tag_items = this.items.map(v => v.tag)
+        this.tag_items2 = this.items2.map(tag_alias)
+      }
+      
+    },
+    search (val) {
+      let term = val || ''
+      term.trim()
+      // Todo: Is it necessary?
+      // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
+      // if(m) {
+      //   term = m[1].trim()
+      // }
+      // this.$store.dispatch('trigger_search', {term:this.search})
+      this.$store.dispatch('trigger_search', {a: term})
+    },
+    search2 (val) {
+      let term = val || ''
+      term.trim()
+      console.log('search2 is being triggered')
+      this.$store.dispatch('trigger_search', {b: term})
+    let pathData = this.$store.dispatch('getPathDataAction', {
+      assetId: 'asset123'
+    });
+    console.log('PathData: ', pathData)
+
+    },
+    select () {
+      this.$store.dispatch('trigger_select', {value:this.select})
+    },
+    '$store.state.trigger.select.value' (val) {
+      this.select = val
+    },
+    '$store.vxg.cmp.BasicHead.allow.add': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+    '$store.vxg.cmp.BasicHead.allow.remove': {
+      handler() {
+        this.$forceUpdate()
+      }
+    },
+
+
+
+
     '$route.name': {
       immediate: true,
       handler (val) {
@@ -163,6 +424,16 @@ export default {
   
   
   computed: {
+    filterDisabled () {
+      return this.$store.state.trigger.filter_disabled.value
+    },
+
+    prependIcon() {
+      
+      return !(this.showSearch2) && this.showIcon ? 'mdi-magnify magnifierIcon' : ''; // Conditionally bind the icon
+    },
+
+
     menu () {
       if (this.menuView.mode !== 'standard') return [];
 
@@ -173,6 +444,9 @@ export default {
         klass: { 'vxg-router-link': true }
       }));
     },
+    filterIcon (){
+      return this.$store.state.vxg.cmp.BasicHead.show.filter
+    },
 
     drawerStyle() {
       return DRAWER_STYLE;
@@ -182,16 +456,48 @@ export default {
     },
 
     view () {
-      return this.custom.special.view
+      //return this.custom.special.view
+      const result = this.custom.special.view;
+    console.log('view:', result);
+    return result;
     },
 
     portal () {
       return this.custom.special.portal
     },
+    tool() {
+      // TODO: better if main.app.web.parts.head was provided directly
+      let headtool = this.$model.main.app.web.parts.head.tool
+      let viewtool = this.view.tool
+      let tool = this.$main.seneca.util.deep(headtool, viewtool)
+      return tool
+    },
+
+    search_config() {
+      return this.$model.main.ux.custom.search_config
+    }
   },
 
   methods: {
+    ...mapActions(['toggleSideInfoCardVisibility']),
+    closeSideInfoCard() {
+        this.toggleSideInfoCardVisibility(false);
+        
+      },
+
+      toggleSearch2() {
+          this.showSearch2 = !this.showSearch2;
+        },
+        reverseInputs() {
+      const temp = this.search;
+      this.search = this.search2;
+      this.search2 = temp;
+    },
+ 
+
     moveRoute(menuView) {
+      console.log('menuView.mode:', menuView.mode);
+
       const path = this.$route.name;
       const targetPath = menuView.mode === 'standard' ? menuView.menu.default : menuView.name;
       
@@ -199,7 +505,97 @@ export default {
         this.$router.push(`/${targetPath}`);
       }
     },
+
+    async setupMiniSearch() {
+      
+    },
+
+    
+      // bypass default combobox filter
+      customFilter (item, queryText, itemText) {
+        return 1
+      },
+
+      handleClick() {
+      this.showIcon = false; // Hide the icon when the combobox is clicked
+    },
+    
+    handleBlur() {
+      this.showIcon = true; // Show the icon when the combobox is blurred
+    },
+
+    changeSearch(event) {
+      setTimeout(async ()=> { // wait for input
+        let term
+        term = event.target ? event.target.value : null
+        if(term) {
+          let out = await this.$seneca.post('sys:search, cmd:search', 
+            { query: term, params: this.search_config }
+          )
+          // this.tag_items = out.data.hits.map(v => v.id)
+          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc)) 
+        } 
+        else {
+          // this.tag_items = this.items.map(v => v.tag)
+          if(this.items != undefined)
+          this.tag_items = this.items.map(tag_alias) 
+        }
+        
+      }, 11)
+      
+    },
+    changeSearch2(event) {
+      setTimeout(async ()=> { // wait for input
+        let term
+        term = event.target ? event.target.value : null
+        if(term) {
+          let out = await this.$seneca.post('sys:search, cmd:search', 
+            { query: term, params: this.search_config }
+          )
+        
+        
+          this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
+          console.log('tag items are ', this.tag_items2)
+        }
+        else {
+        
+          if(this.items2 != undefined)
+          this.tag_items2 = this.items2.map(tag_alias)
+        }
+
+        
+      }, 11)
+    },
+
+    clearFilter () {
+      this.$store.dispatch('vxg_trigger_clear');
+      this.search = '';
+      this.search2 = '';
+      this.$root.$emit('clear-nav-stages');
+
+
+    },
+    show(action) {
+      return this.allow(action) &&
+        this.$store.state.vxg.cmp.BasicHead.show[action] 
+    },
+
+
+  //   handleClickOutside(event) {
+  //   const search = this.$refs.search.$el;
+  //   const search2 = this.$refs.search2 ? this.$refs.search2.$el : null;
+  //   if (!search.contains(event.target) && (!search2 || !search2.contains(event.target))) {
+  //     this.showSearch2 = true;
+  //   }
+  // },
   
+
+    filter(event) {
+      // aaaaaaaaaaaa
+      this.$store.dispatch('trigger_toggle_filter');
+    
+      },
+    
     defaultFound() {
       return this.menuView && this.menuView.menu && this.menuView.menu.default
     },
@@ -230,28 +626,52 @@ export default {
     action(name) {
       this.$emit('action', name)
     }
-  }
+  },
+
+  // mounted() {
+  //   document.addEventListener('click', this.handleClickOutside);
+  // },
+  // beforeDestroy() {
+  //   document.removeEventListener('click', this.handleClickOutside);
+  // }
+
+  
 
 }
 
-const DRAWER_STYLE = Object.freeze({ width: "282px" });
+
+
+const DRAWER_STYLE = Object.freeze({ width: "282px"});
 
 
 </script>
 
 
 <style lang="scss">
+
+.v-navigation-drawer{
+  background: #141B2D;
+}
+
+
+
+.v-navigation-drawer__content{
+  overflow-y: hidden;
+  
+}
 nav.vxg-side {
-    background-color: rgb(var(--vxg-cb1)) !important;
+    background-color: #141B2D !important;
 
     .v-sheet {
-        background-color: rgb(var(--vxg-cb1)) !important;
+        background-color: #141B2D !important;
     }
 
     .v-divider {
         border-color: rgb(var(--vxg-ct2)) !important;
         margin: 16px 8px;
+        height: 22px;
     }
+    
 }
 .btn-style{
     background-color: rgb(40, 51, 72) !important;
@@ -277,6 +697,8 @@ nav.vxg-side {
 
 }
 
+
+
 a.vxg-router-link {
     display: block;
     margin: 0px 8px;
@@ -298,6 +720,7 @@ a.vxg-router-link {
     }
 
 }
+
 .vxg-side-open {
     width: 48px;
     height: 48px;
@@ -307,7 +730,85 @@ a.vxg-router-link {
   width: 48px;
 }
 
+.magnifierIcon {
+  margin: 3px 0 0 40px;
+  font-size: large;
+ 
+  color: #141b2d;
+}
+
+
+img{
+  &.clip-path-group {
+    width: 20px;
+  }
+  &.Layer_5 {
+    width: 20px;
+  }
+  &.catppuccin-search{
+    width: 20px;
+  }
+
+
+
+
+
+}
 .font-size-13 {
   font-size: 13px;
+}
+
+.searchIcons hr {
+  margin: 0 5px !important;
+}
+
+.searchIcons svg{
+  width: 20px;
+  height: 20px;
+}
+.v-input__control {
+    background: white;
+    margin-top: auto;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+.comboxSearch  .v-select__slot {
+    margin-left: 25px;
+    margin-bottom: 4px;
+}
+
+.comboxSearch .v-input__slot{
+  
+  width: calc(100% - 30px);
+}
+
+.comboxSearch fieldset {
+  border: none !important;
+}
+
+.catppuccin-search {
+  width: 24px; /* Adjust size as needed */
+  height: 24px; /* Adjust size as needed */
+}
+.comboxSearch .v-input__icon{
+  position: absolute;
+  margin-left: 187px;
+}
+.v-text-field{
+  padding: 0 34px;
+}
+.comboxSearch2 .v-input__control {
+  margin-top: -6px;
+}
+.comboxSearch2 fieldset {
+    color: transparent !important;
+}
+
+.comboxSearch2 .v-input__append-inner {
+    visibility: hidden;
+}
+.comboxSearch2 .v-select__slot {
+    margin-left: 25px;
+    margin-bottom: 4px;
 }
 </style>

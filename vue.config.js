@@ -12,6 +12,7 @@ module.exports = {
     externals: /vuetify\/lib/,
   },
   devServer: {
+    // 'Access-Control-Allow-Origin': '*',
     port: 19191,
   },
 }

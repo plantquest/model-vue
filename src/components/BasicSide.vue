@@ -335,6 +335,14 @@ export default {
       }
       */
     },
+ // create a watcher for changes in pathData
+ '$store.state.pathData' (data) {
+      console.log('PathData: ', data)
+    },
+   
+
+
+
 
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {

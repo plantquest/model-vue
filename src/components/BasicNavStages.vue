@@ -19,18 +19,32 @@
           <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
         </v-expansion-panel-header>
         
-        <v-expansion-panel-content >
-            <div class="stage" style="background-color:#C0E28B;" >
-              <h3>STAGE 1</h3>
-              <p>Continue on path towards elevator.</p>
+        <v-expansion-panel-content  >
+            <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
+            @click="selectStage(index)"
+              v-bind:class="{ 'activated': getselectedStage == index }">
+              <h3>STAGE {{ index+1 }}</h3>
+              <p>{{ message }}</p>
+        
+            
+            
+              
             </div>
             
-            <div class="stage" style="background-color:white;margin-bottom: 9px;"> 
-            <h3>STAGE 2</h3>
-            <p>Take elevator to level 2 and continue towards your destination.</p>
-            </div>
+           
          
         </v-expansion-panel-content>
+
+        <!-- <v-expansion-panel-content  >
+            <div v-if="routeMassages && routeMassages.length" class="route-massages">
+                    <div v-for="(message, index) in routeMassages" :key="index" class="message">
+                        <p>{{ message }}</p>
+                    </div>
+                    </div>
+            
+           
+         
+        </v-expansion-panel-content> -->
       </v-expansion-panel>
     </v-expansion-panels>
       
@@ -38,6 +52,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     name: 'BasicNavStages',
     data() {
@@ -46,14 +61,131 @@ export default {
             isExpanded: false,
             iconSrc: 'nav_in.svg', // Initial icon
             publicPath: process.env.BASE_URL || '/',
+            pathData: null ,// Add a data property to store the pathData
+            parsedPathData: null,
+            pathArray: null,
+            routeMassages: [],
+            selectedstage : 0,
+            levelNames : [
+                        'Level 1',
+                        'Level 1 Mezz & Intersticial',
+                        'Level 2',
+                        'Level 2 Roof & Intersticial',
+                        'Level 3',
+                        'Basement',
+                    ],
         };
     },
+    computed: {
+    ...mapState({
+      pathData: state => state.pathData, 
+    }),
+  },
     watch: {
     isExpanded() {
       this.toggleIcon();
     },
+    // create a watcher for changes in pathData
+    '$store.state.pathData' (data) {
+    
+      console.log('PathData12333: ', data.asset123);
+      this.pathData = data.asset123;
+      
+      console.log('this.pathData', this.pathData);
+        console.log('JSON.parse', JSON.parse(this.pathData));
+        const parsedData = JSON.parse(this.pathData);
+          console.log('parsedData', parsedData);
+
+          console.log('parsedData0', parsedData[0]);
+     this.pathArray = parsedData[0]
+
+     console.log('pathArray', this.pathArray);
+     
+     let parsedLines = this.parseLines(this.pathArray);
+     console.log('parsedLines', parsedLines);
+     let stages = this.getRouteSteps(parsedLines);
+     this.routeMassages = stages;
+     
+     console.log('stages', stages);
+
+
+      
+    },
+    
   },
   methods: {
+    getselectedStage() {
+     console.log('selectedStage', this.selectedStage);
+      return this.selectedStage;
+     
+    },
+    selectStage(index) {
+        console.log('indexxxxxxxxx', index);
+      this.selectedStage = index;
+    },
+
+     parseLine(line){
+            // line exmple : [47be48,Standard,,8832,4720]
+           
+            
+             let lineData = line.split(',');
+
+            let id = lineData[0];
+            let type = lineData[1];
+
+            let result = {
+        id,
+        type
+      };
+            console.log('Parsed Line:', result);
+            return result;
+        },
+        parseLines(data){
+            return data.map(lineData => {
+                console.log(lineData.detail)
+                let data = lineData.detail.split(',')
+                return {
+                    id : data[0],
+                    type : data[1],
+                    map : lineData.index
+                }
+            })
+        },
+
+
+
+        getRouteSteps(routeData){
+            let steps = routeData;
+
+            let messages = [];
+
+            for(var i=0; i<steps.length-2; i++){
+                if(steps[i].type == "Connector"){
+                    // first node type connector (i)
+                    let msg = `Follow route to strairs and proceed to `;
+                    var j = i;
+                    while(steps[j].type == "Connector"){
+                        j++;
+                    }
+                    // first node type Standar (j)
+                    if(j < steps.length-3){
+                        msg += `${this.levelNames[steps[j].map-1]}`
+                        messages.push(msg)
+                    }
+                    i=j;
+                }
+            }
+
+            if(messages.length > 0){
+                messages.push(`Proceed to your destination.`)
+                        }
+            console.log('Steps:', steps);
+
+            return messages;
+        },
+    
+   
+    
     toggleIcon() {
       this.iconSrc = this.isExpanded ? 'nav_in.svg' : 'nav_out.svg';
     },
@@ -67,6 +199,7 @@ export default {
 
   },
   mounted() {
+    this.parseLines(this.test); // Call parseLines with the test data
     this.$root.$on('clear-nav-stages', this.toggleshowNav);
   },
   beforeDestroy() {
@@ -106,6 +239,10 @@ export default {
         width: 94%;
         top: 1px;
         left: 13px;
+    }
+
+    .stage.activated {
+        background-color: #258489 !important;
     }
     
 }

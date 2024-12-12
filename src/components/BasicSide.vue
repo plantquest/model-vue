@@ -50,7 +50,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="showSearch2 = true"
+        @click="handleNavigationMode"
         
          />
 
@@ -352,13 +352,27 @@ export default {
         console.log('search is being triggerecd')
       }
     },
+    // create a watcher for changes in pathData
 
+    '$store.state.pathData' (data) {
+      console.log('PathData: ', data)
+    },
     '$store.state.trigger.search.b' (term) {
+
+      const pathData = this.$store.dispatch('get_path_data', { 
+      assetId: 'asset123' 
+    }).then((data) => {
+      console.log('PathData: ', data)
+    })
+ 
+
+      console.log('search.b is being triggered')
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
         this.tag_items2 = this.items2.map(tag_alias)
       }
+      
     },
     search (val) {
       let term = val || ''
@@ -374,8 +388,13 @@ export default {
     search2 (val) {
       let term = val || ''
       term.trim()
-    
+      console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
+    let pathData = this.$store.dispatch('getPathDataAction', {
+      assetId: 'asset123'
+    });
+    console.log('PathData: ', pathData)
+
     },
     select () {
       this.$store.dispatch('trigger_select', {value:this.select})
@@ -482,6 +501,11 @@ export default {
       this.search = this.search2;
       this.search2 = temp;
     },
+
+    handleNavigationMode(){
+      this.showSearch2 = true
+      this.$store.dispatch('vxg_trigger_clear');
+    },
  
 
     moveRoute(menuView) {
@@ -561,6 +585,8 @@ export default {
       this.search = '';
       this.search2 = '';
       this.$root.$emit('clear-nav-stages');
+
+
     },
     show(action) {
       return this.allow(action) &&

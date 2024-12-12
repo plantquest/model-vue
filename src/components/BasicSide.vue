@@ -314,6 +314,10 @@ export default {
   },
 
   watch: {
+    search2(newVal) {
+      console.log('search2 is being triggered')
+    this.refreshRoute();
+  },
     menuViewIndex(index) {
       let pathname = null
       pathname = this.menuView.name
@@ -488,10 +492,14 @@ export default {
       toggleSearch2() {
           this.showSearch2 = !this.showSearch2;
         },
-        reverseInputs() {
+    reverseInputs() {
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
+    },
+    refreshRoute(){
+     this.search = this.search;
+     this.search2 = this.search2;
     },
 
     handleNavigationMode(){

@@ -1,5 +1,5 @@
 <template>
-    <div class="basic-nav-stages"   style="position: absolute;z-index:99; width:270px; height:300px;left:7px;    top: 250px;">
+    <div class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
         <v-expansion-panels class="mb-12" v-model="isExpanded" >
       <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
         <v-expansion-panel-header 
@@ -26,13 +26,7 @@
               <h3>STAGE {{ index+1 }}</h3>
               <p>{{ message }}</p>
         
-            
-            
-              
             </div>
-            
-           
-         
         </v-expansion-panel-content>
 
        

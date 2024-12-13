@@ -314,6 +314,10 @@ export default {
   },
 
   watch: {
+    search2(newVal) {
+      console.log('search2 is being triggered')
+    this.refreshRoute();
+  },
     menuViewIndex(index) {
       let pathname = null
       pathname = this.menuView.name
@@ -352,13 +356,27 @@ export default {
         console.log('search is being triggerecd')
       }
     },
+    // create a watcher for changes in pathData
 
+    '$store.state.pathData' (data) {
+      console.log('PathData: ', data)
+    },
     '$store.state.trigger.search.b' (term) {
+
+      const pathData = this.$store.dispatch('get_path_data', { 
+      assetId: 'asset123' 
+    }).then((data) => {
+      console.log('PathData: ', data)
+    })
+ 
+
+      console.log('search.b is being triggered')
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
         this.tag_items2 = this.items2.map(tag_alias)
       }
+      
     },
     search (val) {
       let term = val || ''
@@ -374,8 +392,13 @@ export default {
     search2 (val) {
       let term = val || ''
       term.trim()
-    
+      console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
+    let pathData = this.$store.dispatch('getPathDataAction', {
+      assetId: 'asset123'
+    });
+    console.log('PathData: ', pathData)
+
     },
     select () {
       this.$store.dispatch('trigger_select', {value:this.select})
@@ -477,10 +500,14 @@ export default {
       toggleSearch2() {
           this.showSearch2 = !this.showSearch2;
         },
-        reverseInputs() {
+    reverseInputs() {
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
+    },
+    refreshRoute(){
+     this.search = this.search;
+     this.search2 = this.search2;
     },
 
     handleNavigationMode(){
@@ -566,6 +593,7 @@ export default {
       this.search = '';
       this.search2 = '';
       this.$root.$emit('clear-nav-stages');
+      this.showSearch2 = false
     },
     show(action) {
       return this.allow(action) &&

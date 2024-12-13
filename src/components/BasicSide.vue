@@ -41,9 +41,11 @@
       <v-btn
           v-if="show('clear') && tool.clear.active"
            text
-            style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
+           class="pr-2"
+            style="display:inline-block; justify-content: end; text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
           @click="clearFilter"
-      >Clear</v-btn>
+      >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
+
 
 
 <div v-if="$route.name == 'pqview'">

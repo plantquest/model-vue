@@ -50,7 +50,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="handleNavigationMode"
+        @click="handleNavigationClick"
         
          />
 
@@ -502,9 +502,9 @@ export default {
       this.search2 = temp;
     },
 
-    handleNavigationMode(){
+    handleNavigationClick(){
       this.showSearch2 = true
-      this.$store.dispatch('vxg_trigger_clear');
+      this.$store.dispatch('vxg_trigger_assets_clear');
     },
  
 

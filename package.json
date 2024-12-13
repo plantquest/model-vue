@@ -1,3 +1,4 @@
+
 {
   "name": "@plantquest/model-vue",
   "version": "0.16.85-pqview",
@@ -69,3 +70,4 @@
     "webpack-node-externals": "3.0.0"
   }
 }
+

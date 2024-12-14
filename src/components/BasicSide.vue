@@ -79,6 +79,7 @@
         ref="search"
         class="comboxSearch d-flex justify-space-between"
         v-model="search"
+        :search-input.sync="searchInput"
         @keydown="changeSearch($event)"
         @click:clear="changeSearch($event)"
         :items="tag_items"
@@ -268,7 +269,7 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-    
+      searchInput : '',
       tag_items:[],
       search2:'',
       tag_items2:[],
@@ -591,6 +592,7 @@ export default {
     clearFilter () {
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
+      this.searchInput = '';
       this.search2 = '';
       this.$root.$emit('clear-nav-stages');
       this.showSearch2 = false

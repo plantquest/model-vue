@@ -1,7 +1,9 @@
 <template>
-    <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
+    <div  class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);"
+    
+    >
         <v-expansion-panels class="mb-12" v-model="isExpanded" >
-      <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
+      <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" v-if="routeMassages.length > 0" >
         <v-expansion-panel-header 
           style="border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;" 
           @click="toggleIcon" 
@@ -16,7 +18,7 @@
             class="Layers" 
             style="margin-left: -16px; width: 30px;" 
           />
-          <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLlllE LEVELS</h4>
+          <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLE LEVEmmLS</h4>
         </v-expansion-panel-header>
         
         <v-expansion-panel-content  >

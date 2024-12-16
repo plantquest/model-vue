@@ -158,6 +158,10 @@
         v-if="showSearch2"
         :spec="spec"
     />
+    <!-- <BasicStagesNAvigation
+       
+        :spec="spec"
+    /> -->
 
 
 
@@ -219,7 +223,8 @@
 
 import Nua from 'nua'
 import {  mapActions } from 'vuex';
-import BasicNavStages from './BasicNavStages.vue';
+import BasicNavStages from './BasicNavStages.vue'
+import { BasicStagesNAvigation } from './BasicStagesNavigation.vue'
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
 
@@ -474,9 +479,11 @@ export default {
         
       },
 
-      toggleSearch2() {
+    toggleSearch2() {
           this.showSearch2 = !this.showSearch2;
         },
+
+      
         reverseInputs() {
       const temp = this.search;
       this.search = this.search2;

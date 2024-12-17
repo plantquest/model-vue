@@ -16,7 +16,7 @@
             class="Layers" 
             style="margin-left: -16px; width: 30px;" 
           />
-          <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLlllE LEVELS</h4>
+          <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
         </v-expansion-panel-header>
         
         <v-expansion-panel-content  >
@@ -147,8 +147,14 @@ export default {
      
     },
     selectStage(index) {
-        console.log('indexxxxxxxxx', index);
-      this.selectedStage = index;
+        console.log('indexx', index);
+      this.selectedStage = index+1;
+        console.log('selectedStage', this.selectedStage);
+          // Commit the mutation to update the map index in the store and log the result
+      this.$store.commit('setMapIndex',index+1);
+      console.log('Committed map index:', index);
+      this.$emit('stageSelected', index+1); 
+      this.$store.dispatch('trigger_select', {value: index+1})
     },
 
      parseLine(line){

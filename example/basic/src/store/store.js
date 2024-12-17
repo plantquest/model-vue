@@ -6,6 +6,7 @@ function makeStore(Vue) {
   
   return new Vuex.Store({
     state: {
+      // mapIndex: 0,
 
       vxg: {
         ent: {
@@ -41,8 +42,17 @@ function makeStore(Vue) {
     },
     
     mutations: {
+      // SET_MAP_INDEX(state, index) {
+      //   state.mapIndex = index;
+      // },
     },
     actions: {
+      // setMapIndex({ commit }, index) {
+      //   commit('SET_MAP_INDEX', index);
+      // },
+      // getMapIndex({ state }) {
+      //   return state.mapIndex;
+      // },
     },
     modules: {
     }

@@ -74,6 +74,9 @@
   top: 1px;
   left: 13px;
 }
+.basic-nav-stages .stage.activated {
+  background-color: #258489 !important;
+}
 .v-navigation-drawer {
   background: #141B2D;
 }

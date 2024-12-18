@@ -206,7 +206,7 @@
         <v-card>
           <v-card-title class="headline">User Access Matrix</v-card-title>
           <v-card-text>
-            <img src="/access_matrix.png" alt="Access Matrix" style="width: 100%;">
+            <img src="/user_matrix.png" alt="Access Matrix" style="width: 100%;">
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -292,9 +292,7 @@
     },
   
     mounted() {
-      console.log('mounted', this.spec,'KD')
-      
-      
+      this.$props.spec.ent.primary.field.profile.kind.eo.title = 'Engineering'
     },
   
     async created () {

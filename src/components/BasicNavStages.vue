@@ -21,10 +21,10 @@
         
         <v-expansion-panel-content  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
-            @click="selectStage(index)"
-              v-bind:class="{ 'activated': selectStage == index }">
+            @click="selectStage(message.map)"
+              v-bind:class="{ 'activated': selectedStage == index  }">
               <h3>STAGE {{ index+1 }}</h3>
-              <p>{{ message }}</p>
+              <p>{{ message.msg }}</p>
         
             </div>
         </v-expansion-panel-content>
@@ -49,8 +49,9 @@ export default {
             pathData: null ,// Add a data property to store the pathData
             parsedPathData: null,
             pathArray: null,
+            mapValues: [],
             routeMassages: [],
-            selectedstage : 0,
+            selectedStage : 0,
             levelNames : [
                         'Level 1',
                         'Level 1 Mezz & Intersticial',
@@ -87,6 +88,12 @@ export default {
 
           let parsedLines = this.parseLines(this.pathArray); 
           console.log('parsedLines', parsedLines);
+
+
+            //  // Map the parsedLines array to get map values
+             this.mapValues = parsedLines.map(line => line.map);
+            console.log('mapValues', this.mapValues);
+
           let stages = this.getRouteSteps(parsedLines); 
           this.routeMassages = stages; 
           console.log('stages', stages); 
@@ -118,24 +125,7 @@ export default {
     
  
   methods: {
-    // Dispatch the action to update the pathData in the store
-    // handlePathData(data) {
-    // this.$store.dispatch('set_path_data', { pathDetails: data })
-    //     .then(result => {
-    //       console.log('Dispatch result:', result);
-    //     })
-    //     .catch(error => {
-    //       console.error('Dispatch error:', error);
-    //     });
-    // },
-    // handlePathData(data) {
-    //     this.$store.commit('set_path_data', {pathDetails: data});
-              
-    //           this.$store.dispatch('set_path_data', { 
-    //       assetId: 'asset123', 
-    //       pathData: test});
-    // },
-    
+
 
 
 
@@ -148,13 +138,17 @@ export default {
     },
     selectStage(index) {
         console.log('indexx', index);
-      this.selectedStage = index+1;
+      this.selectedStage = index;
         console.log('selectedStage', this.selectedStage);
           // Commit the mutation to update the map index in the store and log the result
-      this.$store.commit('setMapIndex',index+1);
+      this.$store.commit('setMapIndex',index);
       console.log('Committed map index:', index);
-      this.$emit('stageSelected', index+1); 
-      this.$store.dispatch('trigger_select', {value: index+1})
+      this.$emit('stageSelected', index); 
+      this.$store.dispatch('trigger_select', {value: index})
+      
+     // this.$store.dispatch('trigger_select', {value: message.map})
+
+      
     },
 
      parseLine(line){
@@ -183,6 +177,7 @@ export default {
                     map : lineData.index
                 }
             })
+           
         },
 
 
@@ -202,17 +197,38 @@ export default {
                     }
                     // first node type Standar (j)
                     if(j < steps.length-3){
-                        msg += `${this.levelNames[steps[j].map-1]}`
-                        messages.push(msg)
+                        msg += `${this.levelNames[steps[j].map]}`
+                        messages.push({msg, map: steps[i].map});
                     }
                     i=j;
                 }
             }
 
             if(messages.length > 0){
-                messages.push(`Proceed to your destination.`)
-                        }
+              messages.push({
+                 msg : `Proceed to your destination.`,
+                  map : steps[steps.length-1].map,
+                
+                })
+              }
             console.log('Steps:', steps);
+
+              //         if(levels.length > 0){
+              //   levels.push({
+              //     msg : `Proceed to your destination.`,
+              //     map : steps[steps.length-1].map,
+              //     endIndex : steps.length-1,
+              //     startIndex : startIndex
+              //   })
+              // }else {
+              //   levels.push({
+              //     msg : `Proceed to your destination.`,
+              //     map : steps[steps.length-1].map,
+              //     endIndex : steps.length-1,
+              //     startIndex : 0
+              //   })
+              // }
+              // return levels;
 
             return messages;
         },
@@ -275,7 +291,7 @@ export default {
     }
 
     .stage.activated {
-        background-color: #258489 !important;
+        background-color: #C0E28B !important;
     }
     
 }

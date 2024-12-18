@@ -1,7 +1,6 @@
-
 {
   "name": "@plantquest/model-vue",
-  "version": "0.16.85-pqview",
+  "version": "0.16.55-pqview",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -70,4 +69,3 @@
     "webpack-node-externals": "3.0.0"
   }
 }
-

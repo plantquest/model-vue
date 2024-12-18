@@ -201,7 +201,7 @@
     </div>
 
       <v-spacer></v-spacer>
-      <v-divider style="margin-top: 65px;"></v-divider>
+      <v-divider v-if="!showSearch2" style="margin-top: 65px;"></v-divider>
 
       
     </v-sheet>
@@ -512,6 +512,7 @@ export default {
 
     handleNavigationMode(){
       this.showSearch2 = true
+      this.$store.dispatch('vxg_handle_navigation_mode', this.showSearch2)
       this.$store.dispatch('vxg_trigger_clear');
     },
  
@@ -594,6 +595,7 @@ export default {
       this.search2 = '';
       this.$root.$emit('clear-nav-stages');
       this.showSearch2 = false
+      this.$store.dispatch('vxg_handle_navigation_mode', this.showSearch2)
     },
     show(action) {
       return this.allow(action) &&

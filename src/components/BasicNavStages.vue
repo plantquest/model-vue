@@ -22,7 +22,7 @@
         <v-expansion-panel-content  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
             @click="selectStage(message.map)"
-              v-bind:class="{ 'activated': selectedStage == index  }">
+              v-bind:class="{ 'activated': selectedStage == (index+1 ) }">
               <h3>STAGE {{ index+1 }}</h3>
               <p>{{ message.msg }}</p>
         
@@ -291,7 +291,7 @@ export default {
     }
 
     .stage.activated {
-        background-color: #C0E28B !important;
+        background-color:#C0E28B !important;
     }
     
 }

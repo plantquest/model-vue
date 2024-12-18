@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer app class="vxg-side" :style="drawerStyle">
     
-    <v-sheet class="d-flex flex-column h-100">
+    <v-sheet class="d-flex flex-column" style="height: calc(100vh - 58px);">
       <!-- Header -->
       <div class="d-flex justify-space-between "
        style="background:#27324A" >
@@ -204,13 +204,13 @@
       <v-divider v-if="!showSearch2" style="margin-top: 65px;"></v-divider>
 
       
-      <!-- Footer -->
-      <component  
-        v-if="spec.footer.active"
-        :is="spec.footer.cmp"
-        :spec="spec.footer.spec"
-      />
     </v-sheet>
+    <!-- Footer -->
+    <component  
+      v-if="spec.footer.active"
+      :is="spec.footer.cmp"
+      :spec="spec.footer.spec"
+    />
  
   </v-navigation-drawer>
 </template>

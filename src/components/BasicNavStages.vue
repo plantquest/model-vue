@@ -1,14 +1,12 @@
 <template>
     <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
         <v-expansion-panels class="mb-12" v-model="isExpanded" >
-      <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
+      <v-expansion-panel style="background-color:#DCEEEF" >
         <v-expansion-panel-header 
           style="border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;" 
-          @click="toggleIcon" 
         >
-          <template v-slot:actions @click="toggleIcon" >
-            <img v-if="isExpanded" :src="`${publicPath}${iconSrc}`" alt="Collapse Icon" style="margin-left: 45px;" />
-            <img v-else :src="`${publicPath}${iconSrc}`" alt="Expand Icon" style="margin-left: 45px;" />
+          <template v-slot:actions> 
+            <img @click="toggleIcon" :src="`${publicPath}${iconSrc}`" alt="Collapse Icon" style="margin-left: 45px;" />
           </template>
           <img 
             :src="`${publicPath}Layers.svg`" 
@@ -43,7 +41,7 @@ export default {
     data() {
         return {
             showNav: true,
-            isExpanded: false,
+            isExpanded: undefined,
             iconSrc: 'nav_in.svg', // Initial icon
             publicPath: process.env.BASE_URL || '/',
             pathData: null ,// Add a data property to store the pathData
@@ -69,8 +67,9 @@ export default {
     }),
   },
     watch: {
-    isExpanded() {
-      this.toggleIcon();
+    ToggelExpanded() {
+      console.log('isExpanded', this.isExpanded);
+     return this.isExpanded = !this.isExpanded;
     },
     // create a watcher for changes in pathData
     '$store.state.pathData': {
@@ -237,8 +236,8 @@ export default {
    
     
     toggleIcon() {
-      
-      this.iconSrc = this.isExpanded ? 'nav_in.svg' : 'nav_out.svg';
+      console.log("ToggelIcon , isExpanded : ", this.isExpanded);
+      this.iconSrc = this.isExpanded==0 ? 'nav_in.svg' : 'nav_out.svg';
       
     },
     clearState() {

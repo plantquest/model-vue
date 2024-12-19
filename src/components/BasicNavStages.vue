@@ -21,8 +21,8 @@
         
         <v-expansion-panel-content  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
-            @click="selectStage(message.map)"
-              v-bind:class="{ 'activated': selectedStage == (index+1 ) }">
+            @click="selectStage(message.map); activeStage = index"
+              v-bind:class="{ 'activated': activeStage == index }">
               <h3>STAGE {{ index+1 }}</h3>
               <p>{{ message.msg }}</p>
         
@@ -52,6 +52,7 @@ export default {
             mapValues: [],
             routeMassages: [],
             selectedStage : 0,
+            activeStage: 0,
             levelNames : [
                         'Level 1',
                         'Level 1 Mezz & Intersticial',
@@ -236,7 +237,9 @@ export default {
    
     
     toggleIcon() {
+      
       this.iconSrc = this.isExpanded ? 'nav_in.svg' : 'nav_out.svg';
+      
     },
     clearState() {
       this.isExpanded = false;

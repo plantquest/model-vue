@@ -270,9 +270,6 @@ export default {
         left: 13px;
     }
 
-    .stage.activated {
-        background-color: #258489 !important;
-    }
     
 }
 

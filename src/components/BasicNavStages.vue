@@ -169,6 +169,7 @@ export default {
             return result;
         },
         parseLines(data){
+          if (data)
             return data.map(lineData => {
                 console.log(lineData.detail)
                 let data = lineData.detail.split(',')
@@ -178,6 +179,7 @@ export default {
                     map : lineData.index
                 }
             })
+          else return [];
            
         },
 

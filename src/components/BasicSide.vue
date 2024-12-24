@@ -436,6 +436,11 @@ export default {
   
   
   computed: {
+
+    triggerSelect() {
+      return this.$store.state.trigger.select;
+    },
+
     filterDisabled () {
       return this.$store.state.trigger.filter_disabled.value
     },
@@ -511,6 +516,7 @@ export default {
     },
 
     handleNavigationMode(){
+      console.log('Trigger select:', this.triggerSelect);
       this.showSearch2 = true
       this.$store.dispatch('vxg_handle_navigation_mode', this.showSearch2)
       this.$store.dispatch('vxg_trigger_clear');
@@ -650,9 +656,9 @@ export default {
     }
   },
 
-  // mounted() {
-  //   document.addEventListener('click', this.handleClickOutside);
-  // },
+  mounted() {
+   
+  },
   // beforeDestroy() {
   //   document.removeEventListener('click', this.handleClickOutside);
   // }

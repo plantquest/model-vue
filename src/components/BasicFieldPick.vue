@@ -25,9 +25,25 @@ export default {
     
   data () {
     return {
+      currentUser: null,
+      userRole: {},
     }
   },
+  mounted() {
+    console.log(this.$props.field, 'this.$props.field')
 
+    this.currentUser = this.$store.state.current_user.profile
+      this.userRole ={ ...this.$props.field.kind };
+
+      if (this.currentUser === 'sea') {
+        delete this.userRole.gea;
+        console.log(this.userRole,'gea role has been removed for sea');
+      } else if (this.currentUser === 'eo') {
+
+        this.userRole = { 'ob' : this.userRole.ob }
+        console.log(this.userRole,'gea role has been removed for sea');
+      }
+  },
   created () {
     let custom = this.custom = this.field.custom || {}
     custom.allow = custom.allow || (()=>true)

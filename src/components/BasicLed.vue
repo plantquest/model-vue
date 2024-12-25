@@ -39,7 +39,7 @@
               :color="'outofdate'===item[header.value]?'red':'suspended'===item[header.value]?'orange':'blue'"
               style="font-weight:bold;color:white;"
               >
-              {{ (header.kind[item[header.value]]||{}).title }}
+              {{ getTitle(item[header.value]) }}
             </v-chip>
           </span>
           <span v-else-if="'datetime'===header.type">
@@ -280,6 +280,8 @@
         loadlen: 0,
         showprogress: true,
         loadingerror: false,
+        currentUser: null,
+        userRole: {},
         // 'loading' | 'error' | 'done'
         loadState: 'loading',
         remove: {
@@ -293,6 +295,18 @@
   
     mounted() {
       this.$props.spec.ent.primary.field.profile.kind.eo.title = 'Engineering'
+
+      this.currentUser = this.$store.state.current_user.profile
+      this.userRole = this.$props.spec.ent.primary.field.profile.kind
+
+      if (this.currentUser === 'sea') {
+        delete this.userRole.gea;
+        console.log(this.userRole,'gea role has been removed for sea');
+      } else if (this.currentUser === 'eo') {
+
+        this.userRole = { 'ob' : this.userRole.ob }
+        console.log(this.userRole,'gea role has been removed for sea');
+      }
     },
   
     async created () {
@@ -435,7 +449,24 @@
   
   
     methods: {
-  
+      getTitle(title){
+        switch (title) {
+        case 'sea':
+          return 'Site Engineering Admin';
+
+        case 'eo':
+          return 'Engineering';
+
+        case 'gea':
+          return 'Globle Engineering Admin';
+
+        case 'op' : 
+          return 'Operator'
+
+        case 'ob': 
+          return 'Observer'
+      }
+      },
       itemslot (header) {
         return 'item.'+header.value
       },
@@ -454,7 +485,12 @@
         if (false === this.spec.edit.active) {
           return;
         }
-        
+        if(this.currentUser == 'sea' && selitem.profile == 'gea'){
+          return;
+        }
+        if(this.currentUser == 'eo' && selitem.profile != 'ob'){
+          return;
+        }
         // Check if the item is new or existing
         this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
         console.log('Editing mode:',this.editing)

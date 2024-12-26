@@ -253,7 +253,7 @@ export default {
 
   },
   mounted() {
-    this.parseLines(this.test); // Call parseLines with the test data
+   // this.parseLines(this.test); // Call parseLines with the test data
     this.$root.$on('clear-nav-stages', this.toggleshowNav);
   },
   beforeDestroy() {

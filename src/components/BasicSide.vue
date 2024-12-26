@@ -87,7 +87,7 @@
         outlined
         dense
         clearable
-        placeholder=""
+        placeholder="test"
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 
@@ -142,9 +142,9 @@
        style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
        @click="reverseInputs"
         />
-        <!-- <button @click="showSearch2 = false" style="">
+        <button @click="showSearch2 = false" style="">
           <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
-        </button> -->
+        </button>
       </div>
       
 
@@ -201,7 +201,7 @@
     </div>
 
       <v-spacer></v-spacer>
-      <v-divider v-if="!showSearch2" style="margin-top: 65px;"></v-divider>
+      <v-divider style="margin-top: 65px;"></v-divider>
 
       
       <!-- Footer -->
@@ -314,10 +314,6 @@ export default {
   },
 
   watch: {
-    search2(newVal) {
-      console.log('search2 is being triggered')
-    this.refreshRoute();
-  },
     menuViewIndex(index) {
       let pathname = null
       pathname = this.menuView.name
@@ -339,14 +335,6 @@ export default {
       }
       */
     },
- // create a watcher for changes in pathData
- '$store.state.pathData' (data) {
-      console.log('PathData: ', data)
-    },
-   
-
-
-
 
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
@@ -505,21 +493,16 @@ export default {
       toggleSearch2() {
           this.showSearch2 = !this.showSearch2;
         },
-    reverseInputs() {
+        reverseInputs() {
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
-    },
-    refreshRoute(){
-     this.search = this.search;
-     this.search2 = this.search2;
     },
 
     handleNavigationMode(){
       console.log('Trigger select:', this.triggerSelect);
       this.showSearch2 = true
-      this.$store.dispatch('vxg_handle_navigation_mode', this.showSearch2)
-      this.$store.dispatch('vxg_trigger_clear');
+      //this.$store.dispatch('vxg_trigger_clear');
     },
  
 
@@ -600,8 +583,8 @@ export default {
       this.search = '';
       this.search2 = '';
       this.$root.$emit('clear-nav-stages');
-      this.showSearch2 = false
-      this.$store.dispatch('vxg_handle_navigation_mode', this.showSearch2)
+
+
     },
     show(action) {
       return this.allow(action) &&

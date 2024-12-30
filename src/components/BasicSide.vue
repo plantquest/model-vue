@@ -50,7 +50,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="handleNavigationMode"
+        @click="toggleSearch2"
         
          />
 
@@ -143,7 +143,7 @@
        @click="reverseInputs"
         />
         <button @click="showSearch2 = false" style="">
-          <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
+          <v-icon style="font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
         </button>
       </div>
       
@@ -159,6 +159,7 @@
         :spec="spec"
     />
 
+    <PqsOneView  :show-search2="showSearch2" />
 
 
     
@@ -218,7 +219,7 @@
 <script>
 
 import Nua from 'nua'
-import {  mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 import BasicNavStages from './BasicNavStages.vue';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
@@ -274,7 +275,7 @@ export default {
       tag_items2:[],
       publicPath: process.env.BASE_URL || '/',
       showIcon: true, // Data property to control icon visibility
-      showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
+    //  showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
 
@@ -424,6 +425,7 @@ export default {
   
   
   computed: {
+    ...mapState(['showSearch2']),
 
     triggerSelect() {
       return this.$store.state.trigger.select;
@@ -485,14 +487,15 @@ export default {
 
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
+    ...mapMutations(['toggleSearch2']),
     closeSideInfoCard() {
         this.toggleSideInfoCardVisibility(false);
         
       },
 
-      toggleSearch2() {
-          this.showSearch2 = !this.showSearch2;
-        },
+      // toggleSearch2() {
+      //     this.showSearch2 = !this.showSearch2;
+      //   },
         reverseInputs() {
       const temp = this.search;
       this.search = this.search2;

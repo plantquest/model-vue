@@ -50,7 +50,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="toggleSearch2"
+        @click="toggleSearch2();toggleExpansion()"
         
          />
 
@@ -142,8 +142,9 @@
        style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
        @click="reverseInputs"
         />
+        
         <button @click="showSearch2 = false" style="">
-          <v-icon style="font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
+          <v-icon style="font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" ></v-icon>
         </button>
       </div>
       
@@ -155,7 +156,7 @@
       >Add Destination +</button>
 
       <BasicNavStages
-        v-if="showSearch2"
+        v-if="showSearch2 === true"
         :spec="spec"
     />
 
@@ -425,7 +426,7 @@ export default {
   
   
   computed: {
-    ...mapState(['showSearch2']),
+    ...mapState(['showSearch2','showExpansion']),
 
     triggerSelect() {
       return this.$store.state.trigger.select;
@@ -487,7 +488,7 @@ export default {
 
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
-    ...mapMutations(['toggleSearch2']),
+    ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
     closeSideInfoCard() {
         this.toggleSideInfoCardVisibility(false);
         
@@ -585,6 +586,7 @@ export default {
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
       this.search2 = '';
+      this.$store.state.showSearch2 = false;
       this.$root.$emit('clear-nav-stages');
 
 

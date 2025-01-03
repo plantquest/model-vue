@@ -87,7 +87,7 @@
         outlined
         dense
         clearable
-        placeholder="test"
+        
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 
@@ -587,6 +587,7 @@ export default {
       this.search = '';
       this.search2 = '';
       this.$store.state.showSearch2 = false;
+      this.$store.state.showExpansion = true; 
       this.$root.$emit('clear-nav-stages');
 
 

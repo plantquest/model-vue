@@ -585,7 +585,7 @@ export default {
     clearFilter () {
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
-      this.search2 = '';
+      this.$store.state.trigger.search.b = '';
       this.$store.state.showSearch2 = false;
       this.$store.state.showExpansion = true; 
       this.$root.$emit('clear-nav-stages');

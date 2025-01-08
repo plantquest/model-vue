@@ -391,6 +391,7 @@ export default {
 
     },
     select () {
+      console.log('select is being triggered')
       this.$store.dispatch('trigger_select', {value:this.select})
     },
     '$store.state.trigger.select.value' (val) {
@@ -494,9 +495,7 @@ export default {
         
       },
 
-      // toggleSearch2() {
-      //     this.showSearch2 = !this.showSearch2;
-      //   },
+ 
         reverseInputs() {
       const temp = this.search;
       this.search = this.search2;
@@ -504,7 +503,6 @@ export default {
     },
 
     handleNavigationMode(){
-      console.log('Trigger select:', this.triggerSelect);
       this.showSearch2 = true
       //this.$store.dispatch('vxg_trigger_clear');
     },

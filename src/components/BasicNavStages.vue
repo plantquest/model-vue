@@ -75,6 +75,11 @@ export default {
     // create a watcher for changes in pathData
     '$store.state.pathData': {
     handler(data) {
+      if (!data || !data.asset123) {
+    console.warn("PathData is undefined or missing asset123");
+    return;
+      }
+
       console.log('PathData12333: ', data.asset123);
       this.pathData = data.asset123; 
       console.log('this.pathData', this.pathData);

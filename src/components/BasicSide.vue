@@ -341,23 +341,21 @@ export default {
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
-        // this.tag_items = this.items.map(v => v.tag)
         this.tag_items = this.items.map(tag_alias)
         console.log('search is being triggerecd')
+         // Set pathData to null
+       // this.$store.commit('set_path_data', null)
       }
     },
     // create a watcher for changes in pathData
 
-    '$store.state.pathData' (data) {
-      console.log('PathData: ', data)
-    },
     '$store.state.trigger.search.b' (term) {
 
-      const pathData = this.$store.dispatch('get_path_data', { 
-      assetId: 'asset123' 
-    }).then((data) => {
-      console.log('PathData: ', data)
-    })
+    //   const pathData = this.$store.dispatch('get_path_data', { 
+    //   assetId: 'asset123' 
+    // }).then((data) => {
+    //   console.log('PathData: ', data)
+    // })
  
 
       console.log('search.b is being triggered')
@@ -365,6 +363,7 @@ export default {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
         this.tag_items2 = this.items2.map(tag_alias)
+      //  this.$store.commit('set_path_data', null)
       }
       
     },
@@ -384,10 +383,10 @@ export default {
       term.trim()
       console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
-    let pathData = this.$store.dispatch('getPathDataAction', {
-      assetId: 'asset123'
-    });
-    console.log('PathData: ', pathData)
+    // let pathData = this.$store.dispatch('set_path_data', {
+    //   assetId: 'asset123'
+    // });
+    // console.log('PathData: ', pathData)
 
     },
     select () {

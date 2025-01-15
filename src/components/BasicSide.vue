@@ -160,8 +160,6 @@
         :spec="spec"
     />
 
-    <PqsOneView  :show-search2="showSearch2" />
-
 
     
 
@@ -422,6 +420,21 @@ export default {
         this.menuView = this.menuViewList[route.index]
       } 
     },
+    '$store.state.trigger.select.value': {
+      handler(newVal) {
+        try {
+          if (newVal) {
+            const room = this.getRoom()
+            if (room) {
+              this.select = newVal
+            }
+          }
+        } catch (error) {
+          console.error('Error processing room selection:', error)
+        }
+      },
+      immediate: true
+    }
   },
   
   
@@ -639,6 +652,14 @@ export default {
     },
     action(name) {
       this.$emit('action', name)
+    },
+    getRoom() {
+      const room = this.$store.state.room
+      if (!room) {
+        console.warn('Room is not available')
+        return null
+      }
+      return room
     }
   },
 

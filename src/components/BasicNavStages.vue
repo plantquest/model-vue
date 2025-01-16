@@ -74,38 +74,37 @@ export default {
     },
     // create a watcher for changes in pathData
     '$store.state.pathData': {
-    handler(data) {
-      console.log('PathData12333: ', data.asset123);
+    async handler(data) {
+      if (!data || !data.asset123) {
+        console.warn("PathData is undefined or missing asset123");
+        this.routeMassages = []; // Clear stages if data is invalid
+        return;
+      }
+
       this.pathData = data.asset123; 
       console.log('this.pathData', this.pathData);
 
       try {
         const parsedData = JSON.parse(this.pathData);
-        console.log('parsedData', parsedData);
-
-        if (parsedData && parsedData.length > 0) { 
-          this.pathArray = parsedData[0]; 
-          console.log('pathArray', this.pathArray);
-
-          let parsedLines = this.parseLines(this.pathArray); 
-          console.log('parsedLines', parsedLines);
-
-
-            //  // Map the parsedLines array to get map values
-             this.mapValues = parsedLines.map(line => line.map);
-            console.log('mapValues', this.mapValues);
-
-          let stages = this.getRouteSteps(parsedLines); 
-          this.routeMassages = stages; 
-          console.log('stages', stages); 
-        } else {
+        if (!Array.isArray(parsedData) || parsedData.length === 0) {
           console.warn("Invalid or empty pathData");
-          // Handle the case where parsedData is empty or invalid
+          this.routeMassages = []; // Clear stages if data is invalid
+          return;
         }
+
+        this.pathArray = parsedData[0]; 
+        let parsedLines = this.parseLines(this.pathArray); 
+
+        // Map the parsedLines array to get map values
+        this.mapValues = parsedLines.map(line => line.map);
+
+        let stages = await this.getRouteSteps(parsedLines); 
+        this.routeMassages = stages; 
+        console.log('stages', stages); 
 
       } catch (error) {
         console.error("Error parsing pathData:", error);
-        // Handle the error gracefully 
+        this.routeMassages = []; // Clear stages on error
       }
 
       // Dispatch the action (optional)
@@ -169,6 +168,7 @@ export default {
             return result;
         },
         parseLines(data){
+          if (data)
             return data.map(lineData => {
                 console.log(lineData.detail)
                 let data = lineData.detail.split(',')
@@ -178,12 +178,13 @@ export default {
                     map : lineData.index
                 }
             })
+          else return [];
            
         },
 
 
 
-        getRouteSteps(routeData){
+        async getRouteSteps(routeData){
             let steps = routeData;
 
             let messages = [];
@@ -191,7 +192,7 @@ export default {
             for(var i=0; i<steps.length-2; i++){
                 if(steps[i].type == "Connector"){
                     // first node type connector (i)
-                    let msg = `Follow route to strairs and proceed to `;
+                    let msg = `Follow route to stairs and proceed to `;
                     var j = i;
                     while(steps[j].type == "Connector"){
                         j++;
@@ -253,6 +254,14 @@ export default {
   mounted() {
    // this.parseLines(this.test); // Call parseLines with the test data
     this.$root.$on('clear-nav-stages', this.toggleshowNav);
+    
+    // Automatically select Stage 1 after the stages are rendered
+    this.$nextTick(() => {
+      if (this.routeMassages.length > 0) {
+        this.selectStage(0); // Select Stage 1 (index 0)
+        this.$store.dispatch('trigger_select', { value: 0 }); // Ensure the map updates
+      }
+    });
   },
   beforeDestroy() {
     this.$root.$off('clear-nav-stages', this.toggleshowNav);

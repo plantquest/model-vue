@@ -87,7 +87,8 @@
         outlined
         dense
         clearable
-        
+        placeholder=""
+
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 

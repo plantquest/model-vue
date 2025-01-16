@@ -19,7 +19,7 @@
           <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
         </v-expansion-panel-header>
         
-        <v-expansion-panel-content  >
+        <v-expansion-panel-content style="padding-bottom: 10px;"  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
             @click="selectStage(message.map); activeStage = index"
               v-bind:class="{ 'activated': activeStage == index }">
@@ -32,8 +32,10 @@
        
       </v-expansion-panel>
     </v-expansion-panels>
-      
+    
     </div>
+    
+    
 </template>
 
 <script>
@@ -120,15 +122,8 @@ export default {
   }
 },
     
-    
-    
-    
- 
+
   methods: {
-
-
-
-
 
 
     getselectedStage() {
@@ -141,7 +136,7 @@ export default {
       this.selectedStage = index;
         console.log('selectedStage', this.selectedStage);
           // Commit the mutation to update the map index in the store and log the result
-      this.$store.commit('setMapIndex',index);
+      //this.$store.commit('setMapIndex',index);
       console.log('Committed map index:', index);
       this.$emit('stageSelected', index); 
       this.$store.dispatch('trigger_select', {value: index})
@@ -305,7 +300,11 @@ export default {
     .stage.activated {
         background-color:#C0E28B !important;
     }
-    
+    .v-divider {
+        border-color: rgb(var(--vxg-ct2)) !important;
+        margin: 16px 8px;
+        height: 22px;
+    }
 }
 
 

@@ -41,9 +41,10 @@
       <v-btn
           v-if="show('clear') && tool.clear.active"
            text
-            style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
+            style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #575c62;top:10px"
+            class="btn-clear"
           @click="clearFilter"
-      >Clear</v-btn>
+      >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">
@@ -156,7 +157,7 @@
           
       >Add Destination +</button>
 
-      <BasicNavStages
+      <BasicNavStages 
         v-if="showSearch2 === true"
         :spec="spec"
     />
@@ -210,6 +211,7 @@
         v-if="spec.footer.active"
         :is="spec.footer.cmp"
         :spec="spec.footer.spec"
+       
       />
     </v-sheet>
  
@@ -347,7 +349,12 @@ export default {
       }
     },
     // create a watcher for changes in pathData
+   '$store.state.trigger.search.b' (term) {
 
+      console.log('_____search.b is being triggered' , term)
+    
+      
+    },
     '$store.state.trigger.search.b' (term) {
 
     //   const pathData = this.$store.dispatch('get_path_data', { 
@@ -358,6 +365,7 @@ export default {
  
 
       console.log('search.b is being triggered')
+        this.search2 = term
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
@@ -382,6 +390,8 @@ export default {
       term.trim()
       console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
+      
+    // this.search2 = val
     // let pathData = this.$store.dispatch('set_path_data', {
     //   assetId: 'asset123'
     // });
@@ -389,7 +399,6 @@ export default {
 
     },
     select () {
-      console.log('select is being triggered')
       this.$store.dispatch('trigger_select', {value:this.select})
     },
     '$store.state.trigger.select.value' (val) {
@@ -508,7 +517,9 @@ export default {
         
       },
 
- 
+      // toggleSearch2() {
+      //     this.showSearch2 = !this.showSearch2;
+      //   },
         reverseInputs() {
       const temp = this.search;
       this.search = this.search2;
@@ -516,6 +527,7 @@ export default {
     },
 
     handleNavigationMode(){
+      console.log('Trigger select:', this.triggerSelect);
       this.showSearch2 = true
       //this.$store.dispatch('vxg_trigger_clear');
     },
@@ -677,7 +689,7 @@ export default {
 
 
 
-const DRAWER_STYLE = Object.freeze({ width: "282px"});
+const DRAWER_STYLE = Object.freeze({ width: "282px" });
 
 
 </script>
@@ -706,6 +718,11 @@ nav.vxg-side {
         border-color: rgb(var(--vxg-ct2)) !important;
         margin: 16px 8px;
         height: 22px;
+        position: absolute;
+        z-index: 99999;
+        left: -11px;
+        width: 100%;
+        bottom: 52px;
     }
     
 }
@@ -847,4 +864,6 @@ img{
     margin-left: 25px;
     margin-bottom: 4px;
 }
+
+
 </style>

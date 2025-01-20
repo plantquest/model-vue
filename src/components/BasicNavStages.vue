@@ -71,6 +71,20 @@ export default {
     }),
   },
     watch: {
+
+      '$store.state.trigger.select.value': function (value) {
+        console.log('__value', value);
+         
+        const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+        if (stageIndex !== -1) {
+          this.activeStage = stageIndex;
+          console.log('__activeStage', this.activeStage, stageIndex);
+          
+        }
+      },
+
+
+
     isExpanded() {
       this.toggleIcon();
     },
@@ -207,7 +221,9 @@ export default {
                   map : steps[steps.length-1].map,
                 
                 })
+
               }
+              
             console.log('Steps:', steps);
 
               //         if(levels.length > 0){

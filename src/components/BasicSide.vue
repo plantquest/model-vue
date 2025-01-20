@@ -88,7 +88,8 @@
         outlined
         dense
         clearable
-        
+        placeholder=""
+
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 
@@ -666,12 +667,12 @@ export default {
       this.$emit('action', name)
     },
     getRoom() {
-      const room = this.$store.state.room || null;
+      const room = this.$store.state.room
       if (!room) {
-        console.warn('Room is not available');
-        return null;
+        console.warn('Room is not available')
+        return null
       }
-      return room;
+      return room
     }
   },
 

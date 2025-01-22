@@ -301,11 +301,8 @@
 
       if (this.currentUser === 'sea') {
         delete this.userRole.gea;
-        console.log(this.userRole,'gea role has been removed for sea');
       } else if (this.currentUser === 'eo') {
-
         this.userRole = { 'ob' : this.userRole.ob }
-        console.log(this.userRole,'gea role has been removed for sea');
       }
     },
   
@@ -488,7 +485,7 @@
         if(this.currentUser == 'sea' && selitem.profile == 'gea'){
           return;
         }
-        if(this.currentUser == 'eo' && selitem.profile != 'ob'){
+        if(this.currentUser == 'eo' && selitem.profile != 'ob' && selitem.profile != undefined){
           return;
         }
         // Check if the item is new or existing

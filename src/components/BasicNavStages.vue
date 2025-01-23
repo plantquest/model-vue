@@ -67,10 +67,36 @@ export default {
     },
     computed: {
     ...mapState({
-      pathData: state => state.pathData, 
+      pathData: state => state.pathData,
+      activeStage: state => state.activeStage, 
     }),
   },
     watch: {
+
+    //   activeStage(newVal) {
+      
+    //   console.log('__activeStage updated:', 0);
+     
+    // },
+    
+      // Watch for changes in trigger.select.value
+      '$store.state.trigger.select.value': function (value) {
+        console.log('__value', value);
+        this.activeStage = this.$store.state.activeStage 
+
+        const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+        if (stageIndex !== -1) {
+          this.activeStage = stageIndex;
+          console.log('__activeStage', this.activeStage, stageIndex);
+        } else {
+          this.activeStage = 0;
+        }
+
+      },
+
+    
+
+
     isExpanded() {
       this.toggleIcon();
     },
@@ -207,7 +233,9 @@ export default {
                   map : steps[steps.length-1].map,
                 
                 })
+
               }
+              
             console.log('Steps:', steps);
 
               //         if(levels.length > 0){

@@ -175,12 +175,12 @@
     >
   </v-combobox>  -->
       <!-- Menu Items -->
-      <div class="Menu Items" style="margin-top:-15px;height: calc(100vh - 332px);">
+      <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
         <template v-if="menuView.mode === 'standard'" >
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && item.code !== 'admin'"
+          v-if="allow(item) && (item.title !== 'Devices') "
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
@@ -243,7 +243,7 @@ const SpecShape = Gubu({
 
 function tag_alias(asset) {
   if (null != asset.custom12) {
-    return asset.tag + '(' + asset.custom12 + ')'
+    return asset.tag + ' (' + asset.custom12 + ')'
   }
   return asset.tag
 }
@@ -468,12 +468,17 @@ export default {
     menu () {
       if (this.menuView.mode !== 'standard') return [];
 
+      let hideMenuItems = ['devices', 'Devices']
+      // next lets remove the items from the menu that are in the hideMenuItems array
+      console.log('__hideMenuItems', hideMenuItems);
       const { items, order } = this.menuView.menu;
-      return order.split(/\s*,\s*/).map(code => ({
-        ...items[code],
-        code,
-        klass: { 'vxg-router-link': true }
-      }));
+      console.log('__items', items);
+      console.log('__order', order);
+      const filteredOrder = order.split(/\s*,\s*/).filter(code => !hideMenuItems.includes(code));
+      console.log('__filteredOrder', filteredOrder);
+      const filteredItems = filteredOrder.map(code => items[code]);
+      console.log('__filteredItems', filteredItems);
+      return filteredItems;
     },
     filterIcon (){
       return this.$store.state.vxg.cmp.BasicHead.show.filter

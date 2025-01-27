@@ -41,16 +41,17 @@
       <v-btn
           v-if="show('clear') && tool.clear.active"
            text
-            style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
+            style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #575c62;top:10px"
+            class="btn-clear"
           @click="clearFilter"
-      >Clear</v-btn>
+      >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="showSearch2 = true"
+        @click="toggleSearch2();toggleExpansion()"
         
          />
 
@@ -88,6 +89,7 @@
         dense
         clearable
         placeholder=""
+
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 
@@ -142,9 +144,10 @@
        style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
        @click="reverseInputs"
         />
-        <!-- <button @click="showSearch2 = false" style="">
-          <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
-        </button> -->
+        
+        <button @click="showSearch2 = false" style="">
+          <v-icon style="font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" ></v-icon>
+        </button>
       </div>
       
 
@@ -154,11 +157,10 @@
           
       >Add Destination +</button>
 
-      <BasicNavStages
-        v-if="showSearch2"
+      <BasicNavStages 
+        v-if="showSearch2 === true"
         :spec="spec"
     />
-
 
 
     
@@ -178,7 +180,7 @@
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && item.code !== 'admin'"
+          v-if="allow(item) && (item.title !== 'Devices') "
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
@@ -209,6 +211,7 @@
         v-if="spec.footer.active"
         :is="spec.footer.cmp"
         :spec="spec.footer.spec"
+       
       />
     </v-sheet>
  
@@ -218,7 +221,7 @@
 <script>
 
 import Nua from 'nua'
-import {  mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 import BasicNavStages from './BasicNavStages.vue';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
@@ -240,7 +243,7 @@ const SpecShape = Gubu({
 
 function tag_alias(asset) {
   if (null != asset.custom12) {
-    return asset.tag + '(' + asset.custom12 + ')'
+    return asset.tag + ' (' + asset.custom12 + ')'
   }
   return asset.tag
 }
@@ -274,7 +277,7 @@ export default {
       tag_items2:[],
       publicPath: process.env.BASE_URL || '/',
       showIcon: true, // Data property to control icon visibility
-      showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
+    //  showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
 
@@ -339,30 +342,35 @@ export default {
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
-        // this.tag_items = this.items.map(v => v.tag)
         this.tag_items = this.items.map(tag_alias)
         console.log('search is being triggerecd')
+         // Set pathData to null
+       // this.$store.commit('set_path_data', null)
       }
     },
     // create a watcher for changes in pathData
+   '$store.state.trigger.search.b' (term) {
 
-    '$store.state.pathData' (data) {
-      console.log('PathData: ', data)
+      console.log('_____search.b is being triggered' , term)
+    
+      
     },
     '$store.state.trigger.search.b' (term) {
 
-      const pathData = this.$store.dispatch('get_path_data', { 
-      assetId: 'asset123' 
-    }).then((data) => {
-      console.log('PathData: ', data)
-    })
+    //   const pathData = this.$store.dispatch('get_path_data', { 
+    //   assetId: 'asset123' 
+    // }).then((data) => {
+    //   console.log('PathData: ', data)
+    // })
  
 
       console.log('search.b is being triggered')
+        this.search2 = term
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
         this.tag_items2 = this.items2.map(tag_alias)
+      //  this.$store.commit('set_path_data', null)
       }
       
     },
@@ -382,10 +390,12 @@ export default {
       term.trim()
       console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
-    let pathData = this.$store.dispatch('getPathDataAction', {
-      assetId: 'asset123'
-    });
-    console.log('PathData: ', pathData)
+      
+    // this.search2 = val
+    // let pathData = this.$store.dispatch('set_path_data', {
+    //   assetId: 'asset123'
+    // });
+    // console.log('PathData: ', pathData)
 
     },
     select () {
@@ -420,10 +430,31 @@ export default {
         this.menuView = this.menuViewList[route.index]
       } 
     },
+    '$store.state.trigger.select.value': {
+      handler(newVal) {
+        try {
+          if (newVal) {
+            const room = this.getRoom()
+            if (room) {
+              this.select = newVal
+            }
+          }
+        } catch (error) {
+          console.error('Error processing room selection:', error)
+        }
+      },
+      immediate: true
+    }
   },
   
   
   computed: {
+    ...mapState(['showSearch2','showExpansion']),
+
+    triggerSelect() {
+      return this.$store.state.trigger.select;
+    },
+
     filterDisabled () {
       return this.$store.state.trigger.filter_disabled.value
     },
@@ -437,12 +468,17 @@ export default {
     menu () {
       if (this.menuView.mode !== 'standard') return [];
 
+      let hideMenuItems = ['devices', 'Devices']
+      // next lets remove the items from the menu that are in the hideMenuItems array
+      console.log('__hideMenuItems', hideMenuItems);
       const { items, order } = this.menuView.menu;
-      return order.split(/\s*,\s*/).map(code => ({
-        ...items[code],
-        code,
-        klass: { 'vxg-router-link': true }
-      }));
+      console.log('__items', items);
+      console.log('__order', order);
+      const filteredOrder = order.split(/\s*,\s*/).filter(code => !hideMenuItems.includes(code));
+      console.log('__filteredOrder', filteredOrder);
+      const filteredItems = filteredOrder.map(code => items[code]);
+      console.log('__filteredItems', filteredItems);
+      return filteredItems;
     },
     filterIcon (){
       return this.$store.state.vxg.cmp.BasicHead.show.filter
@@ -480,18 +516,31 @@ export default {
 
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
+    ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
     closeSideInfoCard() {
         this.toggleSideInfoCardVisibility(false);
         
       },
 
-      toggleSearch2() {
-          this.showSearch2 = !this.showSearch2;
-        },
+      // toggleSearch2() {
+      //     this.showSearch2 = !this.showSearch2;
+      //   },
         reverseInputs() {
+     
+
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
+   
+
+       
+     
+    },
+
+    handleNavigationMode(){
+      console.log('Trigger select:', this.triggerSelect);
+      this.showSearch2 = true
+      //this.$store.dispatch('vxg_trigger_clear');
     },
  
 
@@ -570,8 +619,11 @@ export default {
     clearFilter () {
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
-      this.search2 = '';
-      this.$root.$emit('clear-nav-stages');
+      this.$store.state.trigger.search.b = '';
+      this.$store.state.showSearch2 = false;
+      this.$store.commit('clear_path_data');
+      this.$store.state.showExpansion = true; 
+    //  this.$root.$emit('clear-nav-stages');
 
 
     },
@@ -625,12 +677,20 @@ export default {
     },
     action(name) {
       this.$emit('action', name)
+    },
+    getRoom() {
+      const room = this.$store.state.room
+      if (!room) {
+        console.warn('Room is not available')
+        return null
+      }
+      return room
     }
   },
 
-  // mounted() {
-  //   document.addEventListener('click', this.handleClickOutside);
-  // },
+  mounted() {
+   
+  },
   // beforeDestroy() {
   //   document.removeEventListener('click', this.handleClickOutside);
   // }
@@ -641,7 +701,7 @@ export default {
 
 
 
-const DRAWER_STYLE = Object.freeze({ width: "282px"});
+const DRAWER_STYLE = Object.freeze({ width: "282px" });
 
 
 </script>
@@ -670,6 +730,11 @@ nav.vxg-side {
         border-color: rgb(var(--vxg-ct2)) !important;
         margin: 16px 8px;
         height: 22px;
+        position: absolute;
+        z-index: 99999;
+        left: -11px;
+        width: 100%;
+        bottom: 52px;
     }
     
 }
@@ -811,4 +876,6 @@ img{
     margin-left: 25px;
     margin-bottom: 4px;
 }
+
+
 </style>

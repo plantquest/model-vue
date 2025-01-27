@@ -21,9 +21,7 @@ describe('basic', function () {
     components.forEach((cm) => {
       var specfile = testfolder + '/' + cm.replace(/\.vue$/, '.spec.js')
       var exists = Fs.existsSync(specfile)
-      expect(exists ? cm.replace('.vue', '') : 'not-found:' + specfile).equal(
-        cm.replace('.vue', '')
-      )
+      expect(exists ? cm : 'not-found:' + specfile).equal(cm)
     })
   })
 })

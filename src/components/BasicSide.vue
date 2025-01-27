@@ -243,7 +243,7 @@ const SpecShape = Gubu({
 
 function tag_alias(asset) {
   if (null != asset.custom12) {
-    return asset.tag + '(' + asset.custom12 + ')'
+    return asset.tag + ' (' + asset.custom12 + ')'
   }
   return asset.tag
 }

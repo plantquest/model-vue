@@ -78,7 +78,7 @@
             :label="field.title"
             v-model="item[field.name]"
             outlined
-            :disabled="field.readonly || !allow('edit', field)"
+            :disabled="field.readonly || !allow('edit', field) && currentUser != 'eo'"
             :rules="field.rules"
             ></v-text-field>
             
@@ -298,11 +298,16 @@
 
       this.currentUser = this.$store.state.current_user.profile
       this.userRole = this.$props.spec.ent.primary.field.profile.kind
-
+      console.log(this.currentUser, 'this.currentUser');
+      
+      console.log(this.userRole, 'this.currentUser');
       if (this.currentUser === 'sea') {
         delete this.userRole.gea;
       } else if (this.currentUser === 'eo') {
-        this.userRole = { 'ob' : this.userRole.ob }
+        delete this.userRole.gea;
+        delete this.userRole.sea;
+        delete this.userRole.eo;
+        delete this.userRole.op;
       }
     },
   

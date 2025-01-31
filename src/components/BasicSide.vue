@@ -1,4 +1,8 @@
+<script>
+import { tagAlias,removeAlias } from '@/helpers/assetHelper.js';
+</script>
 <template>
+
   <v-navigation-drawer app class="vxg-side" :style="drawerStyle">
     
     <v-sheet class="d-flex flex-column h-100">
@@ -225,7 +229,6 @@ import { mapState, mapMutations, mapActions } from 'vuex';
 import BasicNavStages from './BasicNavStages.vue';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
-
 const SpecShape = Gubu({
   spec: Required(Open({
     footer: {
@@ -241,12 +244,7 @@ const SpecShape = Gubu({
   logo: String,
 })
 
-function tag_alias(asset) {
-  if (null != asset.custom12) {
-    return asset.tag + ' (' + asset.custom12 + ')'
-  }
-  return asset.tag
-}
+
 
 export default {
 
@@ -307,8 +305,8 @@ export default {
       this.items2 = [ ...tool.assets]
       if(this.items.length != 0) {
         // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
-        this.tag_items = this.items.map(tag_alias)
-        this.tag_items2 = this.items2.map(tag_alias)
+        this.tag_items = this.items.map(tagAlias)
+        this.tag_items2 = this.items2.map(tagAlias)
         this.setupMiniSearch(this.items)
         this.setupMiniSearch(this.items2)
         clearInterval(load_assets)
@@ -341,35 +339,23 @@ export default {
 
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
+        term = removeAlias(term)
         this.$refs.search.reset()
-        this.tag_items = this.items.map(tag_alias)
+        this.tag_items = this.items.map(tagAlias)
         console.log('search is being triggerecd')
          // Set pathData to null
        // this.$store.commit('set_path_data', null)
       }
     },
-    // create a watcher for changes in pathData
-   '$store.state.trigger.search.b' (term) {
-
-      console.log('_____search.b is being triggered' , term)
-    
-      
-    },
     '$store.state.trigger.search.b' (term) {
 
-    //   const pathData = this.$store.dispatch('get_path_data', { 
-    //   assetId: 'asset123' 
-    // }).then((data) => {
-    //   console.log('PathData: ', data)
-    // })
- 
-
       console.log('search.b is being triggered')
+        term = removeAlias(term)
         this.search2 = term
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
-        this.tag_items2 = this.items2.map(tag_alias)
+        this.tag_items2 = this.items2.map(v => v.tag)
       //  this.$store.commit('set_path_data', null)
       }
       
@@ -377,26 +363,18 @@ export default {
     search (val) {
       let term = val || ''
       term.trim()
-      // Todo: Is it necessary?
-      // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
-      // if(m) {
-      //   term = m[1].trim()
-      // }
+      term = removeAlias(term)
+     console.log('search is being triggered')
       // this.$store.dispatch('trigger_search', {term:this.search})
       this.$store.dispatch('trigger_search', {a: term})
     },
     search2 (val) {
       let term = val || ''
       term.trim()
+      term = removeAlias(term)
       console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
       
-    // this.search2 = val
-    // let pathData = this.$store.dispatch('set_path_data', {
-    //   assetId: 'asset123'
-    // });
-    // console.log('PathData: ', pathData)
-
     },
     select () {
       this.$store.dispatch('trigger_select', {value:this.select})
@@ -414,9 +392,6 @@ export default {
         this.$forceUpdate()
       }
     },
-
-
-
 
     '$route.name': {
       immediate: true,
@@ -573,16 +548,21 @@ export default {
         let term
         term = event.target ? event.target.value : null
         if(term) {
+          // remove the values with brackets from the search term e.g. Test Tag (D3) -> Test Tag
+          // Remove alias component inside parentheses, e.g. "Test Tag (D3)" -> "Test Tag"
+
+  
+          term = removeAlias(term)
           let out = await this.$seneca.post('sys:search, cmd:search', 
             { query: term, params: this.search_config }
           )
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc)) 
+          this.tag_items = out.data.hits.map(v=>tagAlias(v.doc)) 
         } 
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if(this.items != undefined)
-          this.tag_items = this.items.map(tag_alias) 
+          this.tag_items = this.items.map(tagAlias) 
         }
         
       }, 11)
@@ -592,19 +572,22 @@ export default {
       setTimeout(async ()=> { // wait for input
         let term
         term = event.target ? event.target.value : null
+
         if(term) {
+         term = removeAlias(term)
+
           let out = await this.$seneca.post('sys:search, cmd:search', 
             { query: term, params: this.search_config }
           )
         
         
-          this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
+          this.tag_items2 = out.data.hits.map(v=>tagAlias(v.doc))
           console.log('tag items are ', this.tag_items2)
         }
         else {
         
           if(this.items2 != undefined)
-          this.tag_items2 = this.items2.map(tag_alias)
+          this.tag_items2 = this.items2.map(tagAlias)
         }
 
         
@@ -638,9 +621,7 @@ export default {
   
 
     filter(event) {
-      // aaaaaaaaaaaa
       this.$store.dispatch('trigger_toggle_filter');
-    
       },
     
     defaultFound() {
@@ -686,12 +667,6 @@ export default {
   mounted() {
    
   },
-  // beforeDestroy() {
-  //   document.removeEventListener('click', this.handleClickOutside);
-  // }
-
-  
-
 }
 
 
@@ -707,9 +682,6 @@ const DRAWER_STYLE = Object.freeze({ width: "282px" });
 .v-navigation-drawer{
   background: #141B2D;
 }
-
-
-
 .v-navigation-drawer__content{
   overflow-y: hidden;
   
@@ -756,9 +728,6 @@ nav.vxg-side {
     margin-right: 10px;
 
 }
-
-
-
 a.vxg-router-link {
     display: block;
     margin: 0px 8px;
@@ -780,7 +749,6 @@ a.vxg-router-link {
     }
 
 }
-
 .vxg-side-open {
     width: 48px;
     height: 48px;

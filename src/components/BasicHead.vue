@@ -1,3 +1,8 @@
+<script>
+import { tagAlias,removeAlias } from '@/helpers/assetHelper.js';
+
+</script>
+
 <template>
   <v-app-bar app class="vxg-app-bar">
   <h2>Hello4</h2>
@@ -213,12 +218,7 @@
   <script>
   
   
-  function tag_alias(asset) {
-    if (null != asset.custom12) {
-      return asset.tag + ' (' + asset.custom12 + ')'
-    }
-    return asset.tag
-  }
+
   
   
   export default {
@@ -248,7 +248,7 @@
         if(this.items.length != 0) {
          
           // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
-          this.tag_items = this.items.map(tag_alias)
+          this.tag_items = this.items.map(tagAlias)
           this.setupMiniSearch(this.items)
           clearInterval(load_assets)
         } 
@@ -266,7 +266,7 @@
         if(term == '' && this.$refs.search) {
           this.$refs.search.reset()
           // this.tag_items = this.items.map(v => v.tag)
-          this.tag_items = this.items.map(tag_alias)
+          this.tag_items = this.items.map(tagAlias)
         }
       },
       search (val) {
@@ -351,6 +351,7 @@
       async setupMiniSearch(items) {
         for(const item of items) {
           // item = {...item}
+          item = removeAlias(item)
           this.$seneca.post('sys:search, cmd:add', { doc: item, })
         }
       },
@@ -371,11 +372,11 @@
               { query: term, params: this.search_config }
             )
             // this.tag_items = out.data.hits.map(v => v.id)
-            this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+            this.tag_items = out.data.hits.map(v=>tagAlias(v.doc))
           }
           else {
             // this.tag_items = this.items.map(v => v.tag)
-            this.tag_items = this.items.map(tag_alias)
+            this.tag_items = this.items.map(tagAlias)
           }
           
         }, 11)
@@ -676,14 +677,6 @@
   <script>
   
   
-  function tag_alias(asset) {
-    if (null != asset.custom12) {
-      return asset.tag + ' (' + asset.custom12 + ')'
-    }
-    return asset.tag
-  }
-  
-  
   export default {
     props: ['logo'],
   
@@ -711,7 +704,7 @@
         if(this.items.length != 0) {
          
           // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
-          this.tag_items = this.items.map(tag_alias)
+          this.tag_items = this.items.map(tagAlias)
           this.setupMiniSearch(this.items)
           clearInterval(load_assets)
         } 
@@ -729,7 +722,7 @@
         if(term == '' && this.$refs.search) {
           this.$refs.search.reset()
           // this.tag_items = this.items.map(v => v.tag)
-          this.tag_items = this.items.map(tag_alias)
+          this.tag_items = this.items.map(tagAlias)
         }
       },
       search (val) {
@@ -843,11 +836,11 @@
               { query: term, params: this.search_config }
             )
             // this.tag_items = out.data.hits.map(v => v.id)
-            this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+            this.tag_items = out.data.hits.map(v=>tagAlias(v.doc))
           }
           else {
             // this.tag_items = this.items.map(v => v.tag)
-            this.tag_items = this.items.map(tag_alias)
+            this.tag_items = this.items.map(tagAlias)
           }
           
         }, 11)

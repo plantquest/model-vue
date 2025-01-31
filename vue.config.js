@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 
 module.exports = {
   runtimeCompiler: true,
@@ -14,8 +14,8 @@ module.exports = {
     externals: /vuetify\/lib/,
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src')
-      }
+        '@': path.resolve(__dirname, 'src'),
+      },
     },
   },
   devServer: {

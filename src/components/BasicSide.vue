@@ -339,6 +339,7 @@ export default {
 
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
+        term = removeAlias(term)
         this.$refs.search.reset()
         this.tag_items = this.items.map(tagAlias)
         console.log('search is being triggerecd')
@@ -363,7 +364,7 @@ export default {
       let term = val || ''
       term.trim()
       term = removeAlias(term)
-     
+     console.log('search is being triggered')
       // this.$store.dispatch('trigger_search', {term:this.search})
       this.$store.dispatch('trigger_search', {a: term})
     },

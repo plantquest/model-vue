@@ -1,27 +1,28 @@
 <template>
-    <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
+    <div v-if="routeMessages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
         <v-expansion-panels class="mb-12" v-model="isExpanded" >
-      <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
+      <v-expansion-panel class="nav-panel" v-model="isExpanded" >
         <v-expansion-panel-header 
-          style="border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;" 
           @click="toggleIcon" 
         >
-          <template v-slot:actions @click="toggleIcon" >
-            <img v-if="isExpanded" :src="`${publicPath}${iconSrc}`" alt="Collapse Icon" style="margin-left: 45px;" />
-            <img v-else :src="`${publicPath}${iconSrc}`" alt="Expand Icon" style="margin-left: 45px;" />
+          <template v-slot:actions>
+            <img 
+              :src="`${publicPath}${iconSrc}`" 
+              :alt="isExpanded ? 'Collapse Icon' : 'Expand Icon'" 
+              class="nav-icon"
+            />
           </template>
           <img 
             :src="`${publicPath}Layers.svg`" 
             alt="Layers" 
-            class="Layers" 
-            style="margin-left: -16px; width: 30px;" 
+            class="layers-icon" 
           />
-          <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
+          <h4 class="level-header">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
         </v-expansion-panel-header>
         
         <v-expansion-panel-content style="padding-bottom: 10px;"  >
-            <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
-            @click="selectStage(message.map); activeStage = index"
+            <div v-for="(message, index) in routeMessages" :key="index" class="stage" style="background-color:white;"
+            @click="selectStage(message.map, index)"
               v-bind:class="{ 'activated': activeStage == index }">
               <h3>STAGE {{ index+1 }}</h3>
               <p>{{ message.msg }}</p>
@@ -52,7 +53,7 @@ export default {
             parsedPathData: null,
             pathArray: null,
             mapValues: [],
-            routeMassages: [],
+            routeMessages: [],
             selectedStage : 0,
             activeStage: 0,
             levelNames : [
@@ -84,7 +85,7 @@ export default {
         console.log('__value', value);
         this.activeStage = this.$store.state.activeStage 
 
-        const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+        const stageIndex = this.routeMessages.findIndex(stage => stage.map == value);
         if (stageIndex !== -1) {
           this.activeStage = stageIndex;
           console.log('__activeStage', this.activeStage, stageIndex);
@@ -105,7 +106,7 @@ export default {
     async handler(data) {
       if (!data || !data.asset123) {
         console.warn("PathData is undefined or missing asset123");
-        this.routeMassages = []; // Clear stages if data is invalid
+        this.routeMessages = []; // Clear stages if data is invalid
         return;
       }
 
@@ -116,7 +117,7 @@ export default {
         const parsedData = JSON.parse(this.pathData);
         if (!Array.isArray(parsedData) || parsedData.length === 0) {
           console.warn("Invalid or empty pathData");
-          this.routeMassages = []; // Clear stages if data is invalid
+          this.routeMessages = []; // Clear stages if data is invalid
           return;
         }
 
@@ -127,12 +128,12 @@ export default {
         this.mapValues = parsedLines.map(line => line.map);
 
         let stages = await this.getRouteSteps(parsedLines); 
-        this.routeMassages = stages; 
+        this.routeMessages = stages; 
         console.log('stages', stages); 
 
       } catch (error) {
         console.error("Error parsing pathData:", error);
-        this.routeMassages = []; // Clear stages on error
+        this.routeMessages = []; // Clear stages on error
       }
 
       // Dispatch the action (optional)
@@ -157,19 +158,28 @@ export default {
       return this.selectedStage;
      
     },
-    selectStage(index) {
-        console.log('indexx', index);
-      this.selectedStage = index;
-        console.log('selectedStage', this.selectedStage);
-          // Commit the mutation to update the map index in the store and log the result
-      //this.$store.commit('setMapIndex',index);
-      console.log('Committed map index:', index);
-      this.$emit('stageSelected', index); 
-      this.$store.dispatch('trigger_select', {value: index})
-      
-     // this.$store.dispatch('trigger_select', {value: message.map})
+    selectStage(mapIndex, stageIndex) {
+        this.selectedStage = mapIndex;
+        this.activeStage = stageIndex;
+        
+        // Emit both the map index and stage data for parent components
+        this.$emit('stageSelected', {
+            mapIndex,
+            stageIndex,
+            stageData: this.routeMessages[stageIndex]
+        });
 
-      
+        // Trigger route redraw via Vuex
+        this.$store.dispatch('trigger_select', { 
+            value: mapIndex,
+            redrawRoute: true  // Add flag to indicate route should be redrawn
+        });
+
+        // Optional: Force route recalculation
+        this.$store.dispatch('recalculateRoute', {
+            level: mapIndex,
+            path: this.pathArray
+        });
     },
 
      parseLine(line){
@@ -280,8 +290,8 @@ export default {
     
     // Automatically select Stage 1 after the stages are rendered
     this.$nextTick(() => {
-      if (this.routeMassages.length > 0) {
-        this.selectStage(0); // Select Stage 1 (index 0)
+      if (this.routeMessages.length > 0) {
+        this.selectStage(0, 0); // Select Stage 1 (index 0)
         this.$store.dispatch('trigger_select', { value: 0 }); // Ensure the map updates
       }
     });
@@ -298,41 +308,73 @@ export default {
 <style lang="scss">
 
 .basic-nav-stages {
+  position: absolute;
+  z-index: 99;
+  height: 300px;
+  left: 7px;
+  top: 250px;
+  max-width: calc(100% - 11px);
 
-    .v-expansion-panel-content__wrap {
-        
-        border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;
+  .nav-panel {
+    background-color: #DCEEEF;
+  }
+
+  .nav-icon {
+    margin-left: 45px;
+  }
+
+  .layers-icon {
+    margin-left: -16px;
+    width: 30px;
+  }
+
+  .level-header {
+    width: 300px;
+    font-size: 10px;
+  }
+
+  .v-expansion-panel-header {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
+  .v-expansion-panel-content__wrap {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
+  .stage {
+    width: 95%;
+    height: 85px;
+    margin: 0 4px 0 7px;
+    background-color: white;
+
+    &.activated {
+      background-color: #C0E28B !important;
     }
 
-    .stage {
-        width: 95%;
-        height: 85px;
-        margin: 0px 4px 0px 7px;
+    h3 {
+      position: relative;
+      font-family: "Gill Sans", sans-serif;
+      top: 4px;
+      left: 13px;
     }
 
-    .stage h3 {
-        position: relative;
-        font-family: "Gill Sans", sans-serif;
-        top: 4px;
-        left: 13px;
+    p {
+      position: relative;
+      font-family: "Gill Sans", sans-serif;
+      font-size: 15px;
+      width: 94%;
+      top: 1px;
+      left: 13px;
     }
-    .stage p {
-        position: relative;
-        font-family: "Gill Sans", sans-serif;
-        font-size: 15px;
-        width: 94%;
-        top: 1px;
-        left: 13px;
-    }
+  }
 
-    .stage.activated {
-        background-color:#C0E28B !important;
-    }
-    .v-divider {
-        border-color: rgb(var(--vxg-ct2)) !important;
-        margin: 16px 8px;
-        height: 22px;
-    }
+  .v-divider {
+    border-color: rgb(var(--vxg-ct2)) !important;
+    margin: 16px 8px;
+    height: 22px;
+  }
 }
 
 

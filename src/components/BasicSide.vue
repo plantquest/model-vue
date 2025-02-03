@@ -43,7 +43,7 @@
            text
             style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #575c62;top:10px"
             class="btn-clear"
-          @click="clearFilter"
+          @click="clearFilter();toggleSearchMode()"
       >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
@@ -51,7 +51,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="toggleSearch2();toggleExpansion()"
+        @click="toggleSearchMode();toggleExpansion()"
         
          />
 
@@ -264,6 +264,7 @@ export default {
   
   data () {
     return {
+      showSearch2: true,
       open: true,
       menuShowTitle: false,
       menuViewList: [],
@@ -512,6 +513,10 @@ export default {
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
     ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
+
+    toggleSearchMode() {
+      this.showSearch2 = !this.showSearch2;
+    },
     closeSideInfoCard() {
         this.toggleSideInfoCardVisibility(false);
         

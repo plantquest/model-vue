@@ -71,7 +71,7 @@ export default {
       activeStage: state => state.activeStage, 
     }),
   },
-    watch: {
+    slwatch: {
 
     //   activeStage(newVal) {
       

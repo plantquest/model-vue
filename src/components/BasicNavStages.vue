@@ -82,17 +82,17 @@ export default {
     
       // Watch for changes in trigger.select.value
       '$store.state.trigger.select.value': function (value) {
-        console.log('__value', value);
-        this.activeStage = this.$store.state.activeStage 
+        console.log('Trigger select value changed:', {
+            value,
+            currentStage: this.$store.state.activeStage,
+            routeMessages: this.routeMessages
+        });
 
-        const stageIndex = this.routeMessages.findIndex(stage => stage.map == value);
+        const stageIndex = this.routeMessages.findIndex(stage => stage.map === value);
         if (stageIndex !== -1) {
-          this.activeStage = stageIndex;
-          console.log('__activeStage', this.activeStage, stageIndex);
-        } else {
-          this.activeStage = 0;
+            this.activeStage = stageIndex;
+            console.log('Updated active stage:', this.activeStage);
         }
-
       },
 
     
@@ -159,26 +159,50 @@ export default {
      
     },
     selectStage(mapIndex, stageIndex) {
+        console.log('Selecting stage - Full details:', {
+            mapIndex,
+            stageIndex,
+            selectedRoute: this.routeMessages[stageIndex],
+            pathArray: this.pathArray
+        });
+        
+        const selectedRoute = this.routeMessages[stageIndex];
+        if (!selectedRoute) {
+            console.warn('No route found for stageIndex:', stageIndex);
+            return;
+        }
+
         this.selectedStage = mapIndex;
         this.activeStage = stageIndex;
         
-        // Emit both the map index and stage data for parent components
-        this.$emit('stageSelected', {
-            mapIndex,
-            stageIndex,
-            stageData: this.routeMessages[stageIndex]
-        });
-
-        // Trigger route redraw via Vuex
+        // First trigger the route update
         this.$store.dispatch('trigger_select', { 
             value: mapIndex,
-            redrawRoute: true  // Add flag to indicate route should be redrawn
-        });
+            stage: selectedRoute.stage,
+            redrawRoute: true
+        }).then(() => {
+            // After route is triggered, update store and recalculate
+            this.$store.commit('SET_ACTIVE_STAGE', selectedRoute.stage);
+            
+            this.$emit('stageSelected', {
+                mapIndex,
+                stageIndex,
+                stage: selectedRoute.stage,
+                stageData: selectedRoute
+            });
 
-        // Optional: Force route recalculation
-        this.$store.dispatch('recalculateRoute', {
-            level: mapIndex,
-            path: this.pathArray
+            // Ensure pathArray exists before recalculating
+            if (this.pathArray && this.pathArray.length > 0) {
+                this.$store.dispatch('recalculateRoute', {
+                    level: mapIndex,
+                    stage: selectedRoute.stage,
+                    path: this.pathArray
+                });
+            } else {
+                console.warn('PathArray is empty or undefined');
+            }
+        }).catch(error => {
+            console.error('Error during stage selection:', error);
         });
     },
 

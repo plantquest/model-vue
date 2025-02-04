@@ -88,10 +88,19 @@ export default {
             routeMessages: this.routeMessages
         });
 
-        const stageIndex = this.routeMessages.findIndex(stage => stage.map === value);
-        if (stageIndex !== -1) {
+        const currentStage = this.$store.state.activeStage;
+        const matchingRoute = this.routeMessages.find(route => 
+            route.map === value && route.stage === currentStage
+        );
+
+        if (matchingRoute) {
+            const stageIndex = this.routeMessages.indexOf(matchingRoute);
             this.activeStage = stageIndex;
-            console.log('Updated active stage:', this.activeStage);
+            console.log('Updated active stage:', {
+                stageIndex,
+                stage: matchingRoute.stage,
+                map: value
+            });
         }
       },
 
@@ -159,7 +168,7 @@ export default {
      
     },
     selectStage(mapIndex, stageIndex) {
-        console.log('Selecting stage - Full details:', {
+        console.log('Selecting stage:', {
             mapIndex,
             stageIndex,
             selectedRoute: this.routeMessages[stageIndex],
@@ -174,33 +183,60 @@ export default {
 
         this.selectedStage = mapIndex;
         this.activeStage = stageIndex;
+
+        // First update the store state
+        this.$store.commit('SET_ACTIVE_STAGE', selectedRoute.stage);
         
-        // First trigger the route update
-        this.$store.dispatch('trigger_select', { 
-            value: mapIndex,
-            stage: selectedRoute.stage,
-            redrawRoute: true
-        }).then(() => {
-            // After route is triggered, update store and recalculate
-            this.$store.commit('SET_ACTIVE_STAGE', selectedRoute.stage);
+        // If this is the final stage (destination), clear the route
+        if (stageIndex === this.routeMessages.length - 1) {
+            this.$store.dispatch('trigger_select', { 
+                value: mapIndex,
+                stage: selectedRoute.stage,
+                redrawRoute: false // Don't redraw for final stage
+            });
+            
+            // Clear the route
+            this.$store.dispatch('recalculateRoute', {
+                level: mapIndex,
+                stage: selectedRoute.stage,
+                path: [] // Empty path to clear the route
+            });
             
             this.$emit('stageSelected', {
                 mapIndex,
                 stageIndex,
                 stage: selectedRoute.stage,
-                stageData: selectedRoute
+                stageData: selectedRoute,
+                isFinalStage: true
             });
+            return;
+        }
 
-            // Ensure pathArray exists before recalculating
-            if (this.pathArray && this.pathArray.length > 0) {
-                this.$store.dispatch('recalculateRoute', {
-                    level: mapIndex,
-                    stage: selectedRoute.stage,
-                    path: this.pathArray
-                });
-            } else {
-                console.warn('PathArray is empty or undefined');
-            }
+        // For non-final stages, proceed with normal route drawing
+        const stagePathData = this.pathArray.filter(item => 
+            parseInt(item.stage) === parseInt(selectedRoute.stage)
+        );
+
+        Promise.all([
+            this.$store.dispatch('trigger_select', { 
+                value: mapIndex,
+                stage: selectedRoute.stage,
+                redrawRoute: true
+            }),
+            this.$store.dispatch('recalculateRoute', {
+                level: mapIndex,
+                stage: selectedRoute.stage,
+                path: stagePathData
+            })
+        ]).then(() => {
+            this.$emit('stageSelected', {
+                mapIndex,
+                stageIndex,
+                stage: selectedRoute.stage,
+                stageData: selectedRoute,
+                pathData: stagePathData,
+                isFinalStage: false
+            });
         }).catch(error => {
             console.error('Error during stage selection:', error);
         });
@@ -222,74 +258,62 @@ export default {
             console.log('Parsed Line:', result);
             return result;
         },
-        parseLines(data){
-          if (data)
-            return data.map(lineData => {
-                console.log(lineData.detail)
-                let data = lineData.detail.split(',')
-                return {
-                    id : data[0],
-                    type : data[1],
-                    map : lineData.index
-                }
-            })
-          else return [];
-           
+        parseLines(data) {
+          if (!data) return [];
+          
+          // Group items by stage
+          const groupedByStage = data.reduce((acc, lineData) => {
+            const stage = lineData.stage;
+            if (!acc[stage]) {
+              acc[stage] = [];
+            }
+            acc[stage].push({
+              id: lineData.detail.split(',')[0],
+              type: lineData.detail.split(',')[1],
+              map: lineData.index,
+              stage: lineData.stage
+            });
+            return acc;
+          }, {});
+
+          // Convert grouped data to array format
+          return Object.entries(groupedByStage).map(([stage, items]) => ({
+            items,
+            stage: parseInt(stage),
+            map: items[0].map // Use first item's map as reference
+          }));
         },
 
 
 
-        async getRouteSteps(routeData){
-            let steps = routeData;
-
-            let messages = [];
-
-            for(var i=0; i<steps.length-2; i++){
-                if(steps[i].type == "Connector"){
-                    // first node type connector (i)
-                    let msg = `Follow route to stairs and proceed to `;
-                    var j = i;
-                    while(steps[j].type == "Connector"){
-                        j++;
-                    }
-                    // first node type Standar (j)
-                    if(j < steps.length-3){
-                        msg += `${this.levelNames[steps[j].map]}`
-                        messages.push({msg, map: steps[i].map});
-                    }
-                    i=j;
-                }
-            }
-
-            if(messages.length > 0){
+        async getRouteSteps(routeData) {
+          let messages = [];
+          
+          routeData.forEach(stageGroup => {
+            const connectorItem = stageGroup.items.find(item => item.type === "Connector");
+            
+            if (connectorItem) {
+              const msg = `Follow route to stairs and proceed to ${this.levelNames[stageGroup.map]}`;
               messages.push({
-                 msg : `Proceed to your destination.`,
-                  map : steps[steps.length-1].map,
-                
-                })
+                msg,
+                map: stageGroup.map,
+                stage: stageGroup.stage
+              });
+            }
+          });
 
-              }
-              
-            console.log('Steps:', steps);
+          // Add final destination for the last stage
+          if (routeData.length > 0) {
+            const lastStage = routeData[routeData.length - 1];
+            messages.push({
+              msg: 'Proceed to your destination.',
+              map: lastStage.map,
+              stage: lastStage.stage
+            });
+          }
 
-              //         if(levels.length > 0){
-              //   levels.push({
-              //     msg : `Proceed to your destination.`,
-              //     map : steps[steps.length-1].map,
-              //     endIndex : steps.length-1,
-              //     startIndex : startIndex
-              //   })
-              // }else {
-              //   levels.push({
-              //     msg : `Proceed to your destination.`,
-              //     map : steps[steps.length-1].map,
-              //     endIndex : steps.length-1,
-              //     startIndex : 0
-              //   })
-              // }
-              // return levels;
-
-            return messages;
+          console.log('Route messages by stage:', messages);
+          return messages;
         },
     
    

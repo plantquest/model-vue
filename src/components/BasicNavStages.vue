@@ -16,7 +16,7 @@
             class="Layers" 
             style="margin-left: -16px; width: 30px;" 
           />
-          <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
+          <h4 style="width: 300px;font-size: 14px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
         </v-expansion-panel-header>
         
         <v-expansion-panel-content style="padding-bottom: 10px;"  >
@@ -54,7 +54,7 @@ export default {
             mapValues: [],
             routeMassages: [],
             selectedStage : 0,
-            activeStage: 0,
+            activeStage: this.$store.state.activeStage,
             levelNames : [
                         'Level 1',
                         'Level 1 Mezz & Intersticial',
@@ -71,28 +71,25 @@ export default {
       activeStage: state => state.activeStage, 
     }),
   },
-    slwatch: {
+    watch: {
 
-    //   activeStage(newVal) {
-      
-    //   console.log('__activeStage updated:', 0);
-     
-    // },
-    
-      // Watch for changes in trigger.select.value
       '$store.state.trigger.select.value': function (value) {
-        console.log('__value', value);
-        this.activeStage = this.$store.state.activeStage 
+    console.log('__value', value);
 
-        const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
-        if (stageIndex !== -1) {
-          this.activeStage = stageIndex;
-          console.log('__activeStage', this.activeStage, stageIndex);
-        } else {
-          this.activeStage = 0;
-        }
-
-      },
+    if (this.$store.state.reverseTriggered) {
+      this.activeStage = 0;
+      this.$store.commit('clearReverseTrigger');
+    } else {
+      const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+      if (stageIndex !== -1) {
+        this.activeStage = stageIndex;
+        console.log('__activeStage', this.activeStage, stageIndex);
+      } else {
+        this.activeStage = 0;
+      }
+    }
+    
+  },
 
     
 
@@ -191,7 +188,7 @@ export default {
         parseLines(data){
           if (data)
             return data.map(lineData => {
-                console.log(lineData.detail)
+                //console.log(lineData.detail)
                 let data = lineData.detail.split(',')
                 return {
                     id : data[0],

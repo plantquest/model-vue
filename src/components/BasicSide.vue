@@ -43,7 +43,7 @@
            text
             style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #575c62;top:10px"
             class="btn-clear"
-          @click="clearFilter();toggleSearchMode()"
+          @click="clearFilter(); "
       >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
@@ -51,7 +51,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="toggleSearchMode();toggleExpansion()"
+        @click="toggleSearch2();toggleExpansion();"
         
          />
 
@@ -264,7 +264,7 @@ export default {
   
   data () {
     return {
-      showSearch2: true,
+    //  showSearch2: true,
       open: true,
       menuShowTitle: false,
       menuViewList: [],
@@ -272,7 +272,7 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-    
+     
       tag_items:[],
       search2:'',
       tag_items2:[],
@@ -287,6 +287,11 @@ export default {
   },
   
   created () {
+     // Set showExpansion to false when the component is created
+     if (this.showSearch2) {
+      this.$store.state.showExpansion = false;
+    }
+    
     let menuViewList = []
     for(let name in this.spec.view) {
       let menuView = this.spec.view[name]
@@ -318,6 +323,12 @@ export default {
   },
 
   watch: {
+
+    showSearch2(newVal) {
+      if (newVal) {
+        this.$store.state.showExpansion = false;
+      }
+    },
     menuViewIndex(index) {
       let pathname = null
       pathname = this.menuView.name
@@ -387,6 +398,7 @@ export default {
       this.$store.dispatch('trigger_search', {a: term})
     },
     search2 (val) {
+
       let term = val || ''
       term.trim()
       console.log('search2 is being triggered')
@@ -450,7 +462,9 @@ export default {
   
   
   computed: {
-    ...mapState(['showSearch2','showExpansion']),
+    ...mapState(['showSearch2','showExpansion','pathData']
+    
+    ),
 
     triggerSelect() {
       return this.$store.state.trigger.select;
@@ -513,7 +527,6 @@ export default {
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
     ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
-
     toggleSearchMode() {
       this.showSearch2 = !this.showSearch2;
     },
@@ -526,15 +539,11 @@ export default {
       //     this.showSearch2 = !this.showSearch2;
       //   },
         reverseInputs() {
-     
-
+          this.$store.commit('resetActiveStage');
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
-   
-
-       
-     
+      
     },
 
     handleNavigationMode(){

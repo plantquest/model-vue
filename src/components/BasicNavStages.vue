@@ -16,7 +16,7 @@
             class="Layers" 
             style="margin-left: -16px; width: 30px;" 
           />
-          <h4 style="width: 300px;font-size: 14px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
+          <h4 style="width: 300px;font-size: 14px;padding-left: 2px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
         </v-expansion-panel-header>
         
         <v-expansion-panel-content style="padding-bottom: 10px;"  >
@@ -318,7 +318,7 @@ export default {
         font-family: "Gill Sans", sans-serif;
         font-size: 15px;
         width: 94%;
-        top: 1px;
+        top: 3px;
         left: 13px;
     }
 

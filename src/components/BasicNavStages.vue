@@ -23,7 +23,7 @@
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
             @click="selectStage(message.map); activeStage = index"
               v-bind:class="{ 'activated': activeStage == index }">
-              <h3>STAGE {{ index+1 }}</h3>
+              <h3 style="font-size: 13px;">STAGE {{ index+1 }}</h3>
               <p>{{ message.msg }}</p>
         
             </div>

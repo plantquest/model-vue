@@ -347,6 +347,9 @@ export default {
          // Set pathData to null
        // this.$store.commit('set_path_data', null)
       }
+      if(term && term.tag) {
+        this.search = term.tag
+      }
     },
     // create a watcher for changes in pathData
    '$store.state.trigger.search.b' (term) {

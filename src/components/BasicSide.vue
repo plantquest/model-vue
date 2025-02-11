@@ -175,7 +175,7 @@
     >
   </v-combobox>  -->
       <!-- Menu Items -->
-      <div class="Menu Items" style="margin-top:-15px;height: calc(100vh - 332px);">
+      <div class="Menu Items" style="margin-top: 15px;height: calc(100vh - 332px);">
         <template v-if="menuView.mode === 'standard'" >
           <div class="router_items">
             <router-link 

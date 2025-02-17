@@ -21,9 +21,9 @@
         
         <v-expansion-panel-content style="padding-bottom: 10px;"  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
-            @click="selectStage(message.map); activeStage = index"
+            @click="selectStage(message.map,index); activeStage = index"
               v-bind:class="{ 'activated': activeStage == index }">
-              <h3 style="font-size: 13px;">STAGE {{ index+1 }}</h3>
+              <h3 style="font-size: 13px;">STAGE {{ index+1}}</h3>
               <p>{{ message.msg }}</p>
         
             </div>
@@ -102,71 +102,60 @@ export default {
     async handler(data) {
       if (!data || !data.asset123) {
         console.warn("PathData is undefined or missing asset123");
-        this.routeMassages = []; // Clear stages if data is invalid
+        this.routeMassages = []; 
         return;
       }
 
-      this.pathData = data.asset123; 
-      console.log('this.pathData', this.pathData);
-
       try {
-        const parsedData = JSON.parse(this.pathData);
+        const parsedData = JSON.parse(data.asset123);
         if (!Array.isArray(parsedData) || parsedData.length === 0) {
           console.warn("Invalid or empty pathData");
-          this.routeMassages = []; // Clear stages if data is invalid
+          this.routeMassages = [];
           return;
         }
 
-        this.pathArray = parsedData[0]; 
-        let parsedLines = this.parseLines(this.pathArray); 
+        this.pathArray = parsedData[0];
+        
+        // Get unique stages with their corresponding maps from pathDetails
+        const uniqueStages = this.pathArray.reduce((acc, curr) => {
+          const key = `${curr.stage}`;
+          if (!acc[key]) {
+            acc[key] = {
+              stage: curr.stage,
+              map: curr.map,
+              msg: `${acc.length === 0 ? 'Start' : 'Proceed'} your route on ${this.levelNames[curr.map - 1]} (Stage ${curr.stage})`
+            };
+          }
+          return acc;
+        }, {});
 
-        // Map the parsedLines array to get map values
-        this.mapValues = parsedLines.map(line => line.map);
-
-        let stages = await this.getRouteSteps(parsedLines); 
-        this.routeMassages = stages; 
-        console.log('stages', stages); 
+        this.routeMassages = Object.values(uniqueStages);
+        console.log('stages', this.routeMassages);
 
       } catch (error) {
         console.error("Error parsing pathData:", error);
-        this.routeMassages = []; // Clear stages on error
+        this.routeMassages = [];
       }
-
-      // Dispatch the action (optional)
-      this.$store.dispatch('set_path_data', { pathDetails: data.asset123 })
-        .then(result => {
-          console.log('Dispatch result:', result);
-        })
-        .catch(error => {
-          console.error('Dispatch error:', error);
-        });
     },
-    deep: true // Watch for changes within nested objects 
+    deep: true
   }
 },
     
 
   methods: {
 
+    
 
     getselectedStage() {
      console.log('selectedStage', this.selectedStage);
       return this.selectedStage;
      
     },
-    selectStage(index) {
-        console.log('indexx', index);
-      this.selectedStage = index;
-        console.log('selectedStage', this.selectedStage);
-          // Commit the mutation to update the map index in the store and log the result
-      //this.$store.commit('setMapIndex',index);
-      console.log('Committed map index:', index);
-      this.$emit('stageSelected', index); 
-      this.$store.dispatch('trigger_select', {value: index})
-      
-     // this.$store.dispatch('trigger_select', {value: message.map})
-
-      
+    selectStage(map) {
+      console.log('selectStage map:', map);
+      this.selectedStage = map;
+      this.$emit('stageSelected', map);
+      this.$store.dispatch('trigger_select', { value: map });
     },
 
      parseLine(line){
@@ -185,73 +174,58 @@ export default {
             console.log('Parsed Line:', result);
             return result;
         },
-        parseLines(data){
-          if (data)
-            return data.map(lineData => {
-                //console.log(lineData.detail)
-                let data = lineData.detail.split(',')
+        parseLines(data) {
+          if (data) {
+            let uniqueMaps = new Set();
+            let parsedLines = data.map(lineData => {
+              let data = lineData.detail.split(',')
+              // Parse both map and stage from format "m{map}_{stage}"
+              const matches = lineData.index.match(/m(\d+)_(\d+)/);
+              if (matches) {
+                const mapNumber = parseInt(matches[1]);
+                const stageNumber = parseInt(matches[2]);
+                uniqueMaps.add(mapNumber);
                 return {
-                    id : data[0],
-                    type : data[1],
-                    map : lineData.index
+                  id: data[0],
+                  type: data[1],
+                  map: mapNumber,
+                  stage: stageNumber,
+                  index: lineData.index
                 }
-            })
-          else return [];
-           
+              }
+              return null;
+            }).filter(line => line !== null);
+            
+            // Filter to get unique map/stage combinations
+            return parsedLines.filter((line, index) => 
+              index === 0 || 
+              line.map !== parsedLines[index - 1].map ||
+              line.stage !== parsedLines[index - 1].stage
+            );
+          }
+          return [];
         },
 
 
 
-        async getRouteSteps(routeData){
-            let steps = routeData;
-
+        async getRouteSteps(routeData) {
+            if (!routeData || routeData.length === 0) return [];
+            
             let messages = [];
-
-            for(var i=0; i<steps.length-2; i++){
-                if(steps[i].type == "Connector"){
-                    // first node type connector (i)
-                    let msg = `Follow route to stairs and proceed to `;
-                    var j = i;
-                    while(steps[j].type == "Connector"){
-                        j++;
-                    }
-                    // first node type Standar (j)
-                    if(j < steps.length-3){
-                        msg += `${this.levelNames[steps[j].map]}`
-                        messages.push({msg, map: steps[i].map});
-                    }
-                    i=j;
-                }
-            }
-
-            if(messages.length > 0){
-              messages.push({
-                 msg : `Proceed to your destination.`,
-                  map : steps[steps.length-1].map,
-                
-                })
-
+            let seenCombinations = new Set();
+            
+            for (let step of routeData) {
+              const combination = `${step.map}_${step.stage}`;
+              if (!seenCombinations.has(combination)) {
+                messages.push({
+                  msg: `${seenCombinations.size === 0 ? 'Start' : 'Proceed'} your route on ${this.levelNames[step.map - 1]} (Stage ${step.stage})`,
+                  map: step.map,
+                  stage: step.stage
+                });
+                seenCombinations.add(combination);
               }
-              
-            console.log('Steps:', steps);
-
-              //         if(levels.length > 0){
-              //   levels.push({
-              //     msg : `Proceed to your destination.`,
-              //     map : steps[steps.length-1].map,
-              //     endIndex : steps.length-1,
-              //     startIndex : startIndex
-              //   })
-              // }else {
-              //   levels.push({
-              //     msg : `Proceed to your destination.`,
-              //     map : steps[steps.length-1].map,
-              //     endIndex : steps.length-1,
-              //     startIndex : 0
-              //   })
-              // }
-              // return levels;
-
+            }
+            
             return messages;
         },
     

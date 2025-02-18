@@ -21,7 +21,7 @@
         
         <v-expansion-panel-content style="padding-bottom: 10px;"  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
-            @click="selectStage(message.map); activeStage = index"
+            @click="selectStage(message);"
               v-bind:class="{ 'activated': activeStage == index }">
               <h3>STAGE {{ index+1 }}</h3>
               <p>{{ message.msg }}</p>
@@ -45,7 +45,7 @@ export default {
     data() {
         return {
             showNav: true,
-            isExpanded: false,
+            isExpanded: true,
             iconSrc: 'nav_in.svg', // Initial icon
             publicPath: process.env.BASE_URL || '/',
             pathData: null ,// Add a data property to store the pathData
@@ -80,19 +80,19 @@ export default {
     // },
     
       // Watch for changes in trigger.select.value
-      '$store.state.trigger.select.value': function (value) {
-        console.log('__value', value);
-        this.activeStage = this.$store.state.activeStage 
+      // '$store.state.trigger.select.value': function (value) {
+      //   console.log('__value', value);
+      //   this.activeStage = this.$store.state.activeStage 
 
-        const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
-        if (stageIndex !== -1) {
-          this.activeStage = stageIndex;
-          console.log('__activeStage', this.activeStage, stageIndex);
-        } else {
-          this.activeStage = 0;
-        }
+      //   const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+      //   if (stageIndex !== -1) {
+      //     this.activeStage = stageIndex;
+      //     console.log('__activeStage', this.activeStage, stageIndex);
+      //   } else {
+      //     this.activeStage = 0;
+      //   }
 
-      },
+      // },
 
     
 
@@ -127,8 +127,10 @@ export default {
         this.mapValues = parsedLines.map(line => line.map);
 
         let stages = await this.getRouteSteps(parsedLines); 
-        this.routeMassages = stages; 
-        console.log('stages', stages); 
+        this.routeMassages = stages;
+        var selectFirst = stages[0] 
+        this.selectStage(selectFirst)
+        console.log('stages', stages[0]); 
 
       } catch (error) {
         console.error("Error parsing pathData:", error);
@@ -164,8 +166,16 @@ export default {
           // Commit the mutation to update the map index in the store and log the result
       //this.$store.commit('setMapIndex',index);
       console.log('Committed map index:', index);
-      this.$emit('stageSelected', index); 
-      this.$store.dispatch('trigger_select', {value: index})
+      this.$emit('stageSelected', index);
+      const stageIndex = this.routeMassages.findIndex((stage) => stage.msg == index.msg );
+      if (stageIndex !== -1) {
+          this.activeStage = stageIndex;
+          console.log('__activeStage', this.activeStage, stageIndex);
+        } else {
+          this.activeStage = 0;
+        }
+
+      this.$store.dispatch('trigger_select', {value: index?.map}) 
       
      // this.$store.dispatch('trigger_select', {value: message.map})
 
@@ -207,7 +217,7 @@ export default {
 
         async getRouteSteps(routeData){
             let steps = routeData;
-
+        
             let messages = [];
 
             for(var i=0; i<steps.length-2; i++){
@@ -220,8 +230,9 @@ export default {
                     }
                     // first node type Standar (j)
                     if(j < steps.length-3){
-                        msg += `${this.levelNames[steps[j].map]}`
-                        messages.push({msg, map: steps[i].map});
+                        msg += `${this.levelNames[steps[j].map-2]}`
+                        messages.push({msg, map: steps[i].map-1});
+
                     }
                     i=j;
                 }
@@ -230,7 +241,7 @@ export default {
             if(messages.length > 0){
               messages.push({
                  msg : `Proceed to your destination.`,
-                  map : steps[steps.length-1].map,
+                  map : steps[steps.length-1].map-1,
                 
                 })
 

@@ -229,7 +229,7 @@ export default {
                         j++;
                     }
                     // first node type Standar (j)
-                    if(j < steps.length-3){
+                    if(j < steps.length-2){
                         msg += `${this.levelNames[steps[j].map-2]}`
                         messages.push({msg, map: steps[i].map-1});
 

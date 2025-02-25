@@ -45,7 +45,11 @@ export default {
     data() {
         return {
             showNav: true,
+<<<<<<< Updated upstream
             isExpanded: false,
+=======
+            isExpanded: 0,
+>>>>>>> Stashed changes
             iconSrc: 'nav_in.svg', // Initial icon
             publicPath: process.env.BASE_URL || '/',
             pathData: null ,// Add a data property to store the pathData

@@ -75,12 +75,7 @@
   left: 13px;
 }
 .basic-nav-stages .stage.activated {
-  background-color: #C0E28B !important;
-}
-.basic-nav-stages .v-divider {
-  border-color: rgb(var(--vxg-ct2)) !important;
-  margin: 16px 8px;
-  height: 22px;
+  background-color: #258489 !important;
 }
 .v-navigation-drawer {
   background: #141B2D;
@@ -98,11 +93,6 @@ nav.vxg-side .v-divider {
   border-color: rgb(var(--vxg-ct2)) !important;
   margin: 16px 8px;
   height: 22px;
-  position: absolute;
-  z-index: 99999;
-  left: -11px;
-  width: 100%;
-  bottom: 52px;
 }
 .btn-style {
   background-color: #283348 !important;

@@ -175,12 +175,12 @@
     >
   </v-combobox>  -->
       <!-- Menu Items -->
-      <div class="Menu Items" style="margin-top:-15px;height: calc(100vh - 332px);">
+      <div class="Menu Items" style="margin-top: 15px;height: calc(100vh - 332px);">
         <template v-if="menuView.mode === 'standard'" >
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && item.code !== 'admin'"
+          v-if="allow(item) && item.code !== 'admin' && item.title !== 'Devices'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
@@ -243,7 +243,7 @@ const SpecShape = Gubu({
 
 function tag_alias(asset) {
   if (null != asset.custom12) {
-    return asset.tag + '(' + asset.custom12 + ')'
+    return asset.tag + ' (' + asset.custom12 + ')'
   }
   return asset.tag
 }
@@ -358,6 +358,9 @@ export default {
         console.log('search is being triggerecd')
          // Set pathData to null
        // this.$store.commit('set_path_data', null)
+      }
+      if(term && term.tag) {
+        this.search = term.tag
       }
     },
     // create a watcher for changes in pathData
@@ -539,7 +542,7 @@ export default {
       //     this.showSearch2 = !this.showSearch2;
       //   },
         reverseInputs() {
-          this.$store.commit('resetActiveStage');
+          //this.$store.commit('resetActiveStage');
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;

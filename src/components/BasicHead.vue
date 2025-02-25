@@ -512,7 +512,7 @@
   
   
     <v-btn
-      v-if="show('add') && tool.add.active"
+      v-if="tool.add.active"
       tile
       class="vxg-head-btn"
       @click="addItem"
@@ -537,7 +537,7 @@
     </v-btn>
   
     <v-divider
-      v-if="show('add') && tool.add.active"
+      v-if="tool.add.active"
       vertical style="margin:0px 16px;"></v-divider>
   
   

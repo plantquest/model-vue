@@ -4,7 +4,7 @@
   :label="field.title"
   v-model="item[field.name]"
   outlined
-  :disabled="field.readonly || !allow('edit')"
+  :disabled="field.readonly || !allow('edit') && currentUser != 'eo'"
   ></v-select>
 </template>
 
@@ -25,9 +25,9 @@ export default {
     
   data () {
     return {
+      currentUser: '',
     }
   },
-
   created () {
     let custom = this.custom = this.field.custom || {}
     custom.allow = custom.allow || (()=>true)
@@ -39,6 +39,10 @@ export default {
     }
   },
   
+  mounted(){
+    this.currentUser = this.$store.state.current_user.profile
+  },
+
   methods: {
     pick (field) {
       let kinds = field.kind && Object.entries(field.kind) || []

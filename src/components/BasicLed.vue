@@ -39,7 +39,7 @@
               :color="'outofdate'===item[header.value]?'red':'suspended'===item[header.value]?'orange':'blue'"
               style="font-weight:bold;color:white;"
               >
-              {{ getTitle(item[header.value]) }}
+              {{ (header.kind[item[header.value]]||{}).title }}
             </v-chip>
           </span>
           <span v-else-if="'datetime'===header.type">
@@ -78,7 +78,7 @@
             :label="field.title"
             v-model="item[field.name]"
             outlined
-            :disabled="field.readonly || !allow('edit', field) && currentUser != 'eo'"
+            :disabled="field.readonly || !allow('edit', field)"
             :rules="field.rules"
             ></v-text-field>
             
@@ -206,7 +206,7 @@
         <v-card>
           <v-card-title class="headline">User Access Matrix</v-card-title>
           <v-card-text>
-            <img src="/user_matrix.png" alt="Access Matrix" style="width: 100%;">
+            <img src="/access_matrix.png" alt="Access Matrix" style="width: 100%;">
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -280,8 +280,6 @@
         loadlen: 0,
         showprogress: true,
         loadingerror: false,
-        currentUser: null,
-        userRole: {},
         // 'loading' | 'error' | 'done'
         loadState: 'loading',
         remove: {
@@ -294,21 +292,9 @@
     },
   
     mounted() {
-      this.$props.spec.ent.primary.field.profile.kind.eo.title = 'Engineering'
-
-      this.currentUser = this.$store.state.current_user.profile
-      this.userRole = this.$props.spec.ent.primary.field.profile.kind
-      console.log(this.currentUser, 'this.currentUser');
+      console.log('mounted', this.spec,'KD')
       
-      console.log(this.userRole, 'this.currentUser');
-      if (this.currentUser === 'sea') {
-        delete this.userRole.gea;
-      } else if (this.currentUser === 'eo') {
-        delete this.userRole.gea;
-        delete this.userRole.sea;
-        delete this.userRole.eo;
-        delete this.userRole.op;
-      }
+      
     },
   
     async created () {
@@ -451,24 +437,7 @@
   
   
     methods: {
-      getTitle(title){
-        switch (title) {
-        case 'sea':
-          return 'Site Engineering Admin';
-
-        case 'eo':
-          return 'Engineering';
-
-        case 'gea':
-          return 'Globle Engineering Admin';
-
-        case 'op' : 
-          return 'Operator'
-
-        case 'ob': 
-          return 'Observer'
-      }
-      },
+  
       itemslot (header) {
         return 'item.'+header.value
       },
@@ -487,12 +456,7 @@
         if (false === this.spec.edit.active) {
           return;
         }
-        if(this.currentUser == 'sea' && selitem.profile == 'gea'){
-          return;
-        }
-        if(this.currentUser == 'eo' && selitem.profile != 'ob' && selitem.profile != undefined){
-          return;
-        }
+        
         // Check if the item is new or existing
         this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
         console.log('Editing mode:',this.editing)

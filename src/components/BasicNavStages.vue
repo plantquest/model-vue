@@ -1,5 +1,5 @@
 <template>
-    <div class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
+    <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
         <v-expansion-panels class="mb-12" v-model="isExpanded" >
       <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
         <v-expansion-panel-header 
@@ -19,12 +19,12 @@
           <h4 style="width: 300px;font-size: 10px;">THIS ROUTE CONTAINS MULTIPLE LEVELS</h4>
         </v-expansion-panel-header>
         
-        <v-expansion-panel-content  >
+        <v-expansion-panel-content style="padding-bottom: 10px;"  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
-            @click="selectStage(index)"
-              v-bind:class="{ 'activated': selectStage == index }">
+            @click="selectStage(message);"
+              v-bind:class="{ 'activated': activeStage == index }">
               <h3>STAGE {{ index+1 }}</h3>
-              <p>{{ message }}</p>
+              <p>{{ message.msg }}</p>
         
             </div>
         </v-expansion-panel-content>
@@ -32,8 +32,10 @@
        
       </v-expansion-panel>
     </v-expansion-panels>
-      
+    
     </div>
+    
+    
 </template>
 
 <script>
@@ -43,18 +45,16 @@ export default {
     data() {
         return {
             showNav: true,
-<<<<<<< HEAD
             isExpanded: 0,
-=======
-            isExpanded: false,
->>>>>>> parent of 0fa7d96 (Merge branch 'PQView' into PQView_82)
             iconSrc: 'nav_in.svg', // Initial icon
             publicPath: process.env.BASE_URL || '/',
             pathData: null ,// Add a data property to store the pathData
             parsedPathData: null,
             pathArray: null,
+            mapValues: [],
             routeMassages: [],
-            selectedstage : 0,
+            selectedStage : 0,
+            activeStage: 0,
             levelNames : [
                         'Level 1',
                         'Level 1 Mezz & Intersticial',
@@ -67,41 +67,74 @@ export default {
     },
     computed: {
     ...mapState({
-      pathData: state => state.pathData, 
+      pathData: state => state.pathData,
+      activeStage: state => state.activeStage, 
     }),
   },
     watch: {
+
+    //   activeStage(newVal) {
+      
+    //   console.log('__activeStage updated:', 0);
+     
+    // },
+    
+      // Watch for changes in trigger.select.value
+      // '$store.state.trigger.select.value': function (value) {
+      //   console.log('__value', value);
+      //   this.activeStage = this.$store.state.activeStage 
+
+      //   const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+      //   if (stageIndex !== -1) {
+      //     this.activeStage = stageIndex;
+      //     console.log('__activeStage', this.activeStage, stageIndex);
+      //   } else {
+      //     this.activeStage = 0;
+      //   }
+
+      // },
+
+    
+
+
     isExpanded() {
       this.toggleIcon();
     },
     // create a watcher for changes in pathData
     '$store.state.pathData': {
-    handler(data) {
-      console.log('PathData12333: ', data.asset123);
+    async handler(data) {
+      if (!data || !data.asset123) {
+        console.warn("PathData is undefined or missing asset123");
+        this.routeMassages = []; // Clear stages if data is invalid
+        return;
+      }
+
       this.pathData = data.asset123; 
       console.log('this.pathData', this.pathData);
 
       try {
         const parsedData = JSON.parse(this.pathData);
-        console.log('parsedData', parsedData);
-
-        if (parsedData && parsedData.length > 0) { 
-          this.pathArray = parsedData[0]; 
-          console.log('pathArray', this.pathArray);
-
-          let parsedLines = this.parseLines(this.pathArray); 
-          console.log('parsedLines', parsedLines);
-          let stages = this.getRouteSteps(parsedLines); 
-          this.routeMassages = stages; 
-          console.log('stages', stages); 
-        } else {
+        if (!Array.isArray(parsedData) || parsedData.length === 0) {
           console.warn("Invalid or empty pathData");
-          // Handle the case where parsedData is empty or invalid
+          this.routeMassages = []; // Clear stages if data is invalid
+          return;
         }
+
+        this.pathArray = parsedData[0]; 
+        let parsedLines = this.parseLines(this.pathArray); 
+
+        // Map the parsedLines array to get map values
+        this.mapValues = parsedLines.map(line => line.map);
+
+        let stages = await this.getRouteSteps(parsedLines); 
+        this.routeMassages = stages;
+        var selectFirst = stages[0] 
+        this.selectStage(selectFirst)
+        console.log('stages', stages[0]); 
 
       } catch (error) {
         console.error("Error parsing pathData:", error);
-        // Handle the error gracefully 
+        this.routeMassages = []; // Clear stages on error
       }
 
       // Dispatch the action (optional)
@@ -117,32 +150,8 @@ export default {
   }
 },
     
-    
-    
-    
- 
+
   methods: {
-    // Dispatch the action to update the pathData in the store
-    // handlePathData(data) {
-    // this.$store.dispatch('set_path_data', { pathDetails: data })
-    //     .then(result => {
-    //       console.log('Dispatch result:', result);
-    //     })
-    //     .catch(error => {
-    //       console.error('Dispatch error:', error);
-    //     });
-    // },
-    // handlePathData(data) {
-    //     this.$store.commit('set_path_data', {pathDetails: data});
-              
-    //           this.$store.dispatch('set_path_data', { 
-    //       assetId: 'asset123', 
-    //       pathData: test});
-    // },
-    
-
-
-
 
 
     getselectedStage() {
@@ -151,8 +160,26 @@ export default {
      
     },
     selectStage(index) {
-        console.log('indexxxxxxxxx', index);
+        console.log('indexx', index);
       this.selectedStage = index;
+        console.log('selectedStage', this.selectedStage);
+          // Commit the mutation to update the map index in the store and log the result
+      //this.$store.commit('setMapIndex',index);
+      console.log('Committed map index:', index);
+      this.$emit('stageSelected', index);
+      const stageIndex = this.routeMassages.findIndex((stage) => stage.msg == index.msg );
+      if (stageIndex !== -1) {
+          this.activeStage = stageIndex;
+          console.log('__activeStage', this.activeStage, stageIndex);
+        } else {
+          this.activeStage = 0;
+        }
+
+      this.$store.dispatch('trigger_select', {value: index?.map}) 
+      
+     // this.$store.dispatch('trigger_select', {value: message.map})
+
+      
     },
 
      parseLine(line){
@@ -172,6 +199,7 @@ export default {
             return result;
         },
         parseLines(data){
+          if (data)
             return data.map(lineData => {
                 console.log(lineData.detail)
                 let data = lineData.detail.split(',')
@@ -181,19 +209,21 @@ export default {
                     map : lineData.index
                 }
             })
+          else return [];
+           
         },
 
 
 
-        getRouteSteps(routeData){
+        async getRouteSteps(routeData){
             let steps = routeData;
-
+        
             let messages = [];
 
             for(var i=0; i<steps.length-2; i++){
                 if(steps[i].type == "Connector"){
                     // first node type connector (i)
-                    let msg = `Follow route to strairs and proceed to `;
+                    let msg = `Follow route to stairs and proceed to `;
                     var j = i;
                     while(steps[j].type == "Connector"){
                         j++;
@@ -201,16 +231,40 @@ export default {
                     // first node type Standar (j)
                     if(j < steps.length-3){
                         msg += `${this.levelNames[steps[j].map-1]}`
-                        messages.push(msg)
+                        messages.push({msg, map: steps[i].map-1});
+
                     }
                     i=j;
                 }
             }
 
             if(messages.length > 0){
-                messages.push(`Proceed to your destination.`)
-                        }
+              messages.push({
+                 msg : `Proceed to your destination.`,
+                  map : steps[steps.length-1].map-1,
+                
+                })
+
+              }
+              
             console.log('Steps:', steps);
+
+              //         if(levels.length > 0){
+              //   levels.push({
+              //     msg : `Proceed to your destination.`,
+              //     map : steps[steps.length-1].map,
+              //     endIndex : steps.length-1,
+              //     startIndex : startIndex
+              //   })
+              // }else {
+              //   levels.push({
+              //     msg : `Proceed to your destination.`,
+              //     map : steps[steps.length-1].map,
+              //     endIndex : steps.length-1,
+              //     startIndex : 0
+              //   })
+              // }
+              // return levels;
 
             return messages;
         },
@@ -218,7 +272,9 @@ export default {
    
     
     toggleIcon() {
+      
       this.iconSrc = this.isExpanded ? 'nav_in.svg' : 'nav_out.svg';
+      
     },
     clearState() {
       this.isExpanded = false;
@@ -230,8 +286,16 @@ export default {
 
   },
   mounted() {
-    this.parseLines(this.test); // Call parseLines with the test data
+   // this.parseLines(this.test); // Call parseLines with the test data
     this.$root.$on('clear-nav-stages', this.toggleshowNav);
+    
+    // Automatically select Stage 1 after the stages are rendered
+    this.$nextTick(() => {
+      if (this.routeMassages.length > 0) {
+        this.selectStage(0); // Select Stage 1 (index 0)
+        this.$store.dispatch('trigger_select', { value: 0 }); // Ensure the map updates
+      }
+    });
   },
   beforeDestroy() {
     this.$root.$off('clear-nav-stages', this.toggleshowNav);
@@ -273,9 +337,13 @@ export default {
     }
 
     .stage.activated {
-        background-color: #258489 !important;
+        background-color:#C0E28B !important;
     }
-    
+    .v-divider {
+        border-color: rgb(var(--vxg-ct2)) !important;
+        margin: 16px 8px;
+        height: 22px;
+    }
 }
 
 

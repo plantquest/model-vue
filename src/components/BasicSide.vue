@@ -41,16 +41,17 @@
       <v-btn
           v-if="show('clear') && tool.clear.active"
            text
-            style="max-width:16%;display:inline-block;margin-left:78%;text-transform: none;font-size:12px; text-decoration: underline; color: #575c62;"
-          @click="clearFilter"
-      >Clear</v-btn>
+            style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #575c62;top:10px"
+            class="btn-clear"
+          @click="clearFilter(); "
+      >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="handleNavigationMode"
+        @click="toggleSearch2();toggleExpansion();"
         
          />
 
@@ -88,6 +89,7 @@
         dense
         clearable
         placeholder=""
+
         @click:append="filter"
         :filter="customFilter"
         :prepend-inner-icon="prependIcon" 
@@ -142,9 +144,10 @@
        style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
        @click="reverseInputs"
         />
-        <!-- <button @click="showSearch2 = false" style="">
-          <v-icon style="    font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" >mdi mdi-close</v-icon>
-        </button> -->
+        
+        <button @click="showSearch2 = false" style="">
+          <v-icon style="font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" ></v-icon>
+        </button>
       </div>
       
 
@@ -154,11 +157,10 @@
           
       >Add Destination +</button>
 
-      <BasicNavStages
-        v-if="showSearch2"
+      <BasicNavStages 
+        v-if="showSearch2 === true"
         :spec="spec"
     />
-
 
 
     
@@ -173,12 +175,12 @@
     >
   </v-combobox>  -->
       <!-- Menu Items -->
-      <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
+      <div class="Menu Items" style="margin-top: 15px;height: calc(100vh - 332px);">
         <template v-if="menuView.mode === 'standard'" >
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && item.code !== 'admin'"
+          v-if="allow(item) && item.code !== 'admin' && item.title !== 'Devices'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
@@ -209,6 +211,7 @@
         v-if="spec.footer.active"
         :is="spec.footer.cmp"
         :spec="spec.footer.spec"
+       
       />
     </v-sheet>
  
@@ -218,7 +221,7 @@
 <script>
 
 import Nua from 'nua'
-import {  mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 import BasicNavStages from './BasicNavStages.vue';
 import { Gubu, Open, Required, Skip, Value } from 'gubu'
 
@@ -240,7 +243,7 @@ const SpecShape = Gubu({
 
 function tag_alias(asset) {
   if (null != asset.custom12) {
-    return asset.tag + '(' + asset.custom12 + ')'
+    return asset.tag + ' (' + asset.custom12 + ')'
   }
   return asset.tag
 }
@@ -261,6 +264,7 @@ export default {
   
   data () {
     return {
+    //  showSearch2: true,
       open: true,
       menuShowTitle: false,
       menuViewList: [],
@@ -268,13 +272,13 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-    
+     
       tag_items:[],
       search2:'',
       tag_items2:[],
       publicPath: process.env.BASE_URL || '/',
       showIcon: true, // Data property to control icon visibility
-      showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
+    //  showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
 
@@ -283,6 +287,11 @@ export default {
   },
   
   created () {
+     // Set showExpansion to false when the component is created
+     if (this.showSearch2) {
+      this.$store.state.showExpansion = false;
+    }
+    
     let menuViewList = []
     for(let name in this.spec.view) {
       let menuView = this.spec.view[name]
@@ -314,10 +323,12 @@ export default {
   },
 
   watch: {
-    search2(newVal) {
-      console.log('search2 is being triggered')
-    this.refreshRoute();
-  },
+
+    showSearch2(newVal) {
+      if (newVal) {
+        this.$store.state.showExpansion = false;
+      }
+    },
     menuViewIndex(index) {
       let pathname = null
       pathname = this.menuView.name
@@ -339,42 +350,42 @@ export default {
       }
       */
     },
- // create a watcher for changes in pathData
- '$store.state.pathData' (data) {
-      console.log('PathData: ', data)
-    },
-   
-
-
-
 
    '$store.state.trigger.search.a' (term) {
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
-        // this.tag_items = this.items.map(v => v.tag)
         this.tag_items = this.items.map(tag_alias)
         console.log('search is being triggerecd')
+         // Set pathData to null
+       // this.$store.commit('set_path_data', null)
+      }
+      if(term && term.tag) {
+        this.search = term.tag
       }
     },
     // create a watcher for changes in pathData
+   '$store.state.trigger.search.b' (term) {
 
-    '$store.state.pathData' (data) {
-      console.log('PathData: ', data)
+      console.log('_____search.b is being triggered' , term)
+    
+      
     },
     '$store.state.trigger.search.b' (term) {
 
-      const pathData = this.$store.dispatch('get_path_data', { 
-      assetId: 'asset123' 
-    }).then((data) => {
-      console.log('PathData: ', data)
-    })
+    //   const pathData = this.$store.dispatch('get_path_data', { 
+    //   assetId: 'asset123' 
+    // }).then((data) => {
+    //   console.log('PathData: ', data)
+    // })
  
 
       console.log('search.b is being triggered')
+        this.search2 = term
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
         this.tag_items2 = this.items2.map(tag_alias)
+      //  this.$store.commit('set_path_data', null)
       }
       
     },
@@ -390,14 +401,17 @@ export default {
       this.$store.dispatch('trigger_search', {a: term})
     },
     search2 (val) {
+
       let term = val || ''
       term.trim()
       console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
-    let pathData = this.$store.dispatch('getPathDataAction', {
-      assetId: 'asset123'
-    });
-    console.log('PathData: ', pathData)
+      
+    // this.search2 = val
+    // let pathData = this.$store.dispatch('set_path_data', {
+    //   assetId: 'asset123'
+    // });
+    // console.log('PathData: ', pathData)
 
     },
     select () {
@@ -432,10 +446,33 @@ export default {
         this.menuView = this.menuViewList[route.index]
       } 
     },
+    '$store.state.trigger.select.value': {
+      handler(newVal) {
+        try {
+          if (newVal) {
+            const room = this.getRoom()
+            if (room) {
+              this.select = newVal
+            }
+          }
+        } catch (error) {
+          console.error('Error processing room selection:', error)
+        }
+      },
+      immediate: true
+    }
   },
   
   
   computed: {
+    ...mapState(['showSearch2','showExpansion','pathData']
+    
+    ),
+
+    triggerSelect() {
+      return this.$store.state.trigger.select;
+    },
+
     filterDisabled () {
       return this.$store.state.trigger.filter_disabled.value
     },
@@ -492,27 +529,30 @@ export default {
 
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
+    ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
+    toggleSearchMode() {
+      this.showSearch2 = !this.showSearch2;
+    },
     closeSideInfoCard() {
         this.toggleSideInfoCardVisibility(false);
         
       },
 
-      toggleSearch2() {
-          this.showSearch2 = !this.showSearch2;
-        },
-    reverseInputs() {
+      // toggleSearch2() {
+      //     this.showSearch2 = !this.showSearch2;
+      //   },
+        reverseInputs() {
+          //this.$store.commit('resetActiveStage');
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
-    },
-    refreshRoute(){
-     this.search = this.search;
-     this.search2 = this.search2;
+      
     },
 
     handleNavigationMode(){
+      console.log('Trigger select:', this.triggerSelect);
       this.showSearch2 = true
-      this.$store.dispatch('vxg_trigger_clear');
+      //this.$store.dispatch('vxg_trigger_clear');
     },
  
 
@@ -591,9 +631,13 @@ export default {
     clearFilter () {
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
-      this.search2 = '';
-      this.$root.$emit('clear-nav-stages');
-      this.showSearch2 = false
+      this.$store.state.trigger.search.b = '';
+      this.$store.state.showSearch2 = false;
+      this.$store.commit('clear_path_data');
+      this.$store.state.showExpansion = true; 
+    //  this.$root.$emit('clear-nav-stages');
+
+
     },
     show(action) {
       return this.allow(action) &&
@@ -645,12 +689,20 @@ export default {
     },
     action(name) {
       this.$emit('action', name)
+    },
+    getRoom() {
+      const room = this.$store.state.room
+      if (!room) {
+        console.warn('Room is not available')
+        return null
+      }
+      return room
     }
   },
 
-  // mounted() {
-  //   document.addEventListener('click', this.handleClickOutside);
-  // },
+  mounted() {
+   
+  },
   // beforeDestroy() {
   //   document.removeEventListener('click', this.handleClickOutside);
   // }
@@ -661,7 +713,7 @@ export default {
 
 
 
-const DRAWER_STYLE = Object.freeze({ width: "282px"});
+const DRAWER_STYLE = Object.freeze({ width: "282px" });
 
 
 </script>
@@ -690,6 +742,11 @@ nav.vxg-side {
         border-color: rgb(var(--vxg-ct2)) !important;
         margin: 16px 8px;
         height: 22px;
+        position: absolute;
+        z-index: 99999;
+        left: -11px;
+        width: 100%;
+        bottom: 52px;
     }
     
 }
@@ -831,4 +888,6 @@ img{
     margin-left: 25px;
     margin-bottom: 4px;
 }
+
+
 </style>

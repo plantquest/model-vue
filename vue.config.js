@@ -1,5 +1,3 @@
-const path = require('path')
-
 module.exports = {
   runtimeCompiler: true,
 
@@ -12,11 +10,6 @@ module.exports = {
   },
   configureWebpack: {
     externals: /vuetify\/lib/,
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, 'src'),
-      },
-    },
   },
   devServer: {
     // 'Access-Control-Allow-Origin': '*',

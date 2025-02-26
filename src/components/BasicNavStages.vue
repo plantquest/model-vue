@@ -45,7 +45,7 @@ export default {
     data() {
         return {
             showNav: true,
-            isExpanded: false,
+            isExpanded: 0,
             iconSrc: 'nav_in.svg', // Initial icon
             publicPath: process.env.BASE_URL || '/',
             pathData: null ,// Add a data property to store the pathData

@@ -276,12 +276,12 @@ export default {
     this.$root.$on('clear-nav-stages', this.toggleshowNav);
     
     // Automatically select Stage 1 after the stages are rendered
-    this.$nextTick(() => {
-      if (this.routeMassages.length > 0) {
-        this.selectStage(0); // Select Stage 1 (index 0)
-        this.$store.dispatch('trigger_select', { value: 0 }); // Ensure the map updates
-      }
-    });
+    // this.$nextTick(() => {
+    //   if (this.routeMassages.length > 0) {
+    //     this.selectStage(0); // Select Stage 1 (index 0)
+    //     this.$store.dispatch('trigger_select', { value: 0 }); // Ensure the map updates
+    //   }
+    // });
   },
   beforeDestroy() {
     this.$root.$off('clear-nav-stages', this.toggleshowNav);

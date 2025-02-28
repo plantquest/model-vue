@@ -352,7 +352,6 @@ export default {
     },
 
    '$store.state.trigger.search.a' (term) {
-      this.search = term
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
         this.tag_items = this.items.map(tag_alias)

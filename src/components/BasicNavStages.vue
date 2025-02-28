@@ -217,8 +217,8 @@ export default {
                     }
                     // first node type Standar (j)
                     if(j < steps.length-3){
-                        msg += `${this.levelNames[steps[j].map]}`
-                        messages.push({msg, map: steps[i].map});
+                        msg += `${this.levelNames[steps[j].map-1]}`
+                        messages.push({msg, map: steps[i].map-1});
                     }
                     i=j;
                 }
@@ -227,7 +227,7 @@ export default {
             if(messages.length > 0){
               messages.push({
                  msg : `Proceed to your destination.`,
-                  map : steps[steps.length-1].map,
+                  map : steps[steps.length-1].map-1,
                 
                 })
 
@@ -276,12 +276,12 @@ export default {
     this.$root.$on('clear-nav-stages', this.toggleshowNav);
     
     // Automatically select Stage 1 after the stages are rendered
-    this.$nextTick(() => {
-      if (this.routeMassages.length > 0) {
-        this.selectStage(0); // Select Stage 1 (index 0)
-        this.$store.dispatch('trigger_select', { value: 0 }); // Ensure the map updates
-      }
-    });
+    // this.$nextTick(() => {
+    //   if (this.routeMassages.length > 0) {
+    //     this.selectStage(0); // Select Stage 1 (index 0)
+    //     this.$store.dispatch('trigger_select', { value: 0 }); // Ensure the map updates
+    //   }
+    // });
   },
   beforeDestroy() {
     this.$root.$off('clear-nav-stages', this.toggleshowNav);

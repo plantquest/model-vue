@@ -21,7 +21,7 @@
         
         <v-expansion-panel-content style="padding-bottom: 10px;"  >
             <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
-            @click="selectStage(message.map); activeStage = index"
+            @click="handleStageClick(index, message.map)"
               v-bind:class="{ 'activated': activeStage == index }">
               <h3 style="font-size: 13px;">STAGE {{ index+1 }}</h3>
               <p>{{ message.msg }}</p>
@@ -193,7 +193,7 @@ export default {
                 return {
                     id : data[0],
                     type : data[1],
-                    map : lineData.index
+                    map : lineData.map
                 }
             })
           else return [];
@@ -269,6 +269,14 @@ export default {
     toggleshowNav() {
           this.showNav = !this.showNav;
         },
+
+    handleStageClick(stageIndex, stageMap) {
+      this.activeStage = stageIndex;
+      this.selectedStage = stageMap;
+
+      // Trigger the store with the correct map value
+      this.$store.dispatch('trigger_select', { value: stageMap });
+    },
 
   },
   mounted() {

@@ -838,6 +838,7 @@
         setTimeout(async ()=> { // wait for input
           let term
           term = event.target ? event.target._value : null
+          this.search = term
           if(term) {
             let out = await this.$seneca.post('sys:search, cmd:search', 
               { query: term, params: this.search_config }

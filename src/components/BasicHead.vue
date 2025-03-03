@@ -524,7 +524,7 @@
     </v-btn>
   
     
-    <v-btn
+   <!-- <v-btn
       v-if="show('addmobile') && tool.add.active"
       tile
       class="vxg-head-btn"
@@ -534,7 +534,8 @@
         mdi-map-marker-path
       </v-icon>
       Add Mobile Asset
-    </v-btn>
+    </v-btn> 
+    -->
   
     <v-divider
       v-if="show('add') && tool.add.active"

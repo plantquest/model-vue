@@ -524,7 +524,7 @@
     </v-btn>
   
     
-    <v-btn
+   <!-- <v-btn
       v-if="show('addmobile') && tool.add.active"
       tile
       class="vxg-head-btn"
@@ -534,7 +534,8 @@
         mdi-map-marker-path
       </v-icon>
       Add Mobile Asset
-    </v-btn>
+    </v-btn> 
+    -->
   
     <v-divider
       v-if="show('add') && tool.add.active"
@@ -838,6 +839,7 @@
         setTimeout(async ()=> { // wait for input
           let term
           term = event.target ? event.target._value : null
+          this.search = term
           if(term) {
             let out = await this.$seneca.post('sys:search, cmd:search', 
               { query: term, params: this.search_config }

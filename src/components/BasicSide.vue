@@ -151,11 +151,11 @@
       </div>
       
 
-       <button
+            <!-- <button
           v-if="showSearch2"
           style="cursor: pointer;position: relative;color: white;top:-24px; size:9px; font-size: 10px; left: 65%;"
-          
-      >Add Destination +</button>
+    
+      >Add Destination +</button> -->
 
       <BasicNavStages 
         v-if="showSearch2 === true"

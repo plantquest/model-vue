@@ -41,7 +41,7 @@
       <v-btn
           v-if="show('clear') && tool.clear.active"
            text
-            style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #575c62;top:10px"
+               style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #fff;top:10px"
             class="btn-clear"
           @click="clearFilter(); "
       >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>

@@ -20,7 +20,7 @@
         </v-expansion-panel-header>
         
         <v-expansion-panel-content style="padding-bottom: 10px;"  >
-            <div v-for="(message, index) in routeMassages" :key="index" class="stage" style="background-color:white;"
+            <div v-for="(message, index) in routeMsg" :key="index" class="stage" style="background-color:white;"
             @click="selectStage(message.map); activeStage = index"
               v-bind:class="{ 'activated': activeStage == index }">
               <h3 style="font-size: 13px;">STAGE {{ index+1 }}</h3>
@@ -44,6 +44,7 @@ export default {
     name: 'BasicNavStages',
     data() {
         return {
+            stages : [],
             showNav: true,
             isExpanded: 0,
             iconSrc: 'nav_in.svg', // Initial icon
@@ -53,14 +54,15 @@ export default {
             pathArray: null,
             mapValues: [],
             routeMassages: [],
+            routeMsg: [],
             selectedStage : 0,
             activeStage: this.$store.state.activeStage,
             levelNames : [
-                        'Level 1',
-                        'Level 1 Mezz & Intersticial',
+                        'Ground Floor',
                         'Level 2',
-                        'Level 2 Roof & Intersticial',
                         'Level 3',
+                        'Level 4',
+                        'Level 5',
                         'Basement',
                     ],
         };
@@ -125,7 +127,11 @@ export default {
 
         let stages = await this.getRouteSteps(parsedLines); 
         this.routeMassages = stages; 
+
+        
         console.log('stages', stages); 
+        this.routeMsg = await this.processStages(stages);
+        console.log('__msgfloor', this.routeMsg);
 
       } catch (error) {
         console.error("Error parsing pathData:", error);
@@ -212,7 +218,7 @@ export default {
                     // first node type connector (i)
                     let msg = `Follow route to stairs and proceed to `;
                     var j = i;
-                    while(steps[j].type == "Connector"){
+                    while(steps[j+1].type == "Connector"){
                         j++;
                     }
                     // first node type Standar (j)
@@ -235,25 +241,50 @@ export default {
               
             console.log('Steps:', steps);
 
-              //         if(levels.length > 0){
-              //   levels.push({
-              //     msg : `Proceed to your destination.`,
-              //     map : steps[steps.length-1].map,
-              //     endIndex : steps.length-1,
-              //     startIndex : startIndex
-              //   })
-              // }else {
-              //   levels.push({
-              //     msg : `Proceed to your destination.`,
-              //     map : steps[steps.length-1].map,
-              //     endIndex : steps.length-1,
-              //     startIndex : 0
-              //   })
-              // }
-              // return levels;
-
+             
+            console.log('________Messages:', messages);
             return messages;
         },
+
+
+        async  processStages(){
+          
+          console.log('____stages', this.routeMassages);
+          
+          let stages = this.routeMassages;
+          let stagesMsg = [];
+
+          for (var i = 0; i < stages.length; i++) {
+            if (i < stages.length - 1) {
+                let nextStage = stages[i + 1].map;
+                let nextStageMsg = 0;
+
+                if (nextStage == 1) {
+                  nextStageMsg = 'Ground Floor';
+                } else if (nextStage == 6) {
+                  nextStageMsg = 'Basement';
+                } else {
+                  nextStageMsg = `Level ${nextStage}`;
+                }
+
+                stagesMsg.push({
+                  map: stages[i].map,
+                  msg: `Follow route to stairs and proceed to ${nextStageMsg}`
+                });
+              } else {
+                stagesMsg.push({
+                  map: stages[i].map,
+                  msg: "Proceed to your destination"
+                });
+              }
+                }
+        
+           console.log('__stagesMsg',stagesMsg);
+           return stagesMsg;
+
+
+        },
+
     
    
     

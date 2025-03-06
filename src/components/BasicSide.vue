@@ -180,7 +180,7 @@
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && item.code !== 'admin'"
+          v-if="allow(item) && item.code !== 'admin' && item.title !== 'Devices'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"

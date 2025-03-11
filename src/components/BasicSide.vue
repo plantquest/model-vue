@@ -145,7 +145,7 @@
        @click="reverseInputs"
         />
         
-        <button @click="showSearch2 = false" style="">
+        <button @click="handleButtonClick" style="">
           <v-icon style="font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" ></v-icon>
         </button>
       </div>
@@ -544,6 +544,7 @@ export default {
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
+      this.showSearch2 = true;
       
     },
 
@@ -695,6 +696,9 @@ export default {
         return null
       }
       return room
+    },
+    handleButtonClick() {
+      // Implementation of handleButtonClick method
     }
   },
 

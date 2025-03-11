@@ -180,7 +180,7 @@
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && item.code !== 'admin'"
+           v-if="allow(item) && item.code !== 'admin' && item.title !== 'Devices' && item.code !== 'devices'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
@@ -272,7 +272,7 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-     
+      
       tag_items:[],
       search2:'',
       tag_items2:[],

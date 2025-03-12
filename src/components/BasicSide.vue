@@ -7,9 +7,9 @@
        style="background:#27324A" >
         <div v-html="logo"></div>
         
-        <v-icon v-once large @click="openDrawer" class="drawer-toggle"  style="color: white ;font-size: 29px;">
+        <!-- <v-icon v-once large @click="openDrawer" class="drawer-toggle"  style="color: white ;font-size: 29px;">
           mdi-chevron-left-circle-outline
-        </v-icon>
+        </v-icon> -->
         <!-- <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>
           mdi-chevron-left
           </v-icon> -->

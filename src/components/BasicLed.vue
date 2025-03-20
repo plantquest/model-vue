@@ -294,6 +294,15 @@
     mounted() {
       console.log('mounted', this.spec,'KD')
       
+      Object.keys(this.spec.ent.primary.field.profile.kind).forEach(key => {
+        delete this.spec.ent.primary.field.profile.kind[key];
+      });
+
+      Object.assign(this.spec.ent.primary.field.profile.kind, {
+        so: { title: "System Owner", level: 1 },
+        ea: { title: "Engineering Admin", level: 2 },
+        ob: { title: "Observer", level: 3 }
+      });
       
     },
   

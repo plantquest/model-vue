@@ -391,7 +391,7 @@ export default {
     },
     search (val) {
       let term = val || ''
-      term.trim()
+      term = term.trim()
       // Todo: Is it necessary?
       // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
       // if(m) {
@@ -401,9 +401,8 @@ export default {
       this.$store.dispatch('trigger_search', {a: term})
     },
     search2 (val) {
-
       let term = val || ''
-      term.trim()
+      term =term.trim()
       console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
       

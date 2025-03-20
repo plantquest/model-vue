@@ -271,7 +271,7 @@
       },
       search (val) {
         let term = val || ''
-        term.trim()
+        term = term.trim()
         // Todo: Is it necessary?
         // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
         // if(m) {
@@ -735,7 +735,7 @@
       },
       search (val) {
         let term = val || ''
-        term.trim()
+        term = term.trim()
         // Todo: Is it necessary?
         // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
         // if(m) {

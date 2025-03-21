@@ -482,6 +482,7 @@
       },
   
       saveItem () {
+        this.item.email = this.item.email.trim()
         if(this.spec.ent.store_name.includes('user') ) {
             if(this.editing ==false) {
               console.log('Registering User: ')

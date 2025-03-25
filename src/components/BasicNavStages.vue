@@ -248,43 +248,30 @@ methods: {
 
 
       async  processStages(){
-        
-        console.log('____stages', this.routeMassages);
-        
-        let stages = this.routeMassages;
-        let stagesMsg = [];
+    console.log('____stages', this.routeMassages);
+    let stages = this.routeMassages;
+    let stagesMsg = [];
+    for (var i = 0; i < stages.length; i++) {
+      if (i < stages.length - 1) {
+          let nextStage = stages[i + 1].map;
+          let nextStageMsg = 0;
+          nextStageMsg = `Map ${nextStage}`;
+          stagesMsg.push({
+            map: stages[i].map,
+            msg: `Follow route to stairs and proceed to ${nextStageMsg}`
+          });
+        } else {
+          stagesMsg.push({
+            map: stages[i].map,
+            msg: "Proceed to your destination"
+          });
+        }
+          }
+     console.log('__stagesMsg',stagesMsg);
+     return stagesMsg;
+  },
 
-        for (var i = 0; i < stages.length; i++) {
-          if (i < stages.length - 1) {
-              let nextStage = stages[i + 1].map;
-              let nextStageMsg = 0;
-
-              if (nextStage == 1) {
-                nextStageMsg = 'Ground Floor';
-              } else if (nextStage == 6) {
-                nextStageMsg = 'Basement';
-              } else {
-                nextStageMsg = `Level ${nextStage}`;
-              }
-
-              stagesMsg.push({
-                map: stages[i].map,
-                msg: `Follow route to stairs and proceed to ${nextStageMsg}`
-              });
-            } else {
-              stagesMsg.push({
-                map: stages[i].map,
-                msg: "Proceed to your destination"
-              });
-            }
-              }
-      
-         console.log('__stagesMsg',stagesMsg);
-         return stagesMsg;
-
-
-      },
-
+  
   
  
   

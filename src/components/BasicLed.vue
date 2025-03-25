@@ -480,10 +480,11 @@
         this.show.table = false;
         this.show.item = true;
       },
-  
       saveItem () {
         if(this.spec.ent.store_name.includes('user') ) {
           this.item.email = this.item.email.trim()
+          // make the email all lower case
+          this.item.email = this.item.email.toLowerCase()
             if(this.editing ==false) {
               console.log('Registering User: ')
               this.$store.dispatch('register_user', this.item)           

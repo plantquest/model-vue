@@ -299,12 +299,13 @@
       });
 
       Object.assign(this.spec.ent.primary.field.profile.kind, {
-        so: { title: "System Owner", level: 1 },
-        ea: { title: "Admin", level: 2 },
+        gea: { title: "System Owner", level: 1 },
+        sea: { title: "Admin", level: 2 },
         ob: { title: "User", level: 3 }
       });
       
     },
+    
   
     async created () {
       console.log('mounted', this.spec,'KD')

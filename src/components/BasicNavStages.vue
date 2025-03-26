@@ -240,6 +240,10 @@ methods: {
             }
             
           console.log('Steps:', steps);
+          let map = steps[0].map == 1 ? 1 : steps[0].map-1
+          
+          this.selectStage(map)
+          
 
            
           console.log('________Messages:', messages);

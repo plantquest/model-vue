@@ -160,7 +160,7 @@ methods: {
     return this.selectedStage;
    
   },
-  selectStage(index) {
+  async selectStage(index) {
       console.log('indexx', index);
     this.selectedStage = index;
       console.log('selectedStage', this.selectedStage);
@@ -213,7 +213,11 @@ methods: {
 
           let messages = [];
 
-          for(var i=0; i<steps.length-2; i++){
+          // Add initial stage for starting point
+          // change made here - offset set to zero instead of -3
+          console.log('!!routeData', steps);
+          let offset = 0;
+          for(var i=0; i<steps.length-offset; i++){
               if(steps[i].type == "Connector"){
                   // first node type connector (i)
                   let msg = `Follow route to stairs and proceed to `;
@@ -222,7 +226,9 @@ methods: {
                       j++;
                   }
                   // first node type Standar (j)
-                  if(j < steps.length-3){
+                  let offset = 0;
+                  // change made here - offset set to zero instead of -2
+                  if(j < steps.length-offset){
                       msg += `${this.levelNames[steps[j].map-1]}`
                       messages.push({msg, map: steps[i].map-1});
                   }
@@ -242,7 +248,7 @@ methods: {
           console.log('Steps:', steps);
           let map = steps[0].map == 1 ? 1 : steps[0].map-1
           
-          this.selectStage(map)
+          await this.selectStage(map)
           
 
            

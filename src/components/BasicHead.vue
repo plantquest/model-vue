@@ -577,6 +577,34 @@
       >
     </v-combobox> 
   
+    <div style="width: 300px;">
+      <v-select
+        :items="headers"
+        item-text="text"
+        item-value="value"
+        v-model="selectedColumns"
+        @change="handleColumnChange"
+        multiple
+        chips
+        return-object
+        hide-details
+        outlined
+        dense
+        clearable
+      >
+        <template v-slot:selection="{ item, index }">
+          <v-chip v-if="index === 0">
+            <span>{{ item.text }}</span>
+          </v-chip>
+          <span
+            v-if="index === 1"
+            class="grey--text text-caption"
+          >
+            (+{{ selectedColumns.length - 1 }} others)
+          </span>
+        </template>
+      </v-select>
+    </div>
   
     <v-spacer
       v-if="tool.avatar.active || tool.expandMain.active"
@@ -695,6 +723,31 @@
         view: {
           tool: {}
         },
+        headers: [
+          { value: 'tag', text: 'Asset Tag', order: 0 },
+          { value: 'atype', text: 'Asset Type', order: 1 },
+          { value: 'discipline1', text: 'Discipline', order: 2 },
+          { value: 'description', text: 'Description', order: 3 },
+          { value: 'manufacturer', text: 'Manufacturer', order: 4 },
+          { value: 'model', text: 'Model', order: 5 },
+          { value: 'serial', text: 'Serial Number', order: 6 },
+          { value: 'building', text: 'Building', order: 7 },
+          { value: 'level', text: 'Level', order: 8 },
+          { value: 'room', text: 'Room Number', order: 9 },
+          { value: 'drawing1', text: 'Drawing 1', order: 10 },
+          { value: 'drawing2', text: 'Owner', order: 11 },
+          { value: 'system', text: 'System', order: 12 },
+          { value: 'subsys', text: 'Subsystem', order: 13 },
+          { value: 'custom12', text: 'Alias', order: 14 }
+        ],
+        selectedColumns: [
+          { value: 'tag', text: 'Asset Tag', order: 0 },
+          { value: 'atype', text: 'Asset Type', order: 1 },
+          { value: 'description', text: 'Description', order: 3 },
+          { value: 'building', text: 'Building', order: 7 },
+          { value: 'level', text: 'Level', order: 8 },
+          { value: 'room', text: 'Room Number', order: 9 },
+        ],
         featuresMenu: [],
         items: [],
         tag_items: [],
@@ -832,7 +885,10 @@
       customFilter (item, queryText, itemText) {
         return 1
       },
-    
+      handleColumnChange() {
+        const sorted = this.selectedColumns.sort((a, b) => a.order - b.order);
+        this.$store.dispatch('updateSelectedColumns', sorted)
+      },
       // on-keydown and on-clear logic
       changeSearch(event) {
   

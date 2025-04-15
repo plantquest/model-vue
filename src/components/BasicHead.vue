@@ -131,6 +131,7 @@
       v-if="!detailOpen && tool.expandMain.active"
       vertical style="margin:0px 16px;"></v-divider>
   
+
   
     <v-icon
       v-if="!detailOpen && tool.expandMain.active"
@@ -359,7 +360,7 @@
       customFilter (item, queryText, itemText) {
         return 1
       },
-    
+  
       // on-keydown and on-clear logic
       changeSearch(event) {
   

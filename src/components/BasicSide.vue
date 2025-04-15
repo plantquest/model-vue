@@ -46,7 +46,7 @@
                style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #fff;top:10px"
             class="btn-clear"
           @click="clearFilter(); "
-      >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
+      >{{ showSearch2 ? 'aaaExit Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">
@@ -629,6 +629,8 @@ export default {
     },
 
     clearFilter () {
+      // console  in green and red text big box
+      console.log('%c Hello from the other siiiiiide .... ', 'background: #222; color: #bada55; font-size: 20px; padding: 10px; border-radius: 5px;');
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
       this.$store.state.trigger.search.b = '';

@@ -576,34 +576,45 @@
       :filter="customFilter"
       >
     </v-combobox> 
-  
-    <div style="width: 300px;">
-      <v-select
-        :items="headers"
-        item-text="text"
-        item-value="value"
-        v-model="selectedColumns"
-        @change="handleColumnChange"
-        multiple
-        chips
-        return-object
-        hide-details
-        outlined
-        dense
-        clearable
+
+    <div v-if="$route.name == 'asset'" class="text-center">
+      <v-menu
+        v-model="isColumnVisibility"
+        :close-on-content-click="false"
+        offset-y
       >
-        <template v-slot:selection="{ item, index }">
-          <v-chip v-if="index === 0">
-            <span>{{ item.text }}</span>
-          </v-chip>
-          <span
-            v-if="index === 1"
-            class="grey--text text-caption"
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            class="px-5 ml-4"
+            outlined
+            style="background: white;"
+            v-bind="attrs"
+            v-on="on"
+            @click="isColumnVisibility = !isColumnVisibility"
           >
-            (+{{ selectedColumns.length - 1 }} others)
-          </span>
+            <div style="width: 250px; color: rgba(0, 0, 0, 0.6) !important;" class="d-flex justify-space-between align-center text-capitalize">
+              Column Visibility
+              <v-icon :style="{transform: isColumnVisibility ? 'rotate(180deg)' : 'rotate(0deg)',transition: 'transform 0.3s ease'}">
+                mdi-menu-down
+              </v-icon>
+            </div>
+          </v-btn>
         </template>
-      </v-select>
+
+        <v-card dense style="width: 100%;height: 180px;">
+          <div style="padding: 1px 15px 20px;width: 100%;background: white;">
+            <div v-for="(item, index) in headers" :key="index">
+              <v-checkbox
+                v-model="selectedColumns"
+                @change="handleColumnChange"
+                :hide-details="true"
+                :label="item.text"
+                :value="item"
+              ></v-checkbox>
+            </div>
+          </div>
+        </v-card>
+      </v-menu>
     </div>
   
     <v-spacer
@@ -748,6 +759,7 @@
           { value: 'level', text: 'Level', order: 8 },
           { value: 'room', text: 'Room Number', order: 9 },
         ],
+        isColumnVisibility: false,
         featuresMenu: [],
         items: [],
         tag_items: [],

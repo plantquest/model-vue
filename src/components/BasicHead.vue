@@ -735,7 +735,6 @@
           tool: {}
         },
         headers: [
-          { value: 'tag', text: 'Asset Tag', order: 0 },
           { value: 'atype', text: 'Asset Type', order: 1 },
           { value: 'discipline1', text: 'Discipline', order: 2 },
           { value: 'description', text: 'Description', order: 3 },

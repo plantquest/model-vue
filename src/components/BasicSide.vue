@@ -46,7 +46,7 @@
                style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #fff;top:10px"
             class="btn-clear"
           @click="clearFilter(); "
-      >{{ showSearch2 ? 'aaaExit Navigation Mode' : 'Clear Search' }}</v-btn>
+      >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">
@@ -158,6 +158,13 @@
           style="cursor: pointer;position: relative;color: white;top:-24px; size:9px; font-size: 10px; left: 65%;"
     
       >Add Destination +</button> -->
+      <!-- <div v-if="showSearch2 === true" style="color: #fff;" >
+        <v-icon style="margin: -7px 0;color: white;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four
+        </v-icon>
+        {{ Math.floor(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(2) }} meters)
+
+      </div> -->
 
       <BasicNavStages 
         v-if="showSearch2 === true"
@@ -274,7 +281,9 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-      
+      aprxTime: 0,
+      aprxDistance: 0,
+
       tag_items:[],
       search2:'',
       tag_items2:[],

@@ -1,4 +1,6 @@
 <template>
+
+  
   <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
       <v-expansion-panels class="mb-12" v-model="isExpanded" >
     <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >

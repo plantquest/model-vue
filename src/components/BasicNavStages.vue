@@ -1,4 +1,6 @@
 <template>
+
+  
   <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
       <v-expansion-panels class="mb-12" v-model="isExpanded" >
     <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
@@ -109,10 +111,10 @@ export default {
     }
 
     this.pathData = data.asset123; 
-    console.log('this.pathData', this.pathData);
+    console.log('basic_nav_this.pathData', this.pathDetails);
 
     try {
-      const parsedData = JSON.parse(this.pathData);
+      const parsedData = this.pathData;
       if (!Array.isArray(parsedData) || parsedData.length === 0) {
         console.warn("Invalid or empty pathData");
         this.routeMassages = []; // Clear stages if data is invalid
@@ -125,13 +127,13 @@ export default {
       // Map the parsedLines array to get map values
       this.mapValues = parsedLines.map(line => line.map);
 
-      let stages = await this.getRouteSteps(parsedLines); 
-      this.routeMassages = stages; 
+       this.routeMsg= await this.getRouteSteps(parsedLines); 
+      this.routeMassages = this.routeMsg; 
 
       
-      console.log('stages', stages); 
-      this.routeMsg = await this.processStages(stages);
-      console.log('__msgfloor', this.routeMsg);
+      // console.log('stages', stages); 
+      // let stages = await this.processStages(stages);
+      // console.log('__msgfloor', this.routeMsg);
 
     } catch (error) {
       console.error("Error parsing pathData:", error);
@@ -199,7 +201,9 @@ methods: {
               return {
                   id : data[0],
                   type : data[1],
-                  map : lineData.index
+                  map : lineData.index,
+                  x : parseFloat(data[3]),
+                  y : parseFloat(data[4]),
               }
           })
         else return [];
@@ -229,7 +233,7 @@ methods: {
                   let offset = 0;
                   // change made here - offset set to zero instead of -2
                   if(j < steps.length-offset){
-                      msg += `${this.levelNames[steps[j].map-1]}`
+                      msg += this.getMapName(steps[j])
                       messages.push({msg, map: steps[i].map-1});
                   }
                   i=j;
@@ -256,6 +260,24 @@ methods: {
           return messages;
       },
 
+  getMapName(node){ //: { type : string, x:number, y: number, map : number, polygon_id: string }) : string {
+    // find the nearest assetObject to the node
+    console.log('___list_main_asset:', this.$store.state.main_asset);
+    let assets = this.$store.state.main_asset.filter((asset)=> !isNaN(parseInt( asset.map)) && parseInt( asset.map) == node.map - 1 );
+    let closest = assets[0];
+    let mindist = Infinity;
+    for (let a of assets){
+
+      let dist = Math.sqrt(Math.pow(a.xco - node.x, 2) + Math.pow(a.yco - node.y, 2));
+      if (dist < mindist){
+        closest = a;
+        mindist = dist;
+      }
+    }
+    console.log('closest', node.map, closest.map);
+    console.log('closest', closest);
+    return closest ? closest.level : '@';
+  },
 
       async  processStages(){
     console.log('____stages', this.routeMassages);

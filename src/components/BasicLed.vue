@@ -5,7 +5,7 @@
       v-if="show.table"
       dense
       :headers="headers"
-      :items="items"
+      :items="filteredItems"
       :items-per-page="25"
       x-custom-filter="customFilter"
       :footer-props="{
@@ -28,7 +28,7 @@
         <span> error - no results </span>
       </div>
   
-      <template
+      <!-- <template
         v-for="header in headers"
         v-slot:[itemslot(header)]="{ item }">
         <div :key="header.value">
@@ -47,6 +47,42 @@
           </span>
           <span v-else>{{ item[header.value] }}</span>
         </div>
+      </template> -->
+
+      <template v-slot:header="{ props }">
+        <tr>
+          <th v-for="header in props.headers" :key="header.text" style="color: #707174;" :style="{ background : columnFilters[header.value] ? '#dfdfdf' : '' }" class="text-left font-weight-medium pl-4" >
+            <span>{{ header.text }}</span>
+
+            <!-- Filter Icon and Menu -->
+            <v-menu offset-y :close-on-content-click="false">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn class="filterBtn" icon v-bind="attrs" v-on="on">
+                  <v-icon :style="{ color : columnFilters[header.value] ? '#64a6ce' : '#707174' }" small>mdi-filter</v-icon>
+                </v-btn>
+              </template>
+              <div style="background-color: white; width: 280px">
+                <v-text-field 
+                  class="pa-4" 
+                  type="text" 
+                  :label="'Filter by ' + header.text.toUpperCase()"
+                  v-model="columnFilters[header.value]" 
+                  @input="updateFilter(header.value, $event)"
+                  :autofocus="true"
+                ></v-text-field>
+                <v-btn 
+                  small 
+                  text 
+                  color="primary" 
+                  class="ml-2 mb-2"
+                  @click="clearFilter(header.value)"
+                >
+                  Clear
+                </v-btn>
+              </div>
+            </v-menu>
+          </th>
+        </tr>
       </template>
       
     </v-data-table>
@@ -278,6 +314,7 @@
         sortDesc: true,
         search: '',
         loadlen: 0,
+        columnFilters: {},
         showprogress: true,
         loadingerror: false,
         // 'loading' | 'error' | 'done'
@@ -351,7 +388,18 @@
     },
     
     computed: {
-  
+      filteredItems() {
+        return this.items.filter((item) => {
+          return Object.keys(this.columnFilters).every((columnName) => {
+            const filterValue = this.columnFilters[columnName]?.toLowerCase().trim();
+            if (!filterValue) return true;
+            const dataKey = columnName.toLowerCase();
+            const itemValue = item[dataKey] ? item[dataKey].toString().toLowerCase() : "";
+            this.searched_items = itemValue.includes(filterValue)
+            return this.searched_items;
+          });
+        });
+      },
       loading() {
         return this.loadState == 'loading'
       },
@@ -447,7 +495,12 @@
   
   
     methods: {
-  
+      updateFilter(column, value) {
+        this.columnFilters[column] = value;
+      },
+      clearFilter(column) {
+        this.columnFilters[column] = ""; // Reset the filter
+      },
       itemslot (header) {
         return 'item.'+header.value
       },

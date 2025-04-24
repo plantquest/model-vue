@@ -158,13 +158,26 @@
           style="cursor: pointer;position: relative;color: white;top:-24px; size:9px; font-size: 10px; left: 65%;"
     
       >Add Destination +</button> -->
-      <!-- <div v-if="showSearch2 === true" style="color: #fff;" >
+
+
+     <div v-if="pathData && Object.keys(pathData).length > 0" 
+        style="color: #000;background-color:#b5d7d9;
+        height: 33px;
+        width: calc(100% - 8px);
+        left: 4px;
+        padding-top: 3px;
+        padding-left: 13px;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        position: absolute;
+        z-index: 9999;
+        top: 185px;" >
         <v-icon style="margin: -7px 0;color: white;" aria-hidden="true" aria-label="Route to Asset">
           mdi-clock-time-four
         </v-icon>
-        {{ Math.floor(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(2) }} meters)
+        {{ Math.floor(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
 
-      </div> -->
+       </div>
 
       <BasicNavStages 
         v-if="showSearch2 === true"
@@ -281,8 +294,8 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-      aprxTime: 0,
-      aprxDistance: 0,
+      //aprxTime: 0,
+     // aprxDistance: 0,
 
       tag_items:[],
       search2:'',
@@ -476,7 +489,10 @@ export default {
     ...mapState(['showSearch2','showExpansion','pathData']
     
     ),
-
+    ...mapState({
+        aprxTime: state => state.pathEstimation?.distance,
+        aprxDistance: state => state.pathEstimation?.distance,
+     }),
     triggerSelect() {
       return this.$store.state.trigger.select;
     },

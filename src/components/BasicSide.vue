@@ -160,23 +160,21 @@
       >Add Destination +</button> -->
 
 
-     <div v-if="pathData && Object.keys(pathData).length > 0" 
-        style="color: #000;background-color:#b5d7d9;
+     <div v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
+        style="color: #000;background-color:rgb(220 238 239);
         height: 33px;
         width: calc(100% - 8px);
         left: 4px;
         padding-top: 3px;
         padding-left: 13px;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
         position: absolute;
         z-index: 9999;
         top: 185px;" >
-        <v-icon style="margin: -7px 0;color: white;" aria-hidden="true" aria-label="Route to Asset">
-          mdi-clock-time-four
+        <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four-outline
         </v-icon>
-        {{ Math.floor(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
-
+        {{ Math.trunc(aprxTime/60)}}:{{(aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+       
        </div>
 
       <BasicNavStages 
@@ -490,7 +488,7 @@ export default {
     
     ),
     ...mapState({
-        aprxTime: state => state.pathEstimation?.distance,
+        aprxTime: state => state.pathEstimation?.time,
         aprxDistance: state => state.pathEstimation?.distance,
      }),
     triggerSelect() {
@@ -887,6 +885,7 @@ img{
 .comboxSearch .v-input__slot{
   
   width: calc(100% - 30px);
+  
 }
 
 .comboxSearch fieldset {
@@ -906,6 +905,7 @@ img{
 }
 .comboxSearch2 .v-input__control {
   margin-top: -6px;
+  border-radius: 0 !important;
 }
 .comboxSearch2 fieldset {
     color: transparent !important;
@@ -917,6 +917,7 @@ img{
 .comboxSearch2 .v-select__slot {
     margin-left: 25px;
     margin-bottom: 4px;
+    border-radius: 0 !important;
 }
 
 

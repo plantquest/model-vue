@@ -51,9 +51,11 @@
   right: 0;
   background: transparent;
 }
-.basic-nav-stages .v-expansion-panel-content__wrap {
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+.basic-nav-stages .v-expansion-panel.v-expansion-panel--active.v-item--active {
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+  border-top-left-radius: 0px !important;
+  border-top-right-radius: 0px !important;
 }
 .basic-nav-stages .stage {
   width: 95%;
@@ -204,6 +206,7 @@ img.catppuccin-search {
 }
 .comboxSearch2 .v-input__control {
   margin-top: -6px;
+  border-radius: 0 !important;
 }
 .comboxSearch2 fieldset {
   color: transparent !important;
@@ -214,6 +217,7 @@ img.catppuccin-search {
 .comboxSearch2 .v-select__slot {
   margin-left: 25px;
   margin-bottom: 4px;
+  border-radius: 0 !important;
 }
 .vxg-form-field {
   text-align: right;

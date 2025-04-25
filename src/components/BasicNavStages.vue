@@ -1,7 +1,7 @@
 <template>
 
   
-  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
+  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:4px;top: 218px;max-width: calc(100% - 8px);">
       <v-expansion-panels class="mb-12" v-model="isExpanded" >
     <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
       <v-expansion-panel-header 
@@ -226,7 +226,7 @@ methods: {
                   // first node type connector (i)
                   let msg = `Follow route to stairs and proceed to `;
                   var j = i;
-                  while(steps[j+1].type == "Connector"){
+                  while(j < steps.length-1 && steps[j+1].type == "Connector"){
                       j++;
                   }
                   // first node type Standar (j)
@@ -348,7 +348,14 @@ beforeDestroy() {
 
   .v-expansion-panel-content__wrap {
       
-      border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;
+     // border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;
+     // border-top-left-radius: 10px !important;border-top-right-radius: 10px !important;
+  }
+
+  .v-expansion-panel.v-expansion-panel--active.v-item--active {
+    border-top-left-radius: 10px !important;border-top-right-radius: 10px !important;
+    border-top-left-radius: 0px !important;border-top-right-radius: 0px !important;
+   // border-radius: 0 !important;
   }
 
   .stage {

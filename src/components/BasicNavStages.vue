@@ -23,7 +23,7 @@
       
       <v-expansion-panel-content style="padding-bottom: 10px;"  >
           <div v-for="(message, index) in routeMsg" :key="index" class="stage" style="background-color:white;"
-          @click="selectStage(message.map); activeStage = index"
+          @click="selectStage(message.map); activeStage = index; $store.commit('setCurrentStage', index + 1)"
             v-bind:class="{ 'activated': activeStage == index }">
             <h3 style="font-size: 13px;">STAGE {{ index+1 }}</h3>
             <p>{{ message.msg }}</p>
@@ -76,22 +76,25 @@ export default {
   }),
 },
   watch: {
-
+    '$store.state.currentStage'(newVal) {
+        console.log('Current Stage:', newVal);
+        this.activeStage = newVal - 1; 
+      },
     '$store.state.trigger.select.value': function (value) {
   console.log('__value', value);
 
-  if (this.$store.state.reverseTriggered) {
-    this.activeStage = 0;
-    this.$store.commit('clearReverseTrigger');
-  } else {
-    const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
-    if (stageIndex !== -1) {
-      this.activeStage = stageIndex;
-      console.log('__activeStage', this.activeStage, stageIndex);
-    } else {
-      this.activeStage = 0;
-    }
-  }
+  // if (this.$store.state.reverseTriggered) {
+  //   this.activeStage = 0;
+  //   this.$store.commit('clearReverseTrigger');
+  // } else {
+  //   const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+  //   if (stageIndex !== -1) {
+  //     this.activeStage = stageIndex;
+  //     console.log('__activeStage', this.activeStage, stageIndex);
+  //   } else {
+  //     this.activeStage = 0;
+  //   }
+  // }
   
 },
 
@@ -322,6 +325,7 @@ methods: {
 
 },
 mounted() {
+  console.log('Current Stage on mount:', this.$store.state.currentStage);
  // this.parseLines(this.test); // Call parseLines with the test data
   this.$root.$on('clear-nav-stages', this.toggleshowNav);
   

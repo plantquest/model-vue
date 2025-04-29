@@ -484,7 +484,7 @@ export default {
   
   
   computed: {
-    ...mapState(['showSearch2','showExpansion','pathData']
+    ...mapState(['showSearch2','showExpansion','pathData','currentStage']
     
     ),
     ...mapState({
@@ -551,7 +551,7 @@ export default {
 
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
-    ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
+    ...mapMutations(['toggleSearch2', 'toggleExpansion','setCurrentStage']),
     toggleSearchMode() {
       this.showSearch2 = !this.showSearch2;
     },
@@ -564,7 +564,10 @@ export default {
       //     this.showSearch2 = !this.showSearch2;
       //   },
         reverseInputs() {
-          this.$store.commit('resetActiveStage');
+          //this.$store.commit('resetActiveStage');
+          this.$store.commit('setCurrentStage', 1);
+          this.$store.dispatch('setCurrentStage', 1);
+          console.log(this.$store.state.currentStage); 
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;

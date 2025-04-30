@@ -1,7 +1,6 @@
 <template>
-
   
-  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
+  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:4px;top: 218px;max-width: calc(100% - 8px);">
       <v-expansion-panels class="mb-12" v-model="isExpanded" >
     <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
       <v-expansion-panel-header 
@@ -30,7 +29,6 @@
       
           </div>
       </v-expansion-panel-content>
-
      
     </v-expansion-panel>
   </v-expansion-panels>
@@ -39,7 +37,6 @@
   
   
 </template>
-
 <script>
 import { mapState } from 'vuex';
 export default {
@@ -76,10 +73,8 @@ export default {
   }),
 },
   watch: {
-
     '$store.state.trigger.select.value': function (value) {
   console.log('__value', value);
-
   if (this.$store.state.reverseTriggered) {
     this.activeStage = 0;
     this.$store.commit('clearReverseTrigger');
@@ -94,10 +89,7 @@ export default {
   }
   
 },
-
   
-
-
   isExpanded() {
     this.toggleIcon();
   },
@@ -109,10 +101,8 @@ export default {
       this.routeMassages = []; // Clear stages if data is invalid
       return;
     }
-
     this.pathData = data.asset123; 
     console.log('basic_nav_this.pathData', this.pathDetails);
-
     try {
       const parsedData = this.pathData;
       if (!Array.isArray(parsedData) || parsedData.length === 0) {
@@ -120,26 +110,20 @@ export default {
         this.routeMassages = []; // Clear stages if data is invalid
         return;
       }
-
       this.pathArray = parsedData[0]; 
       let parsedLines = this.parseLines(this.pathArray); 
-
       // Map the parsedLines array to get map values
       this.mapValues = parsedLines.map(line => line.map);
-
        this.routeMsg= await this.getRouteSteps(parsedLines); 
       this.routeMassages = this.routeMsg; 
-
       
       // console.log('stages', stages); 
       // let stages = await this.processStages(stages);
       // console.log('__msgfloor', this.routeMsg);
-
     } catch (error) {
       console.error("Error parsing pathData:", error);
       this.routeMassages = []; // Clear stages on error
     }
-
     // Dispatch the action (optional)
     this.$store.dispatch('set_path_data', { pathDetails: data.asset123 })
       .then(result => {
@@ -153,10 +137,7 @@ export default {
 }
 },
   
-
 methods: {
-
-
   getselectedStage() {
    console.log('selectedStage', this.selectedStage);
     return this.selectedStage;
@@ -173,19 +154,15 @@ methods: {
     this.$store.dispatch('trigger_select', {value: index})
     
    // this.$store.dispatch('trigger_select', {value: message.map})
-
     
   },
-
    parseLine(line){
           // line exmple : [47be48,Standard,,8832,4720]
          
           
            let lineData = line.split(',');
-
           let id = lineData[0];
           let type = lineData[1];
-
           let result = {
       id,
       type
@@ -209,14 +186,9 @@ methods: {
         else return [];
          
       },
-
-
-
       async getRouteSteps(routeData){
           let steps = routeData;
-
           let messages = [];
-
           // Add initial stage for starting point
           // change made here - offset set to zero instead of -3
           console.log('!!routeData', steps);
@@ -226,7 +198,7 @@ methods: {
                   // first node type connector (i)
                   let msg = `Follow route to stairs and proceed to `;
                   var j = i;
-                  while(steps[j+1].type == "Connector"){
+                  while(j < steps.length-1 && steps[j+1].type == "Connector"){
                       j++;
                   }
                   // first node type Standar (j)
@@ -239,14 +211,12 @@ methods: {
                   i=j;
               }
           }
-
           if(messages.length > 0){
             messages.push({
                msg : `Proceed to your destination.`,
                 map : steps[steps.length-1].map-1,
               
               })
-
             }
             
           console.log('Steps:', steps);
@@ -254,12 +224,10 @@ methods: {
           
           await this.selectStage(map)
           
-
            
           console.log('________Messages:', messages);
           return messages;
       },
-
   getMapName(node){ //: { type : string, x:number, y: number, map : number, polygon_id: string }) : string {
     // find the nearest assetObject to the node
     console.log('___list_main_asset:', this.$store.state.main_asset);
@@ -267,7 +235,6 @@ methods: {
     let closest = assets[0];
     let mindist = Infinity;
     for (let a of assets){
-
       let dist = Math.sqrt(Math.pow(a.xco - node.x, 2) + Math.pow(a.yco - node.y, 2));
       if (dist < mindist){
         closest = a;
@@ -278,7 +245,6 @@ methods: {
     console.log('closest', closest);
     return closest ? closest.level : '@';
   },
-
       async  processStages(){
     console.log('____stages', this.routeMassages);
     let stages = this.routeMassages;
@@ -302,7 +268,6 @@ methods: {
      console.log('__stagesMsg',stagesMsg);
      return stagesMsg;
   },
-
   
   
  
@@ -319,7 +284,6 @@ methods: {
   toggleshowNav() {
         this.showNav = !this.showNav;
       },
-
 },
 mounted() {
  // this.parseLines(this.test); // Call parseLines with the test data
@@ -341,22 +305,23 @@ beforeDestroy() {
   }
 };
 </script>
-
 <style lang="scss">
-
 .basic-nav-stages {
-
   .v-expansion-panel-content__wrap {
       
-      border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;
+     // border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;
+     // border-top-left-radius: 10px !important;border-top-right-radius: 10px !important;
   }
-
+  .v-expansion-panel.v-expansion-panel--active.v-item--active {
+    border-top-left-radius: 10px !important;border-top-right-radius: 10px !important;
+    border-top-left-radius: 0px !important;border-top-right-radius: 0px !important;
+   // border-radius: 0 !important;
+  }
   .stage {
       width: 95%;
       height: 85px;
       margin: 0px 4px 0px 7px;
   }
-
   .stage h3 {
       position: relative;
       font-family: "Gill Sans", sans-serif;
@@ -371,7 +336,6 @@ beforeDestroy() {
       top: 3px;
       left: 13px;
   }
-
   .stage.activated {
       background-color:#C0E28B !important;
   }
@@ -381,7 +345,4 @@ beforeDestroy() {
       height: 22px;
   }
 }
-
-
-
 </style>

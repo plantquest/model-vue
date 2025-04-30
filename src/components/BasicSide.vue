@@ -160,22 +160,22 @@
       >Add Destination +</button> -->
 
 
-     <div v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
-        style="color: #000;background-color:rgb(220 238 239);
-        height: 33px;
-        width: calc(100% - 8px);
-        left: 4px;
-        padding-top: 3px;
-        padding-left: 13px;
-        position: absolute;
-        z-index: 9999;
-        top: 185px;" >
-        <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
-          mdi-clock-time-four-outline
-        </v-icon>
-        {{ Math.trunc(aprxTime/60)}}:{{(aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
-       
-       </div>
+     <div
+       v-if="typeof aprxTime === 'number' && typeof aprxDistance === 'number'"
+       style="color: #000;background-color:rgb(220 238 239);
+         height: 33px;
+         width: calc(100% - 8px);
+         left: 4px;
+         padding-top: 3px;
+         padding-left: 13px;
+         position: absolute;
+         z-index: 9999;
+         top: 185px;">
+       <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
+         mdi-clock-time-four-outline
+       </v-icon>
+       {{ Math.trunc(aprxTime/60) }}:{{ (aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+     </div>
 
       <BasicNavStages 
         v-if="showSearch2 === true"

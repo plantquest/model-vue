@@ -79,6 +79,7 @@ export default {
     '$store.state.currentStage'(newVal) {
         console.log('Current Stage:', newVal);
         this.activeStage = newVal - 1; 
+        this.$store.dispatch('setCurrentStage', newVal);
       },
     '$store.state.trigger.select.value': function (value) {
   console.log('__value', value);

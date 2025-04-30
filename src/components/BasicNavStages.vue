@@ -23,7 +23,7 @@
       
       <v-expansion-panel-content style="padding-bottom: 10px;"  >
           <div v-for="(message, index) in routeMsg" :key="index" class="stage" style="background-color:white;"
-          @click="selectStage(message.map); activeStage = index; $store.commit('setCurrentStage', index + 1)"
+          @click="selectStage(message.map); activeStage = index"
             v-bind:class="{ 'activated': activeStage == index }">
             <h3 style="font-size: 13px;">STAGE {{ index+1 }}</h3>
             <p>{{ message.msg }}</p>
@@ -76,11 +76,7 @@ export default {
   }),
 },
   watch: {
-  //   '$store.state.currentStage'(newVal) {
-  //       console.log('Current Stage:', newVal);
-  //       this.activeStage = newVal - 1; 
-  //       this.$store.dispatch('setCurrentStage', newVal);
-  //     },
+
     '$store.state.trigger.select.value': function (value) {
   console.log('__value', value);
 
@@ -326,7 +322,6 @@ methods: {
 
 },
 mounted() {
-  console.log('Current Stage on mount:', this.$store.state.currentStage);
  // this.parseLines(this.test); // Call parseLines with the test data
   this.$root.$on('clear-nav-stages', this.toggleshowNav);
   

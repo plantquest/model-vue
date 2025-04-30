@@ -158,6 +158,32 @@
           style="cursor: pointer;position: relative;color: white;top:-24px; size:9px; font-size: 10px; left: 65%;"
     
       >Add Destination +</button> -->
+      <!-- <div v-if="showSearch2 === true" style="color: #fff;" >
+        <v-icon style="margin: -7px 0;color: white;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four
+        </v-icon>
+        {{ Math.floor(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(2) }} meters)
+
+      </div> -->
+
+
+     <div
+       
+       v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
+       style="color: #000;background-color:rgb(220 238 239);
+         height: 33px;
+         width: calc(100% - 8px);
+         left: 4px;
+         padding-top: 3px;
+         padding-left: 13px;
+         position: absolute;
+         z-index: 9999;
+         top: 185px;">
+       <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
+         mdi-clock-time-four-outline
+       </v-icon>
+       {{ Math.trunc(aprxTime/60) }}:{{ (aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+     </div>
 
 
      <div
@@ -566,9 +592,6 @@ export default {
       //   },
         reverseInputs() {
           this.$store.commit('resetActiveStage');
-         // this.$store.commit('setCurrentStage', 1);
-          //this.$store.dispatch('setCurrentStage', 1);
-          console.log(this.$store.state.currentStage); 
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
@@ -656,8 +679,6 @@ export default {
     },
 
     clearFilter () {
-      // console  in green and red text big box
-      console.log('%c Hello from the other siiiiiide .... ', 'background: #222; color: #bada55; font-size: 20px; padding: 10px; border-radius: 5px;');
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
       this.$store.state.trigger.search.b = '';

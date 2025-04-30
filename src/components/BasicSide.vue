@@ -161,7 +161,8 @@
 
 
      <div
-       v-if="typeof aprxTime === 'number' && typeof aprxDistance === 'number'"
+       
+       v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
        style="color: #000;background-color:rgb(220 238 239);
          height: 33px;
          width: calc(100% - 8px);
@@ -564,9 +565,9 @@ export default {
       //     this.showSearch2 = !this.showSearch2;
       //   },
         reverseInputs() {
-          //this.$store.commit('resetActiveStage');
-          this.$store.commit('setCurrentStage', 1);
-          this.$store.dispatch('setCurrentStage', 1);
+          this.$store.commit('resetActiveStage');
+         // this.$store.commit('setCurrentStage', 1);
+          //this.$store.dispatch('setCurrentStage', 1);
           console.log(this.$store.state.currentStage); 
       const temp = this.search;
       this.search = this.search2;

@@ -76,26 +76,26 @@ export default {
   }),
 },
   watch: {
-    '$store.state.currentStage'(newVal) {
-        console.log('Current Stage:', newVal);
-        this.activeStage = newVal - 1; 
-        this.$store.dispatch('setCurrentStage', newVal);
-      },
+  //   '$store.state.currentStage'(newVal) {
+  //       console.log('Current Stage:', newVal);
+  //       this.activeStage = newVal - 1; 
+  //       this.$store.dispatch('setCurrentStage', newVal);
+  //     },
     '$store.state.trigger.select.value': function (value) {
   console.log('__value', value);
 
-  // if (this.$store.state.reverseTriggered) {
-  //   this.activeStage = 0;
-  //   this.$store.commit('clearReverseTrigger');
-  // } else {
-  //   const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
-  //   if (stageIndex !== -1) {
-  //     this.activeStage = stageIndex;
-  //     console.log('__activeStage', this.activeStage, stageIndex);
-  //   } else {
-  //     this.activeStage = 0;
-  //   }
-  // }
+  if (this.$store.state.reverseTriggered) {
+    this.activeStage = 0;
+    this.$store.commit('clearReverseTrigger');
+  } else {
+    const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+    if (stageIndex !== -1) {
+      this.activeStage = stageIndex;
+      console.log('__activeStage', this.activeStage, stageIndex);
+    } else {
+      this.activeStage = 0;
+    }
+  }
   
 },
 

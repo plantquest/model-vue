@@ -80,6 +80,8 @@ export default {
         console.log('Current Stage:', newVal);
         this.activeStage = newVal - 1; 
         this.$store.dispatch('setCurrentStage', newVal);
+        //this.$store.commit('trigger_select');
+       // console.log('___Updated trigger.select:', this.$store.state.trigger.select.value);
       },
     '$store.state.trigger.select.value': function (value) {
   console.log('__value', value);
@@ -174,7 +176,9 @@ methods: {
     //this.$store.commit('setMapIndex',index);
     console.log('Committed map index:', index);
     this.$emit('stageSelected', index); 
-    this.$store.dispatch('trigger_select', {value: index})
+    this.$store.commit('setCurrentStage', index + 1); // Update the current stage in the store
+    this.$store.dispatch('setCurrentStage', index); // Update the current stage in the store
+    //this.$store.dispatch('trigger_select', {value: index})
     
    // this.$store.dispatch('trigger_select', {value: message.map})
 
@@ -256,7 +260,7 @@ methods: {
           console.log('Steps:', steps);
           let map = steps[0].map == 1 ? 1 : steps[0].map-1
           
-          await this.selectStage(map)
+          //await this.selectStage(map)
           
 
            

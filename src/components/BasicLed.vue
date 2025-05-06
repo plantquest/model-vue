@@ -418,16 +418,21 @@
             (this.spec.list.layout.order ?
              this.spec.list.layout.order.split(/\s*,\s*/) :
              Object.keys(this.spec.ent.primary.field)
+            
              )
             .map(fn=>headermap[fn])
             .filter(h=>null!=h)
-        
         return headers
       },
   
       items () {
         let items = this.$store.state[this.spec.ent.store_name]
-  
+
+        items.forEach((item) => {
+          item.when = new Date(item.when); // Convert the `when` field to a Date object
+        });
+
+
         // TODO: generalize
         if('user-by-role' === this.spec.name) {
           items = items.filter(item=>this.param.item.role===item.profile)

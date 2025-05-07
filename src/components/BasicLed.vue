@@ -389,16 +389,19 @@
     
     computed: {
       filteredItems() {
-        return this.items.filter((item) => {
+        var tmp = this.items.filter((item) => {
           return Object.keys(this.columnFilters).every((columnName) => {
             const filterValue = this.columnFilters[columnName]?.toLowerCase().trim();
             if (!filterValue) return true;
             const dataKey = columnName.toLowerCase();
             const itemValue = item[dataKey] ? item[dataKey].toString().toLowerCase() : "";
+            // Log dataKey and itemValue
             this.searched_items = itemValue.includes(filterValue)
             return this.searched_items;
           });
         });
+        console.log('!!!Filtered Items:', tmp);
+        return tmp
       },
       loading() {
         return this.loadState == 'loading'
@@ -427,6 +430,15 @@
   
       items () {
         let items = this.$store.state[this.spec.ent.store_name]
+        console.log('!!items!!', items)
+
+        items.forEach((item) => {
+          item.profile = 
+            item.profile === 'so' || item.profile === 'gea' || item.profile === 'sea' ? 'System Admin' : 
+            item.profile === 'ob' ? 'User' :    
+            (item.profile === 'op' || item.profile === 'oe') ? 'Admin' : 
+            item.profile; 
+        });
 
         items.forEach((item) => {
           item.when = new Date(item.when); // Convert the `when` field to a Date object

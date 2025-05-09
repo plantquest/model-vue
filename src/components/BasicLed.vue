@@ -389,16 +389,19 @@
     
     computed: {
       filteredItems() {
-        return this.items.filter((item) => {
+        var tmp = this.items.filter((item) => {
           return Object.keys(this.columnFilters).every((columnName) => {
             const filterValue = this.columnFilters[columnName]?.toLowerCase().trim();
             if (!filterValue) return true;
             const dataKey = columnName.toLowerCase();
             const itemValue = item[dataKey] ? item[dataKey].toString().toLowerCase() : "";
+            // Log dataKey and itemValue
             this.searched_items = itemValue.includes(filterValue)
             return this.searched_items;
           });
         });
+        console.log('!!!Filtered Items:', tmp);
+        return tmp
       },
       loading() {
         return this.loadState == 'loading'
@@ -418,16 +421,30 @@
             (this.spec.list.layout.order ?
              this.spec.list.layout.order.split(/\s*,\s*/) :
              Object.keys(this.spec.ent.primary.field)
+            
              )
             .map(fn=>headermap[fn])
             .filter(h=>null!=h)
-        
         return headers
       },
   
       items () {
         let items = this.$store.state[this.spec.ent.store_name]
-  
+        console.log('!!items!!', items)
+
+        items.forEach((item) => {
+          item.profile = 
+             item.profile === 'gea'  ? 'System Owner' : 
+            item.profile === 'ob' ? 'User' :    
+            item.profile === 'sea'  ? 'Admin' : 
+            '';
+        });
+
+        items.forEach((item) => {
+          item.when = new Date(item.when); // Convert the `when` field to a Date object
+        });
+
+
         // TODO: generalize
         if('user-by-role' === this.spec.name) {
           items = items.filter(item=>this.param.item.role===item.profile)

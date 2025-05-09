@@ -1,6 +1,5 @@
 <template>
-  
-  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:4px;top: 218px;max-width: calc(100% - 8px);">
+  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
       <v-expansion-panels class="mb-12" v-model="isExpanded" >
     <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
       <v-expansion-panel-header 
@@ -22,7 +21,7 @@
       
       <v-expansion-panel-content style="padding-bottom: 10px;"  >
           <div v-for="(message, index) in routeMsg" :key="index" class="stage" style="background-color:white;"
-          @click="selectStage(message.map); activeStage = index"
+          @click="selectStage(message.map); activeStage = index; $store.commit('setCurrentStage', index + 1)"
             v-bind:class="{ 'activated': activeStage == index }">
             <h3 style="font-size: 13px;">STAGE {{ index+1 }}</h3>
             <p>{{ message.msg }}</p>
@@ -73,20 +72,28 @@ export default {
   }),
 },
   watch: {
+    '$store.state.currentStage'(newVal) {
+        console.log('Current Stage:', newVal);
+        this.activeStage = newVal - 1; 
+        this.$store.dispatch('setCurrentStage', newVal);
+        //this.$store.commit('trigger_select');
+       // console.log('___Updated trigger.select:', this.$store.state.trigger.select.value);
+      },
     '$store.state.trigger.select.value': function (value) {
   console.log('__value', value);
-  if (this.$store.state.reverseTriggered) {
-    this.activeStage = 0;
-    this.$store.commit('clearReverseTrigger');
-  } else {
-    const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
-    if (stageIndex !== -1) {
-      this.activeStage = stageIndex;
-      console.log('__activeStage', this.activeStage, stageIndex);
-    } else {
-      this.activeStage = 0;
-    }
-  }
+
+  // if (this.$store.state.reverseTriggered) {
+  //   this.activeStage = 0;
+  //   this.$store.commit('clearReverseTrigger');
+  // } else {
+  //   const stageIndex = this.routeMassages.findIndex(stage => stage.map == value);
+  //   if (stageIndex !== -1) {
+  //     this.activeStage = stageIndex;
+  //     console.log('__activeStage', this.activeStage, stageIndex);
+  //   } else {
+  //     this.activeStage = 0;
+  //   }
+  // }
   
 },
   
@@ -103,6 +110,7 @@ export default {
     }
     this.pathData = data.asset123; 
     console.log('basic_nav_this.pathData', this.pathDetails);
+
     try {
       const parsedData = this.pathData;
       if (!Array.isArray(parsedData) || parsedData.length === 0) {
@@ -114,12 +122,15 @@ export default {
       let parsedLines = this.parseLines(this.pathArray); 
       // Map the parsedLines array to get map values
       this.mapValues = parsedLines.map(line => line.map);
+
        this.routeMsg= await this.getRouteSteps(parsedLines); 
       this.routeMassages = this.routeMsg; 
+
       
       // console.log('stages', stages); 
       // let stages = await this.processStages(stages);
       // console.log('__msgfloor', this.routeMsg);
+
     } catch (error) {
       console.error("Error parsing pathData:", error);
       this.routeMassages = []; // Clear stages on error
@@ -151,7 +162,9 @@ methods: {
     //this.$store.commit('setMapIndex',index);
     console.log('Committed map index:', index);
     this.$emit('stageSelected', index); 
-    this.$store.dispatch('trigger_select', {value: index})
+    this.$store.commit('setCurrentStage', index + 1); // Update the current stage in the store
+    this.$store.dispatch('setCurrentStage', index); // Update the current stage in the store
+    //this.$store.dispatch('trigger_select', {value: index})
     
    // this.$store.dispatch('trigger_select', {value: message.map})
     
@@ -222,12 +235,14 @@ methods: {
           console.log('Steps:', steps);
           let map = steps[0].map == 1 ? 1 : steps[0].map-1
           
-          await this.selectStage(map)
+          //await this.selectStage(map)
           
+
            
           console.log('________Messages:', messages);
           return messages;
       },
+
   getMapName(node){ //: { type : string, x:number, y: number, map : number, polygon_id: string }) : string {
     // find the nearest assetObject to the node
     console.log('___list_main_asset:', this.$store.state.main_asset);
@@ -235,6 +250,7 @@ methods: {
     let closest = assets[0];
     let mindist = Infinity;
     for (let a of assets){
+
       let dist = Math.sqrt(Math.pow(a.xco - node.x, 2) + Math.pow(a.yco - node.y, 2));
       if (dist < mindist){
         closest = a;
@@ -245,6 +261,7 @@ methods: {
     console.log('closest', closest);
     return closest ? closest.level : '@';
   },
+
       async  processStages(){
     console.log('____stages', this.routeMassages);
     let stages = this.routeMassages;
@@ -286,6 +303,7 @@ methods: {
       },
 },
 mounted() {
+  console.log('Current Stage on mount:', this.$store.state.currentStage);
  // this.parseLines(this.test); // Call parseLines with the test data
   this.$root.$on('clear-nav-stages', this.toggleshowNav);
   
@@ -312,11 +330,13 @@ beforeDestroy() {
      // border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;
      // border-top-left-radius: 10px !important;border-top-right-radius: 10px !important;
   }
+
   .v-expansion-panel.v-expansion-panel--active.v-item--active {
     border-top-left-radius: 10px !important;border-top-right-radius: 10px !important;
     border-top-left-radius: 0px !important;border-top-right-radius: 0px !important;
    // border-radius: 0 !important;
   }
+
   .stage {
       width: 95%;
       height: 85px;

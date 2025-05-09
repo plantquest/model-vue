@@ -166,6 +166,42 @@
 
       </div> -->
 
+
+     <div v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
+        style="color: #000;background-color:rgb(220 238 239);
+        height: 33px;
+        width: calc(100% - 8px);
+        left: 4px;
+        padding-top: 3px;
+        padding-left: 13px;
+        position: absolute;
+        z-index: 9999;
+        top: 185px;" >
+        <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four-outline
+        </v-icon>
+        {{ Math.trunc(aprxTime/60)}}:{{(aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+       
+       </div>
+
+
+     <div v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
+        style="color: #000;background-color:rgb(220 238 239);
+        height: 33px;
+        width: calc(100% - 8px);
+        left: 4px;
+        padding-top: 3px;
+        padding-left: 13px;
+        position: absolute;
+        z-index: 9999;
+        top: 185px;" >
+        <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four-outline
+        </v-icon>
+        {{ Math.trunc(aprxTime/60)}}:{{(aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+       
+       </div>
+
       <BasicNavStages 
         v-if="showSearch2 === true"
         :spec="spec"
@@ -281,8 +317,8 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-      aprxTime: 0,
-      aprxDistance: 0,
+      //aprxTime: 0,
+     // aprxDistance: 0,
 
       tag_items:[],
       search2:'',
@@ -473,10 +509,13 @@ export default {
   
   
   computed: {
-    ...mapState(['showSearch2','showExpansion','pathData']
+    ...mapState(['showSearch2','showExpansion','pathData','currentStage']
     
     ),
-
+    ...mapState({
+        aprxTime: state => state.pathEstimation?.time,
+        aprxDistance: state => state.pathEstimation?.distance,
+     }),
     triggerSelect() {
       return this.$store.state.trigger.select;
     },
@@ -537,7 +576,7 @@ export default {
 
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
-    ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
+    ...mapMutations(['toggleSearch2', 'toggleExpansion','setCurrentStage']),
     toggleSearchMode() {
       this.showSearch2 = !this.showSearch2;
     },
@@ -550,7 +589,10 @@ export default {
       //     this.showSearch2 = !this.showSearch2;
       //   },
         reverseInputs() {
-          this.$store.commit('resetActiveStage');
+          //this.$store.commit('resetActiveStage');
+          this.$store.commit('setCurrentStage', 1);
+          this.$store.dispatch('setCurrentStage', 1);
+          console.log(this.$store.state.currentStage); 
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
@@ -638,8 +680,6 @@ export default {
     },
 
     clearFilter () {
-      // console  in green and red text big box
-      console.log('%c Hello from the other siiiiiide .... ', 'background: #222; color: #bada55; font-size: 20px; padding: 10px; border-radius: 5px;');
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
       this.$store.state.trigger.search.b = '';
@@ -871,6 +911,7 @@ img{
 .comboxSearch .v-input__slot{
   
   width: calc(100% - 30px);
+  
 }
 
 .comboxSearch fieldset {
@@ -890,6 +931,7 @@ img{
 }
 .comboxSearch2 .v-input__control {
   margin-top: -6px;
+  border-radius: 0 !important;
 }
 .comboxSearch2 fieldset {
     color: transparent !important;
@@ -901,6 +943,7 @@ img{
 .comboxSearch2 .v-select__slot {
     margin-left: 25px;
     margin-bottom: 4px;
+    border-radius: 0 !important;
 }
 
 

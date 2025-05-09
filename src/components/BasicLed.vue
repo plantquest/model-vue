@@ -434,10 +434,10 @@
 
         items.forEach((item) => {
           item.profile = 
-            item.profile === 'so' || item.profile === 'gea' || item.profile === 'sea' ? 'System Admin' : 
+             item.profile === 'gea'  ? 'System Owner' : 
             item.profile === 'ob' ? 'User' :    
-            (item.profile === 'op' || item.profile === 'oe') ? 'Admin' : 
-            item.profile; 
+            item.profile === 'sea'  ? 'Admin' : 
+            '';
         });
 
         items.forEach((item) => {

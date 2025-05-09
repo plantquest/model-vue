@@ -1,7 +1,5 @@
 <template>
-
-  
-  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:4px;top: 218px;max-width: calc(100% - 8px);">
+  <div v-if="routeMassages.length > 1" class="basic-nav-stages"   style="position: absolute;z-index:99; height:300px;left:7px;top: 250px;max-width: calc(100% - 11px);">
       <v-expansion-panels class="mb-12" v-model="isExpanded" >
     <v-expansion-panel v-model="isExpanded" style="background-color:#DCEEEF" >
       <v-expansion-panel-header 
@@ -30,7 +28,6 @@
       
           </div>
       </v-expansion-panel-content>
-
      
     </v-expansion-panel>
   </v-expansion-panels>
@@ -39,7 +36,6 @@
   
   
 </template>
-
 <script>
 import { mapState } from 'vuex';
 export default {
@@ -100,10 +96,7 @@ export default {
   // }
   
 },
-
   
-
-
   isExpanded() {
     this.toggleIcon();
   },
@@ -115,7 +108,6 @@ export default {
       this.routeMassages = []; // Clear stages if data is invalid
       return;
     }
-
     this.pathData = data.asset123; 
     console.log('basic_nav_this.pathData', this.pathDetails);
 
@@ -126,10 +118,8 @@ export default {
         this.routeMassages = []; // Clear stages if data is invalid
         return;
       }
-
       this.pathArray = parsedData[0]; 
       let parsedLines = this.parseLines(this.pathArray); 
-
       // Map the parsedLines array to get map values
       this.mapValues = parsedLines.map(line => line.map);
 
@@ -145,7 +135,6 @@ export default {
       console.error("Error parsing pathData:", error);
       this.routeMassages = []; // Clear stages on error
     }
-
     // Dispatch the action (optional)
     this.$store.dispatch('set_path_data', { pathDetails: data.asset123 })
       .then(result => {
@@ -159,10 +148,7 @@ export default {
 }
 },
   
-
 methods: {
-
-
   getselectedStage() {
    console.log('selectedStage', this.selectedStage);
     return this.selectedStage;
@@ -181,19 +167,15 @@ methods: {
     //this.$store.dispatch('trigger_select', {value: index})
     
    // this.$store.dispatch('trigger_select', {value: message.map})
-
     
   },
-
    parseLine(line){
           // line exmple : [47be48,Standard,,8832,4720]
          
           
            let lineData = line.split(',');
-
           let id = lineData[0];
           let type = lineData[1];
-
           let result = {
       id,
       type
@@ -217,14 +199,9 @@ methods: {
         else return [];
          
       },
-
-
-
       async getRouteSteps(routeData){
           let steps = routeData;
-
           let messages = [];
-
           // Add initial stage for starting point
           // change made here - offset set to zero instead of -3
           console.log('!!routeData', steps);
@@ -247,14 +224,12 @@ methods: {
                   i=j;
               }
           }
-
           if(messages.length > 0){
             messages.push({
                msg : `Proceed to your destination.`,
                 map : steps[steps.length-1].map-1,
               
               })
-
             }
             
           console.log('Steps:', steps);
@@ -310,7 +285,6 @@ methods: {
      console.log('__stagesMsg',stagesMsg);
      return stagesMsg;
   },
-
   
   
  
@@ -327,7 +301,6 @@ methods: {
   toggleshowNav() {
         this.showNav = !this.showNav;
       },
-
 },
 mounted() {
   console.log('Current Stage on mount:', this.$store.state.currentStage);
@@ -350,11 +323,8 @@ beforeDestroy() {
   }
 };
 </script>
-
 <style lang="scss">
-
 .basic-nav-stages {
-
   .v-expansion-panel-content__wrap {
       
      // border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;
@@ -372,7 +342,6 @@ beforeDestroy() {
       height: 85px;
       margin: 0px 4px 0px 7px;
   }
-
   .stage h3 {
       position: relative;
       font-family: "Gill Sans", sans-serif;
@@ -387,7 +356,6 @@ beforeDestroy() {
       top: 3px;
       left: 13px;
   }
-
   .stage.activated {
       background-color:#C0E28B !important;
   }
@@ -397,7 +365,4 @@ beforeDestroy() {
       height: 22px;
   }
 }
-
-
-
 </style>

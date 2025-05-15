@@ -16,6 +16,7 @@
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc"
       :search="search"
+      :customSort ="sortDate"
       >
   
       <template v-slot:loading>
@@ -287,8 +288,8 @@
   
   <script>
   
-  import { memoize } from 'lodash'
-  
+  import { memoize } from 'lodash';
+ 
   export default {
     props: {
       spec: {
@@ -430,7 +431,6 @@
   
       items () {
         let items = this.$store.state[this.spec.ent.store_name]
-        console.log('!!items!!', items)
 
         items.forEach((item) => {
           item.profile = 
@@ -441,16 +441,13 @@
         });
 
         items.forEach((item) => {
-          item.when = new Date(item.when); // Convert the `when` field to a Date object
+          item.when = new Date(item.when); 
         });
-
-
+ 
         // TODO: generalize
         if('user-by-role' === this.spec.name) {
           items = items.filter(item=>this.param.item.role===item.profile)
-          //items = items.filter(item=>'op'===item.profile)
         }
-  
         return items
       },
   
@@ -512,6 +509,10 @@
   
   
     methods: {
+      sortDate (items){
+        return items.sort((a, b) => b.when - a.when);
+        
+      },
       updateFilter(column, value) {
         this.columnFilters[column] = value;
       },

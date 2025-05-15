@@ -686,6 +686,7 @@ export default {
       this.$store.state.showSearch2 = false;
       this.$store.commit('clear_path_data');
       this.$store.state.showExpansion = true; 
+      this.$store.commit('clearMatchingConnectorData');
     //  this.$root.$emit('clear-nav-stages');
 
 

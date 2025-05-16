@@ -1,6 +1,6 @@
 {
   "name": "@plantquest/model-vue",
-  "version": "0.18.125-pqview-stable",
+  "version": "0.18.130-pqview-stable",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",

@@ -1,5 +1,8 @@
 <template>
-  <v-navigation-drawer app class="vxg-side" :style="drawerStyle">
+  <v-navigation-drawer app class="vxg-side" :style="drawerStyle" permanent  
+  :clipped="false" 
+  :mini-variant="false" 
+  :temporary="false">
     
     <v-sheet class="d-flex flex-column h-100">
       <!-- Header -->
@@ -198,8 +201,12 @@
         <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
           mdi-clock-time-four-outline
         </v-icon>
-        {{ Math.trunc(aprxTime/60)}}:{{(aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
-       
+        <span v-if="aprxTime >= 60">
+    {{ Math.trunc(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+  </span>
+  <span v-else>
+    {{ aprxTime }} seconds ({{ aprxDistance.toFixed(0) }} meters)
+  </span>
        </div>
 
       <BasicNavStages 
@@ -777,6 +784,7 @@ const DRAWER_STYLE = Object.freeze({ width: "282px" });
 <style lang="scss">
 
 .v-navigation-drawer{
+  position: fixed !important;
   background: #141B2D;
 }
 

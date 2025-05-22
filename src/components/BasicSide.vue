@@ -201,8 +201,12 @@
         <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
           mdi-clock-time-four-outline
         </v-icon>
-        {{ Math.trunc(aprxTime/60)}}:{{(aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
-       
+        <span v-if="aprxTime >= 60">
+    {{ Math.trunc(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+  </span>
+  <span v-else>
+    {{ aprxTime }} seconds ({{ aprxDistance.toFixed(0) }} meters)
+  </span>
        </div>
 
       <BasicNavStages 

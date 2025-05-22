@@ -49,7 +49,7 @@
                style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #fff;top:10px"
             class="btn-clear"
           @click="clearFilter(); "
-          >{{ showSearch2 ? 'Close Navigation Mode' : 'Clearr Search' }}</v-btn>
+          >{{ showSearch2 ? 'Close Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">

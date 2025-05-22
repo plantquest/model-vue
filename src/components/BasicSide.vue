@@ -1,5 +1,8 @@
 <template>
-  <v-navigation-drawer app class="vxg-side" :style="drawerStyle">
+  <v-navigation-drawer app class="vxg-side" :style="drawerStyle" permanent  
+  :clipped="false" 
+  :mini-variant="false" 
+  :temporary="false">
     
     <v-sheet class="d-flex flex-column h-100">
       <!-- Header -->
@@ -46,7 +49,7 @@
                style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #fff;top:10px"
             class="btn-clear"
           @click="clearFilter(); "
-          >{{ showSearch2 ? 'Close Navigation Mode' : 'Clear Search' }}</v-btn>
+          >{{ showSearch2 ? 'Close Navigation Mode' : 'Clearr Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">
@@ -777,6 +780,7 @@ const DRAWER_STYLE = Object.freeze({ width: "282px" });
 <style lang="scss">
 
 .v-navigation-drawer{
+  position: fixed !important;
   background: #141B2D;
 }
 

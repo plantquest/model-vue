@@ -1,5 +1,8 @@
 <template>
-  <v-navigation-drawer app class="vxg-side" :style="drawerStyle" permanent  
+  <v-navigation-drawer app class="vxg-side" 
+  :style="drawerStyle" 
+  permanent  
+  :touchless="true"
   :clipped="false" 
   :mini-variant="false" 
   :temporary="false">
@@ -775,7 +778,7 @@ export default {
 
 
 
-const DRAWER_STYLE = Object.freeze({ width: "282px" });
+const DRAWER_STYLE = Object.freeze({ width: "282px", visibility: "visible !important", transform: "none !important" });
 
 
 </script>

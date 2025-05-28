@@ -222,16 +222,16 @@
 
 </div>
    
-      <!-- <v-combobox
-      
-    
-    @click:append="filter"
-    :filter="customFilter"
-    >
-  </v-combobox>  -->
-      <!-- Menu Items -->
-      <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
-        <template v-if="menuView.mode === 'standard'" >
+            <!-- <v-combobox
+            
+          
+          @click:append="filter"
+          :filter="customFilter"
+          >
+        </v-combobox>  -->
+            <!-- Menu Items -->
+        <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
+         <template v-if="menuView.mode === 'standard'" >
           <div class="router_items">
             <router-link 
           v-for="item in menu"
@@ -240,9 +240,9 @@
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
 
-        >
+         >
           <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
-        </router-link>
+            </router-link>
           </div>
        
       </template>

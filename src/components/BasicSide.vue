@@ -149,7 +149,7 @@
       <div v-if="showSearch2" >
         
         <img :src="`${publicPath}two-opposite-up-and-down-arrows-side-by-side.svg`" alt="two-opposite-arrows-side-by-side"
-       style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;margin-left: -18px; background: white; z-index: 999;"
+       style="cursor: pointer;position: relative;top: -49px; left: calc(100% - 29px); width:18px;margin-left: -18px; background: white; z-index: 999;"
        @click="reverseInputs"
         />
         

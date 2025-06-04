@@ -1,5 +1,8 @@
 <template>
-  <v-navigation-drawer app class="vxg-side" :style="drawerStyle" permanent  
+  <v-navigation-drawer app class="vxg-side" 
+  :style="drawerStyle" 
+  permanent  
+  :touchless="true"
   :clipped="false" 
   :mini-variant="false" 
   :temporary="false">
@@ -146,7 +149,7 @@
       <div v-if="showSearch2" >
         
         <img :src="`${publicPath}two-opposite-up-and-down-arrows-side-by-side.svg`" alt="two-opposite-arrows-side-by-side"
-       style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
+       style="cursor: pointer;position: relative;top: -49px; left: calc(100% - 29px); width:18px;margin-left: -18px; background: white; z-index: 999;"
        @click="reverseInputs"
         />
         
@@ -219,16 +222,16 @@
 
 </div>
    
-      <!-- <v-combobox
-      
-    
-    @click:append="filter"
-    :filter="customFilter"
-    >
-  </v-combobox>  -->
-      <!-- Menu Items -->
-      <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
-        <template v-if="menuView.mode === 'standard'" >
+            <!-- <v-combobox
+            
+          
+          @click:append="filter"
+          :filter="customFilter"
+          >
+        </v-combobox>  -->
+            <!-- Menu Items -->
+        <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
+         <template v-if="menuView.mode === 'standard'" >
           <div class="router_items">
             <router-link 
           v-for="item in menu"
@@ -237,9 +240,9 @@
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
 
-        >
+         >
           <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
-        </router-link>
+            </router-link>
           </div>
        
       </template>
@@ -775,7 +778,7 @@ export default {
 
 
 
-const DRAWER_STYLE = Object.freeze({ width: "282px" });
+const DRAWER_STYLE = Object.freeze({ width: "282px", visibility: "visible !important", transform: "none !important" });
 
 
 </script>

@@ -17,6 +17,7 @@
       :sort-desc.sync="sortDesc"
       :search="search"
       :customSort ="sortDate"
+      style="padding:16px; position: absolute; top: 0; bottom:0; left: 0; right: 0; overflow:hidden;"
       >
   
       <template v-slot:loading>

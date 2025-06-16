@@ -59,7 +59,7 @@
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="toggleSearch2();toggleExpansion();"
+        @click="toggleSearch2();toggleExpansion();handleRoute()"
         
          />
 
@@ -90,6 +90,7 @@
         v-model="search"
         @keydown="changeSearch($event)"
         @click:clear="changeSearch($event)"
+        @change="handleChangeSearch($event)"
         :items="tag_items"
         flat
         hide-details
@@ -432,8 +433,7 @@ export default {
     // }).then((data) => {
     //   console.log('PathData: ', data)
     // })
- 
-
+    
       console.log('search.b is being triggered')
         this.search2 = term
       if(term == '' && this.$refs.search2) {
@@ -442,7 +442,14 @@ export default {
         this.tag_items2 = this.items2.map(tag_alias)
       //  this.$store.commit('set_path_data', null)
       }
-      
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          mode: 'route',
+          a: this.search,
+          b: this.search2
+        }
+      })     
     },
     search (val) {
       let term = val || ''
@@ -646,10 +653,27 @@ export default {
       this.showIcon = true; // Show the icon when the combobox is blurred
     },
 
+    handleChangeSearch(event){
+      this.$router.push({
+        path: this.$route.path,
+        query: {
+          mode: 'assetsearch',
+          term: event,
+        }
+      })
+    },
+
     changeSearch(event) {
       setTimeout(async ()=> { // wait for input
         let term
         term = event.target ? event.target.value : null
+          this.$router.push({
+            path: this.$route.path,
+            query: {
+              mode: 'assetsearch',
+              term: event.target?.value,
+            }
+          })
         if(term) {
           let out = await this.$seneca.post('sys:search, cmd:search', 
             { query: term, params: this.search_config }
@@ -662,9 +686,9 @@ export default {
           if(this.items != undefined)
           this.tag_items = this.items.map(tag_alias) 
         }
-        
+
       }, 11)
-      
+
     },
     changeSearch2(event) {
       setTimeout(async ()=> { // wait for input
@@ -689,7 +713,22 @@ export default {
       }, 11)
     },
 
+    handleRoute() {
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          mode: 'route',
+          a:  this.search || '',
+          b: this.search2 || ''
+        }
+      })
+    },
+
     clearFilter () {
+      this.$router.replace({
+        path: this.$route.path,
+        query: {}
+      })
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
       this.$store.state.trigger.search.b = '';
@@ -718,6 +757,18 @@ export default {
 
     filter(event) {
       // aaaaaaaaaaaa
+      if(this.$route.query.mode !== 'filtersearch') {
+        this.$router.replace({
+          path: this.$route.path,
+          query: {
+            mode: 'filtersearch',
+            area: '',
+            level: '',
+            systemtype: '',
+            assettype: '',
+          }
+        })
+      }
       this.$store.dispatch('trigger_toggle_filter');
     
       },
@@ -766,7 +817,10 @@ export default {
   },
 
   mounted() {
-   
+    const mode = this.$route.query.mode
+    if (mode === 'filtersearch') {
+      this.$store.dispatch('trigger_toggle_filter');
+    }
   },
   // beforeDestroy() {
   //   document.removeEventListener('click', this.handleClickOutside);

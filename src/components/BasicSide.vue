@@ -654,13 +654,24 @@ export default {
     },
 
     handleChangeSearch(event){
-      this.$router.push({
-        path: this.$route.path,
-        query: {
-          mode: 'assetsearch',
-          term: event,
-        }
-      })
+      if(!this.showSearch2){
+        this.$router.push({
+          path: this.$route.path,
+          query: {
+            mode: 'assetsearch',
+            term: event,
+          }
+        })
+      }else{
+        this.$router.replace({
+          path: this.$route.path,
+          query: {
+            mode: 'route',
+            a: this.search,
+            b: this.search2
+          }
+        })
+      }
     },
 
     changeSearch(event) {

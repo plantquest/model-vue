@@ -228,6 +228,7 @@
         </v-card>
       </v-dialog>
     
+    </div>
       <v-toolbar flat>
         <v-btn outlined @click="closeItem">Cancel</v-btn>
         <v-spacer />
@@ -236,7 +237,6 @@
         <v-btn outlined @click="saveItem" v-if="allow('edit')">Save</v-btn>
         <div style="padding: 5px;"></div>
       </v-toolbar>
-    </div>
   </div>
 
       <v-dialog v-model="accessMatrixDialog" max-width="800" persistent>
@@ -426,6 +426,7 @@
              )
             .map(fn=>headermap[fn])
             .filter(h=>null!=h)
+            .filter(item => item.text !== 'Status')
         return headers
       },
   
@@ -471,7 +472,7 @@
             
             fds.push(fd)
           }
-          return fds
+          return fds.filter(item => item.title !== 'Status')
         }
         catch(e) {
           // console.error(e)

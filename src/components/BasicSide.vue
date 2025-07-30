@@ -741,6 +741,7 @@ export default {
         query: {}
       })
       this.$store.dispatch('vxg_trigger_clear');
+      this.$store.dispatch('set_cmp_flags',{name:'BasicMain', flags:{show:false}})
       this.search = '';
       this.$store.state.trigger.search.b = '';
       this.$store.state.showSearch2 = false;

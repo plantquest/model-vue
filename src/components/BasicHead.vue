@@ -131,6 +131,7 @@
       v-if="!detailOpen && tool.expandMain.active"
       vertical style="margin:0px 16px;"></v-divider>
   
+
   
     <v-icon
       v-if="!detailOpen && tool.expandMain.active"
@@ -213,6 +214,13 @@
   <script>
   
   
+  function tag_alias(asset) {
+    if (null != asset.custom12) {
+      return asset.tag + '(' + asset.custom12 + ')'
+    }
+    return asset.tag
+  }
+  
   
   export default {
     props: ['logo'],
@@ -264,7 +272,7 @@
       },
       search (val) {
         let term = val || ''
-        term.trim()
+        term = term.trim()
         // Todo: Is it necessary?
         // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
         // if(m) {
@@ -352,7 +360,7 @@
       customFilter (item, queryText, itemText) {
         return 1
       },
-    
+  
       // on-keydown and on-clear logic
       changeSearch(event) {
   
@@ -517,7 +525,7 @@
     </v-btn>
   
     
-    <v-btn
+   <!-- <v-btn
       v-if="show('addmobile') && tool.add.active"
       tile
       class="vxg-head-btn"
@@ -527,7 +535,8 @@
         mdi-map-marker-path
       </v-icon>
       Add Mobile Asset
-    </v-btn>
+    </v-btn> 
+    -->
   
     <v-divider
       v-if="show('add') && tool.add.active"
@@ -671,7 +680,7 @@
   
   function tag_alias(asset) {
     if (null != asset.custom12) {
-      return asset.tag + ' (' + asset.custom12 + ')'
+      return asset.tag + '(' + asset.custom12 + ')'
     }
     return asset.tag
   }
@@ -727,7 +736,7 @@
       },
       search (val) {
         let term = val || ''
-        term.trim()
+        term = term.trim()
         // Todo: Is it necessary?
         // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
         // if(m) {
@@ -831,6 +840,7 @@
         setTimeout(async ()=> { // wait for input
           let term
           term = event.target ? event.target._value : null
+          this.search = term
           if(term) {
             let out = await this.$seneca.post('sys:search, cmd:search', 
               { query: term, params: this.search_config }

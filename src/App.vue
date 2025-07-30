@@ -2,7 +2,6 @@
 <div>
   <h1>This is a test bed. The exported component is provided by index.js</h1>
 
-
 </div>
 </template>
 

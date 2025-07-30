@@ -5,7 +5,7 @@
       v-if="show.table"
       dense
       :headers="headers"
-      :items="items"
+      :items="filteredItems"
       :items-per-page="25"
       x-custom-filter="customFilter"
       :footer-props="{
@@ -16,6 +16,7 @@
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc"
       :search="search"
+      :customSort ="sortDate"
       >
   
       <template v-slot:loading>
@@ -28,7 +29,7 @@
         <span> error - no results </span>
       </div>
   
-      <template
+      <!-- <template
         v-for="header in headers"
         v-slot:[itemslot(header)]="{ item }">
         <div :key="header.value">
@@ -47,6 +48,42 @@
           </span>
           <span v-else>{{ item[header.value] }}</span>
         </div>
+      </template> -->
+
+      <template v-slot:header="{ props }">
+        <tr>
+          <th v-for="header in props.headers" :key="header.text" style="color: #707174;" :style="{ background : columnFilters[header.value] ? '#dfdfdf' : '' }" class="text-left font-weight-medium pl-4" >
+            <span>{{ header.text }}</span>
+
+            <!-- Filter Icon and Menu -->
+            <v-menu offset-y :close-on-content-click="false">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn class="filterBtn" icon v-bind="attrs" v-on="on">
+                  <v-icon :style="{ color : columnFilters[header.value] ? '#64a6ce' : '#707174' }" small>mdi-filter</v-icon>
+                </v-btn>
+              </template>
+              <div style="background-color: white; width: 280px">
+                <v-text-field 
+                  class="pa-4" 
+                  type="text" 
+                  :label="'Filter by ' + header.text.toUpperCase()"
+                  v-model="columnFilters[header.value]" 
+                  @input="updateFilter(header.value, $event)"
+                  :autofocus="true"
+                ></v-text-field>
+                <v-btn 
+                  small 
+                  text 
+                  color="primary" 
+                  class="ml-2 mb-2"
+                  @click="clearFilter(header.value)"
+                >
+                  Clear
+                </v-btn>
+              </div>
+            </v-menu>
+          </th>
+        </tr>
       </template>
       
     </v-data-table>
@@ -191,6 +228,7 @@
         </v-card>
       </v-dialog>
     
+    </div>
       <v-toolbar flat>
         <v-btn outlined @click="closeItem">Cancel</v-btn>
         <v-spacer />
@@ -199,7 +237,6 @@
         <v-btn outlined @click="saveItem" v-if="allow('edit')">Save</v-btn>
         <div style="padding: 5px;"></div>
       </v-toolbar>
-    </div>
   </div>
 
       <v-dialog v-model="accessMatrixDialog" max-width="800" persistent>
@@ -251,8 +288,8 @@
   
   <script>
   
-  import { memoize } from 'lodash'
-  
+  import { memoize } from 'lodash';
+ 
   export default {
     props: {
       spec: {
@@ -278,6 +315,7 @@
         sortDesc: true,
         search: '',
         loadlen: 0,
+        columnFilters: {},
         showprogress: true,
         loadingerror: false,
         // 'loading' | 'error' | 'done'
@@ -294,8 +332,18 @@
     mounted() {
       console.log('mounted', this.spec,'KD')
       
+      Object.keys(this.spec.ent.primary.field.profile.kind).forEach(key => {
+        delete this.spec.ent.primary.field.profile.kind[key];
+      });
+
+      Object.assign(this.spec.ent.primary.field.profile.kind, {
+        gea: { title: "System Owner", level: 1 },
+        sea: { title: "Admin", level: 2 },
+        ob: { title: "User", level: 3 }
+      });
       
     },
+    
   
     async created () {
       console.log('mounted', this.spec,'KD')
@@ -341,7 +389,21 @@
     },
     
     computed: {
-  
+      filteredItems() {
+        var tmp = this.items.filter((item) => {
+          return Object.keys(this.columnFilters).every((columnName) => {
+            const filterValue = this.columnFilters[columnName]?.toLowerCase().trim();
+            if (!filterValue) return true;
+            const dataKey = columnName.toLowerCase();
+            const itemValue = item[dataKey] ? item[dataKey].toString().toLowerCase() : "";
+            // Log dataKey and itemValue
+            this.searched_items = itemValue.includes(filterValue)
+            return this.searched_items;
+          });
+        });
+        console.log('!!!Filtered Items:', tmp);
+        return tmp
+      },
       loading() {
         return this.loadState == 'loading'
       },
@@ -360,22 +422,33 @@
             (this.spec.list.layout.order ?
              this.spec.list.layout.order.split(/\s*,\s*/) :
              Object.keys(this.spec.ent.primary.field)
+            
              )
             .map(fn=>headermap[fn])
             .filter(h=>null!=h)
-        
+            .filter(item => item.text !== 'Status')
         return headers
       },
   
       items () {
         let items = this.$store.state[this.spec.ent.store_name]
-  
+
+        items.forEach((item) => {
+          item.profile = 
+             item.profile === 'gea'  ? 'System Owner' : 
+            item.profile === 'ob' ? 'User' :    
+            item.profile === 'sea'  ? 'Admin' : 
+            '';
+        });
+
+        items.forEach((item) => {
+          item.when = new Date(item.when); 
+        });
+ 
         // TODO: generalize
         if('user-by-role' === this.spec.name) {
           items = items.filter(item=>this.param.item.role===item.profile)
-          //items = items.filter(item=>'op'===item.profile)
         }
-  
         return items
       },
   
@@ -399,7 +472,7 @@
             
             fds.push(fd)
           }
-          return fds
+          return fds.filter(item => item.title !== 'Status')
         }
         catch(e) {
           // console.error(e)
@@ -437,7 +510,16 @@
   
   
     methods: {
-  
+      sortDate (items){
+        return items.sort((a, b) => b.when - a.when);
+        
+      },
+      updateFilter(column, value) {
+        this.columnFilters[column] = value;
+      },
+      clearFilter(column) {
+        this.columnFilters[column] = ""; // Reset the filter
+      },
       itemslot (header) {
         return 'item.'+header.value
       },
@@ -471,9 +553,11 @@
         this.show.table = false;
         this.show.item = true;
       },
-  
       saveItem () {
         if(this.spec.ent.store_name.includes('user') ) {
+          this.item.email = this.item.email.trim()
+          // make the email all lower case
+          this.item.email = this.item.email.toLowerCase()
             if(this.editing ==false) {
               console.log('Registering User: ')
               this.$store.dispatch('register_user', this.item)           

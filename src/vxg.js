@@ -7,6 +7,8 @@ import VxgBasicHead from './components/BasicHead.vue'
 import VxgBasicFoot from './components/BasicFoot.vue'
 import VxgBasicMain from './components/BasicMain.vue'
 import VxgBasicSide from './components/BasicSide.vue'
+console.log('%cHello World!', 'color: green; font-size: 20px; font-weight: bold; background-color: #f0f0f0; padding: 10px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);');
+
 import VxgBasicLed from './components/BasicLed.vue'
 import VxgBasicFieldPick from './components/BasicFieldPick.vue'
 import VxgBasicAuth from './components/BasicAuth.vue'
@@ -21,6 +23,8 @@ console.log('VXG 01')
 
 class Vxg {
   constructor(config) {
+    console.log('%cHello World!', 'color: green; font-size: 20px; font-weight: bold; background-color: #f0f0f0; padding: 10px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);');
+
     this.match = {
       allow: new Patrun({ gex: true }),
     }

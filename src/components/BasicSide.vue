@@ -1,5 +1,11 @@
 <template>
-  <v-navigation-drawer app class="vxg-side" :style="drawerStyle">
+  <v-navigation-drawer app class="vxg-side" 
+  :style="drawerStyle" 
+  permanent  
+  :touchless="true"
+  :clipped="false" 
+  :mini-variant="false" 
+  :temporary="false">
     
     <v-sheet class="d-flex flex-column h-100">
       <!-- Header -->
@@ -7,13 +13,15 @@
        style="background:#27324A" >
         <div v-html="logo"></div>
         
+       <!-- 
         <v-icon v-once large @click="openDrawer" class="drawer-toggle"  style="color: white ;font-size: 29px;">
           mdi-chevron-left-circle-outline
-        </v-icon>
+        </v-icon>  -->
         <!-- <v-icon v-once large @click="closeDrawer" class="drawer-toggle" dark>
           mdi-chevron-left
           </v-icon> -->
          
+
       </div>
 
       <!-- Menu Toggle -->
@@ -41,17 +49,17 @@
       <v-btn
           v-if="show('clear') && tool.clear.active"
            text
-            style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #575c62;top:10px"
+               style="max-width:200px;display:inline-block;margin-left:48%;text-transform: none;font-size:12px; color: #fff;top:10px"
             class="btn-clear"
-          @click="clearFilter"
-      >{{ showSearch2 ? 'Exit Navigation Mode' : 'Clear Search' }}</v-btn>
+          @click="clearFilter(); "
+          >{{ showSearch2 ? 'Close Navigation Mode' : 'Clear Search' }}</v-btn>
 
 
 <div v-if="$route.name == 'pqview'">
   <div v-if="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
-        @click="toggleSearch2();toggleExpansion()"
+        @click="toggleSearch2();toggleExpansion();handleRoute()"
         
          />
 
@@ -82,6 +90,7 @@
         v-model="search"
         @keydown="changeSearch($event)"
         @click:clear="changeSearch($event)"
+        @change="handleChangeSearch($event)"
         :items="tag_items"
         flat
         hide-details
@@ -141,21 +150,68 @@
       <div v-if="showSearch2" >
         
         <img :src="`${publicPath}two-opposite-up-and-down-arrows-side-by-side.svg`" alt="two-opposite-arrows-side-by-side"
-       style="cursor: pointer;position: relative;top: -52px; left: calc(100% - 29px); width:16px;"
+       style="cursor: pointer;position: relative;top: -49px; left: calc(100% - 29px); width:18px;margin-left: -18px; background: white; z-index: 999;"
        @click="reverseInputs"
         />
         
-        <button @click="showSearch2 = false" style="">
+        <button @click="handleButtonClick" style="">
           <v-icon style="font-size: 12px !important;bottom: 78px;right: calc(100% - 250px);background-color: #dbe9f5;border-radius: 6px;color: #283348;" ></v-icon>
         </button>
       </div>
       
 
-       <button
+            <!-- <button
           v-if="showSearch2"
           style="cursor: pointer;position: relative;color: white;top:-24px; size:9px; font-size: 10px; left: 65%;"
-          
-      >Add Destination +</button>
+    
+      >Add Destination +</button> -->
+      <!-- <div v-if="showSearch2 === true" style="color: #fff;" >
+        <v-icon style="margin: -7px 0;color: white;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four
+        </v-icon>
+        {{ Math.floor(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(2) }} meters)
+
+      </div> -->
+
+
+     <div v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
+        style="color: #000;background-color:rgb(220 238 239);
+        height: 33px;
+        width: calc(100% - 8px);
+        left: 4px;
+        padding-top: 3px;
+        padding-left: 13px;
+        position: absolute;
+        z-index: 9999;
+        top: 185px;" >
+        <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four-outline
+        </v-icon>
+        {{ Math.trunc(aprxTime/60)}}:{{(aprxTime%60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+       
+       </div>
+
+
+     <div v-if="showSearch2 && search2 && pathData && Object.keys(pathData).length > 0" 
+        style="color: #000;background-color:rgb(220 238 239);
+        height: 33px;
+        width: calc(100% - 8px);
+        left: 4px;
+        padding-top: 3px;
+        padding-left: 13px;
+        position: absolute;
+        z-index: 9999;
+        top: 185px;" >
+        <v-icon style="margin: -7px 0;color: black;" aria-hidden="true" aria-label="Route to Asset">
+          mdi-clock-time-four-outline
+        </v-icon>
+        <span v-if="aprxTime >= 60">
+    {{ Math.trunc(aprxTime / 60) }}:{{ (aprxTime % 60).toString().padStart(2, '0') }} minutes ({{ aprxDistance.toFixed(0) }} meters)
+  </span>
+  <span v-else>
+    {{ aprxTime }} seconds ({{ aprxDistance.toFixed(0) }} meters)
+  </span>
+       </div>
 
       <BasicNavStages 
         v-if="showSearch2 === true"
@@ -167,27 +223,27 @@
 
 </div>
    
-      <!-- <v-combobox
-      
-    
-    @click:append="filter"
-    :filter="customFilter"
-    >
-  </v-combobox>  -->
-      <!-- Menu Items -->
-      <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
-        <template v-if="menuView.mode === 'standard'" >
+            <!-- <v-combobox
+            
+          
+          @click:append="filter"
+          :filter="customFilter"
+          >
+        </v-combobox>  -->
+            <!-- Menu Items -->
+        <div class="Menu Items" style="margin-top:15px;height: calc(100vh - 332px);">
+         <template v-if="menuView.mode === 'standard'" >
           <div class="router_items">
             <router-link 
           v-for="item in menu"
-          v-if="allow(item) && (item.title !== 'Devices') "
+           v-if="allow(item) && item.code !== 'admin' && item.title !== 'Devices' && item.code !== 'devices'"
           :key="item.code"
           :to="`/${item.code}`"
           :class="['vxg-router-link', item.klass]"
 
-        >
+         >
           <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
-        </router-link>
+            </router-link>
           </div>
        
       </template>
@@ -264,6 +320,7 @@ export default {
   
   data () {
     return {
+    //  showSearch2: true,
       open: true,
       menuShowTitle: false,
       menuViewList: [],
@@ -271,7 +328,9 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
-    
+      //aprxTime: 0,
+     // aprxDistance: 0,
+
       tag_items:[],
       search2:'',
       tag_items2:[],
@@ -286,6 +345,11 @@ export default {
   },
   
   created () {
+     // Set showExpansion to false when the component is created
+     if (this.showSearch2) {
+      this.$store.state.showExpansion = false;
+    }
+    
     let menuViewList = []
     for(let name in this.spec.view) {
       let menuView = this.spec.view[name]
@@ -317,6 +381,12 @@ export default {
   },
 
   watch: {
+
+    showSearch2(newVal) {
+      if (newVal) {
+        this.$store.state.showExpansion = false;
+      }
+    },
     menuViewIndex(index) {
       let pathname = null
       pathname = this.menuView.name
@@ -340,6 +410,10 @@ export default {
     },
 
    '$store.state.trigger.search.a' (term) {
+      this.search = term
+      if (term == '') {
+        return 
+      }
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
         this.tag_items = this.items.map(tag_alias)
@@ -362,8 +436,7 @@ export default {
     // }).then((data) => {
     //   console.log('PathData: ', data)
     // })
- 
-
+    
       console.log('search.b is being triggered')
         this.search2 = term
       if(term == '' && this.$refs.search2) {
@@ -372,11 +445,18 @@ export default {
         this.tag_items2 = this.items2.map(tag_alias)
       //  this.$store.commit('set_path_data', null)
       }
-      
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          mode: 'route',
+          a: this.search,
+          b: this.search2
+        }
+      })     
     },
     search (val) {
       let term = val || ''
-      term.trim()
+      term = term.trim()
       // Todo: Is it necessary?
       // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
       // if(m) {
@@ -387,7 +467,7 @@ export default {
     },
     search2 (val) {
       let term = val || ''
-      term.trim()
+      term =term.trim()
       console.log('search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
       
@@ -449,8 +529,13 @@ export default {
   
   
   computed: {
-    ...mapState(['showSearch2','showExpansion']),
-
+    ...mapState(['showSearch2','showExpansion','pathData','currentStage']
+    
+    ),
+    ...mapState({
+        aprxTime: state => state.pathEstimation?.time,
+        aprxDistance: state => state.pathEstimation?.distance,
+     }),
     triggerSelect() {
       return this.$store.state.trigger.select;
     },
@@ -516,7 +601,10 @@ export default {
 
   methods: {
     ...mapActions(['toggleSideInfoCardVisibility']),
-    ...mapMutations(['toggleSearch2', 'toggleExpansion' ]),
+    ...mapMutations(['toggleSearch2', 'toggleExpansion','setCurrentStage']),
+    toggleSearchMode() {
+      this.showSearch2 = !this.showSearch2;
+    },
     closeSideInfoCard() {
         this.toggleSideInfoCardVisibility(false);
         
@@ -526,15 +614,15 @@ export default {
       //     this.showSearch2 = !this.showSearch2;
       //   },
         reverseInputs() {
-     
-
+          //this.$store.commit('resetActiveStage');
+          this.$store.commit('setCurrentStage', 1);
+          this.$store.dispatch('setCurrentStage', 1);
+          console.log(this.$store.state.currentStage); 
       const temp = this.search;
       this.search = this.search2;
       this.search2 = temp;
-   
-
-       
-     
+      this.showSearch2 = true;
+      
     },
 
     handleNavigationMode(){
@@ -573,10 +661,38 @@ export default {
       this.showIcon = true; // Show the icon when the combobox is blurred
     },
 
+    handleChangeSearch(event){
+      if(!this.showSearch2){
+        this.$router.push({
+          path: this.$route.path,
+          query: {
+            mode: 'assetsearch',
+            term: event,
+          }
+        })
+      }else{
+        this.$router.replace({
+          path: this.$route.path,
+          query: {
+            mode: 'route',
+            a: this.search,
+            b: this.search2
+          }
+        })
+      }
+    },
+
     changeSearch(event) {
       setTimeout(async ()=> { // wait for input
         let term
         term = event.target ? event.target.value : null
+          this.$router.push({
+            path: this.$route.path,
+            query: {
+              mode: 'assetsearch',
+              term: event.target?.value,
+            }
+          })
         if(term) {
           let out = await this.$seneca.post('sys:search, cmd:search', 
             { query: term, params: this.search_config }
@@ -589,9 +705,9 @@ export default {
           if(this.items != undefined)
           this.tag_items = this.items.map(tag_alias) 
         }
-        
+
       }, 11)
-      
+
     },
     changeSearch2(event) {
       setTimeout(async ()=> { // wait for input
@@ -616,13 +732,30 @@ export default {
       }, 11)
     },
 
+    handleRoute() {
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          mode: 'route',
+          a:  this.search || '',
+          b: this.search2 || ''
+        }
+      })
+    },
+
     clearFilter () {
+      this.$router.replace({
+        path: this.$route.path,
+        query: {}
+      })
       this.$store.dispatch('vxg_trigger_clear');
+      this.$store.dispatch('set_cmp_flags',{name:'BasicMain', flags:{show:false}})
       this.search = '';
       this.$store.state.trigger.search.b = '';
       this.$store.state.showSearch2 = false;
       this.$store.commit('clear_path_data');
       this.$store.state.showExpansion = true; 
+      this.$store.commit('clearMatchingConnectorData');
     //  this.$root.$emit('clear-nav-stages');
 
 
@@ -644,6 +777,18 @@ export default {
 
     filter(event) {
       // aaaaaaaaaaaa
+      if(this.$route.query.mode !== 'filtersearch') {
+        this.$router.replace({
+          path: this.$route.path,
+          query: {
+            mode: 'filtersearch',
+            area: '',
+            level: '',
+            systemtype: '',
+            assettype: '',
+          }
+        })
+      }
       this.$store.dispatch('trigger_toggle_filter');
     
       },
@@ -685,11 +830,17 @@ export default {
         return null
       }
       return room
+    },
+    handleButtonClick() {
+      // Implementation of handleButtonClick method
     }
   },
 
   mounted() {
-   
+    const mode = this.$route.query.mode
+    if (mode === 'filtersearch') {
+      this.$store.dispatch('trigger_toggle_filter');
+    }
   },
   // beforeDestroy() {
   //   document.removeEventListener('click', this.handleClickOutside);
@@ -701,7 +852,7 @@ export default {
 
 
 
-const DRAWER_STYLE = Object.freeze({ width: "282px" });
+const DRAWER_STYLE = Object.freeze({ width: "282px", visibility: "visible !important", transform: "none !important" });
 
 
 </script>
@@ -710,6 +861,7 @@ const DRAWER_STYLE = Object.freeze({ width: "282px" });
 <style lang="scss">
 
 .v-navigation-drawer{
+  position: fixed !important;
   background: #141B2D;
 }
 
@@ -845,6 +997,7 @@ img{
 .comboxSearch .v-input__slot{
   
   width: calc(100% - 30px);
+  
 }
 
 .comboxSearch fieldset {
@@ -864,6 +1017,7 @@ img{
 }
 .comboxSearch2 .v-input__control {
   margin-top: -6px;
+  border-radius: 0 !important;
 }
 .comboxSearch2 fieldset {
     color: transparent !important;
@@ -875,6 +1029,7 @@ img{
 .comboxSearch2 .v-select__slot {
     margin-left: 25px;
     margin-bottom: 4px;
+    border-radius: 0 !important;
 }
 
 

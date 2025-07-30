@@ -299,7 +299,7 @@ const SpecShape = Gubu({
 
 function tag_alias(asset) {
   if (null != asset.custom12) {
-    return asset.tag + '(' + asset.custom12 + ')'
+    return asset.tag + ' (' + asset.custom12 + ')'
   }
   return asset.tag
 }
@@ -553,12 +553,17 @@ export default {
     menu () {
       if (this.menuView.mode !== 'standard') return [];
 
+      let hideMenuItems = ['devices', 'Devices']
+      // next lets remove the items from the menu that are in the hideMenuItems array
+      console.log('__hideMenuItems', hideMenuItems);
       const { items, order } = this.menuView.menu;
-      return order.split(/\s*,\s*/).map(code => ({
-        ...items[code],
-        code,
-        klass: { 'vxg-router-link': true }
-      }));
+      console.log('__items', items);
+      console.log('__order', order);
+      const filteredOrder = order.split(/\s*,\s*/).filter(code => !hideMenuItems.includes(code));
+      console.log('__filteredOrder', filteredOrder);
+      const filteredItems = filteredOrder.map(code => items[code]);
+      console.log('__filteredItems', filteredItems);
+      return filteredItems;
     },
     filterIcon (){
       return this.$store.state.vxg.cmp.BasicHead.show.filter

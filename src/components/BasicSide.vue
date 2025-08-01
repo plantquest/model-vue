@@ -130,7 +130,7 @@
     <v-combobox
        class="comboxSearch2"
         ref="search2"
-        v-if="showSearch2"
+        v-show="showSearch2"
         v-model="search2"
         @keydown="changeSearch2($event)"
         @click:clear="changeSearch2($event)"

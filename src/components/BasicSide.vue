@@ -56,7 +56,7 @@
 
 
 <div v-if="$route.name == 'pqview'">
-  <div v-if="!showSearch2">
+  <div v-show="!showSearch2">
         <img :src="`${publicPath}Layer_5.svg`" alt="Layer_5" class="Layer_5"
         style="position:absolute; z-index:1; margin:10px 0; margin-left:16px"
         @click="toggleSearch2();toggleExpansion();handleRoute()"
@@ -410,11 +410,12 @@ export default {
     },
 
    '$store.state.trigger.search.a' (term) {
+   
       this.search = term
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
         this.tag_items = this.items.map(tag_alias)
-        console.log('search is being triggerecd')
+        console.log('query changes search is being triggerecd')
          // Set pathData to null
        // this.$store.commit('set_path_data', null)
       }
@@ -437,6 +438,7 @@ export default {
     // })
     
       console.log('search.b is being triggered')
+    
         this.search2 = term
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
@@ -519,7 +521,9 @@ export default {
           // check that this only on first dom load else skip
 
           // Enable navigation mode
-          this.showSearch2 = true
+          if (!this.showSearch2) {
+            this.toggleSearch2();
+          }
           
           // Set search values from URL parameters
           this.search = query.a || ''
@@ -627,7 +631,7 @@ export default {
     ...mapActions(['toggleSideInfoCardVisibility']),
     ...mapMutations(['toggleSearch2', 'toggleExpansion','setCurrentStage']),
     toggleSearchMode() {
-      this.showSearch2 = !this.showSearch2;
+      this.toggleSearch2();
     },
     closeSideInfoCard() {
         this.toggleSideInfoCardVisibility(false);
@@ -642,31 +646,41 @@ export default {
           this.$store.commit('setCurrentStage', 1);
           this.$store.dispatch('setCurrentStage', 1);
           console.log(this.$store.state.currentStage); 
+          
+      // Store original values
       const temp = this.search;
+      
+      // Swap the search values
       this.search = this.search2;
       this.search2 = temp;
-      this.showSearch2 = true;
-      // lets change thr url parameters too 
-      this.$nextTick(() => {
-        this.search = this.search2;
-        this.search2 = temp;
-      })
+      
+      // Update showSearch2 through the store mutation instead of direct assignment
+      if (!this.showSearch2) {
+        this.toggleSearch2();
+      }
+      
+      // Update URL parameters with swapped values (with error handling)
       this.$router.replace({
         path: this.$route.path,
         query: {
           mode: 'route',
-          a: this.search2,
-          b: this.search
+          a: this.search,  // Note: using this.search (which is now the old search2)
+          b: this.search2  // Note: using this.search2 (which is now the old search)
+        }
+      }).catch(err => {
+        // Ignore NavigationDuplicated errors
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Router navigation error:', err);
         }
       });
-      // use ticker next to update the search fields
-   
-      // next lets update the search fields
     },
 
     handleNavigationMode(){
       console.log('Trigger select:', this.triggerSelect);
-      this.showSearch2 = true
+      // Update showSearch2 through the store mutation instead of direct assignment
+      if (!this.showSearch2) {
+        this.toggleSearch2();
+      }
       //this.$store.dispatch('vxg_trigger_clear');
     },
  
@@ -717,6 +731,10 @@ export default {
             a: this.search,
             b: this.search2
           }
+        }).catch(err => {
+          if (err.name !== 'NavigationDuplicated') {
+            console.error('Router navigation error:', err);
+          }
         })
       }
     },
@@ -737,7 +755,9 @@ export default {
             { query: term, params: this.search_config }
           )
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc)) 
+          this.tag_items = out.data.hits
+  .filter(v => v && v.doc)  // Filter out null/undefined items
+  .map(v => tag_alias(v.doc))
         } 
         else {
           // this.tag_items = this.items.map(v => v.tag)
@@ -758,7 +778,9 @@ export default {
           )
         
         
-          this.tag_items2 = out.data.hits.map(v=>tag_alias(v.doc))
+          this.tag_items2 = out.data.hits
+  .filter(v => v && v.doc)  // Filter out null/undefined items
+  .map(v => tag_alias(v.doc))
           console.log('tag items are ', this.tag_items2)
         }
         else {
@@ -773,7 +795,9 @@ export default {
 
     handleRoute() {
       // detect from the url if mode=route , a has a value and b has a value
-      this.showSearch2 = true
+      if (!this.showSearch2) {
+        this.toggleSearch2();
+      }
 
 
       this.$router.replace({
@@ -782,6 +806,10 @@ export default {
           mode: 'route',
           a:  this.search || '',
           b: this.search2 || ''
+        }
+      }).catch(err => {
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Router navigation error:', err);
         }
       })
     },
@@ -806,6 +834,10 @@ export default {
     this.$router.replace({
         path: this.$route.path,
         query: {}
+      }).catch(err => {
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Router navigation error:', err);
+        }
       })
 
     },

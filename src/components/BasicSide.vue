@@ -427,13 +427,7 @@ export default {
         }
       })    
     },
-    // create a watcher for changes in pathData
-   '$store.state.trigger.search.b' (term) {
-
-      console.log('_____search.b is being triggered' , term)
-    
-      
-    },
+ 
     '$store.state.trigger.search.b' (term) {
 
     //   const pathData = this.$store.dispatch('get_path_data', { 

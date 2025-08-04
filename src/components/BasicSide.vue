@@ -130,7 +130,7 @@
     <v-combobox
        class="comboxSearch2"
         ref="search2"
-        v-if="showSearch2"
+        v-show="showSearch2"
         v-model="search2"
         @keydown="changeSearch2($event)"
         @click:clear="changeSearch2($event)"
@@ -507,6 +507,31 @@ export default {
         this.menuView = this.menuViewList[route.index]
       } 
     },
+    '$route.query': {
+      immediate: true,
+      handler (query) {
+        // Handle route initialization when mode is 'route'
+        console.log('query:', query.a, query.b)
+
+        if (query.mode === 'route') {
+          // check that this only on first dom load else skip
+
+          // Enable navigation mode
+          this.showSearch2 = true
+          
+          // Set search values from URL parameters
+          this.search = query.a || ''
+          this.search2 = query.b || ''
+          
+          // Update store state
+          //TODO fix the NaN number when the next line is uncommented
+          this.$store.state.trigger.search.a = this.search
+          this.$store.state.trigger.search.b = this.search2
+
+          //lets change the search fields to the url parameters
+        }
+      }
+    },
     '$store.state.trigger.select.value': {
       handler(newVal) {
         try {
@@ -614,7 +639,16 @@ export default {
       this.search = this.search2;
       this.search2 = temp;
       this.showSearch2 = true;
-      
+      // lets change thr url parameters too 
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          mode: 'route',
+          a: this.search2,
+          b: this.search
+        }
+      });
+      // next lets update the search fields
     },
 
     handleNavigationMode(){
@@ -725,6 +759,10 @@ export default {
     },
 
     handleRoute() {
+      // detect from the url if mode=route , a has a value and b has a value
+      this.showSearch2 = true
+
+
       this.$router.replace({
         path: this.$route.path,
         query: {
@@ -741,8 +779,8 @@ export default {
         query: {}
       })
       this.$store.dispatch('vxg_trigger_clear');
-      this.$store.dispatch('set_cmp_flags',{name:'BasicMain', flags:{show:false}})
       this.search = '';
+      this.$store.state.trigger.search.a = '';
       this.$store.state.trigger.search.b = '';
       this.$store.state.showSearch2 = false;
       this.$store.commit('clear_path_data');

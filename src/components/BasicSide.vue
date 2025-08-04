@@ -298,10 +298,13 @@ const SpecShape = Gubu({
 })
 
 function tag_alias(asset) {
-  if (null != asset.custom12) {
-    return asset.tag + '(' + asset.custom12 + ')'
-  }
-  return asset.tag
+  const label = asset.custom12 != null
+    ? `${asset.tag} (${asset.custom12})`
+    : asset.tag;
+  return {
+    text: label,
+    value: label,
+  };
 }
 
 export default {
@@ -330,7 +333,7 @@ export default {
       search: '',
       //aprxTime: 0,
      // aprxDistance: 0,
-
+      items: [],
       tag_items:[],
       search2:'',
       tag_items2:[],
@@ -452,8 +455,9 @@ export default {
       })     
     },
     search (val) {
-      let term = val || ''
-      term = term.trim()
+      let term = val?.text.trim() || ''
+      
+      console.log(val?.text, 'value of search')
       // Todo: Is it necessary?
       // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
       // if(m) {
@@ -463,9 +467,8 @@ export default {
       this.$store.dispatch('trigger_search', {a: term})
     },
     search2 (val) {
-      let term = val || ''
-      term =term.trim()
-      console.log('search2 is being triggered')
+      let term = val?.text.trim() || ''
+      console.log(val, 'search2 is being triggered')
       this.$store.dispatch('trigger_search', {b: term})
       
     // this.search2 = val
@@ -641,8 +644,10 @@ export default {
 
     
       // bypass default combobox filter
-      customFilter (item, queryText, itemText) {
-        return 1
+      customFilter(item, queryText) {
+        const text = (item?.text || '').toLowerCase();
+        const query = (queryText || '').toLowerCase();
+        return text.includes(query);
       },
 
       handleClick() {
@@ -659,7 +664,7 @@ export default {
           path: this.$route.path,
           query: {
             mode: 'assetsearch',
-            term: event,
+            term: event.text,
           }
         })
       }else{
@@ -667,7 +672,7 @@ export default {
           path: this.$route.path,
           query: {
             mode: 'route',
-            a: this.search,
+            a: this.search.text,
             b: this.search2
           }
         })
@@ -675,31 +680,37 @@ export default {
     },
 
     changeSearch(event) {
-      setTimeout(async ()=> { // wait for input
-        let term
-        term = event.target ? event.target.value : null
-          this.$router.push({
-            path: this.$route.path,
-            query: {
-              mode: 'assetsearch',
-              term: event.target?.value,
-            }
-          })
-        if(term) {
-          let out = await this.$seneca.post('sys:search, cmd:search', 
-            { query: term, params: this.search_config }
-          )
-          // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits.map(v=>tag_alias(v.doc)) 
-        } 
-        else {
-          // this.tag_items = this.items.map(v => v.tag)
-          if(this.items != undefined)
-          this.tag_items = this.items.map(tag_alias) 
+      setTimeout(async () => {
+        const term = event?.target?.value ?? this.search.trim() ?? '';
+    
+        this.$router.push({
+          path: this.$route.path,
+          query: {
+            mode: 'assetsearch',
+            term,
+          },
+        });
+
+        try {
+          if (term) {
+            const out = await this.$seneca.post('sys:search, cmd:search', {
+              query: term,
+              params: this.search_config,
+            });
+
+            const hits = Array.isArray(out?.data?.hits) ? out.data.hits : [];
+
+            this.tag_items = hits.map(v => tag_alias(v.doc));
+          } else {
+            this.tag_items = Array.isArray(this.items)
+              ? this.items.map(tag_alias)
+              : [];
+          }
+        } catch (error) {
+          console.error('Search failed:', error);
+          this.tag_items = [];
         }
-
-      }, 11)
-
+      }, 11);
     },
     changeSearch2(event) {
       setTimeout(async ()=> { // wait for input

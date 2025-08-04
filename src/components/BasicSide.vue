@@ -418,6 +418,14 @@ export default {
          // Set pathData to null
        // this.$store.commit('set_path_data', null)
       }
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          mode: 'route',
+          a: this.search,
+          b: this.search2
+        }
+      })    
     },
     // create a watcher for changes in pathData
    '$store.state.trigger.search.b' (term) {
@@ -527,6 +535,11 @@ export default {
           //TODO fix the NaN number when the next line is uncommented
           this.$store.state.trigger.search.a = this.search
           this.$store.state.trigger.search.b = this.search2
+          //next tick to update the search fields
+          this.$nextTick(() => {
+            this.search = query.a || ''
+            this.search2 = query.b || ''
+          })
 
           //lets change the search fields to the url parameters
         }
@@ -640,6 +653,10 @@ export default {
       this.search2 = temp;
       this.showSearch2 = true;
       // lets change thr url parameters too 
+      this.$nextTick(() => {
+        this.search = this.search2;
+        this.search2 = temp;
+      })
       this.$router.replace({
         path: this.$route.path,
         query: {
@@ -648,6 +665,8 @@ export default {
           b: this.search
         }
       });
+      // use ticker next to update the search fields
+   
       // next lets update the search fields
     },
 
@@ -774,20 +793,26 @@ export default {
     },
 
     clearFilter () {
-      this.$router.replace({
-        path: this.$route.path,
-        query: {}
-      })
+  
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
       this.$store.state.trigger.search.a = '';
+      this.search = '';
       this.$store.state.trigger.search.b = '';
       this.$store.state.showSearch2 = false;
       this.$store.commit('clear_path_data');
       this.$store.state.showExpansion = true; 
       this.$store.commit('clearMatchingConnectorData');
+      // next lets update the search fields
+      this.$nextTick(() => {
+        this.search = '';
+        this.search2 = '';
+      })
     //  this.$root.$emit('clear-nav-stages');
-
+    this.$router.replace({
+        path: this.$route.path,
+        query: {}
+      })
 
     },
     show(action) {

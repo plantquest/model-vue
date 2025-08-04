@@ -371,8 +371,8 @@ export default {
       this.items2 = [ ...tool.assets]
       if(this.items.length != 0) {
         // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
-        this.tag_items = this.items.map(tag_alias)
-        this.tag_items2 = this.items2.map(tag_alias)
+        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias)
+        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias)
         this.setupMiniSearch(this.items)
         this.setupMiniSearch(this.items2)
         clearInterval(load_assets)
@@ -409,12 +409,12 @@ export default {
       */
     },
 
-   '$store.state.trigger.search.a' (term) {
+       '$store.state.trigger.search.a' (term) {
    
       this.search = term
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
-        this.tag_items = this.items.map(tag_alias)
+        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias)
         console.log('query changes search is being triggerecd')
          // Set pathData to null
        // this.$store.commit('set_path_data', null)
@@ -425,6 +425,11 @@ export default {
           mode: 'route',
           a: this.search,
           b: this.search2
+        }
+      }).catch(err => {
+        // Ignore NavigationDuplicated errors
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Router navigation error:', err);
         }
       })    
     },
@@ -443,7 +448,7 @@ export default {
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
-        this.tag_items2 = this.items2.map(tag_alias)
+        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias)
       //  this.$store.commit('set_path_data', null)
       }
       this.$router.replace({
@@ -452,6 +457,11 @@ export default {
           mode: 'route',
           a: this.search,
           b: this.search2
+        }
+      }).catch(err => {
+        // Ignore NavigationDuplicated errors
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Router navigation error:', err);
         }
       })     
     },
@@ -756,13 +766,13 @@ export default {
           )
           // this.tag_items = out.data.hits.map(v => v.id)
           this.tag_items = out.data.hits
-  .filter(v => v && v.doc)  // Filter out null/undefined items
-  .map(v => tag_alias(v.doc))
+            .filter(v => v && v.doc)  // Filter out null/undefined items
+            .map(v => tag_alias(v.doc))
         } 
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if(this.items != undefined)
-          this.tag_items = this.items.map(tag_alias) 
+          this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias) 
         }
 
       }, 11)
@@ -779,14 +789,14 @@ export default {
         
         
           this.tag_items2 = out.data.hits
-  .filter(v => v && v.doc)  // Filter out null/undefined items
-  .map(v => tag_alias(v.doc))
+            .filter(v => v && v.doc)  // Filter out null/undefined items
+            .map(v => tag_alias(v.doc))
           console.log('tag items are ', this.tag_items2)
         }
         else {
         
           if(this.items2 != undefined)
-          this.tag_items2 = this.items2.map(tag_alias)
+          this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias)
         }
 
         
@@ -808,6 +818,7 @@ export default {
           b: this.search2 || ''
         }
       }).catch(err => {
+        // Ignore NavigationDuplicated errors
         if (err.name !== 'NavigationDuplicated') {
           console.error('Router navigation error:', err);
         }
@@ -867,6 +878,11 @@ export default {
             level: '',
             systemtype: '',
             assettype: '',
+          }
+        }).catch(err => {
+          // Ignore NavigationDuplicated errors
+          if (err.name !== 'NavigationDuplicated') {
+            console.error('Router navigation error:', err);
           }
         })
       }

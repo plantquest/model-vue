@@ -373,7 +373,7 @@ export default {
       search_mode = new URLSearchParams(window.location.search).get('mode')
       let asset = new URLSearchParams(window.location.search).get('asset')
       console.log('asset is ', asset)
-      console.log('search_mode is ', search_mode)
+      
       if (search_mode == 'route') {
         this.$router.replace({
           path: this.$route.path,
@@ -392,8 +392,11 @@ export default {
       }
       if(search_mode == 'assetsearch'){
         console.log('search_mode is assetsearch')
-
-        this.$store.dispatch('trigger_search', { a: term })
+        
+        // Trigger search when in assetsearch mode
+        if(term) {
+          this.performAssetSearch(term);
+        }
       }
     },
 
@@ -713,6 +716,15 @@ export default {
     },
 
     changeSearch(event) {
+      // Handle Enter key submission for assetsearch mode
+      if (event.key === 'Enter' && this.$route.query.mode === 'assetsearch') {
+        const term = event.target?.value?.trim();
+        if (term) {
+          this.performAssetSearch(term);
+          return;
+        }
+      }
+
       setTimeout(async () => { // wait for input
         let term
         term = event.target ? event.target.value : null
@@ -896,6 +908,49 @@ export default {
     },
     handleButtonClick() {
       // Implementation of handleButtonClick method
+    },
+
+    async performAssetSearch(term) {
+      try {
+        console.log('Performing asset search for term:', term);
+        
+        if (term && term.trim()) {
+          
+          const searchTerm = term.trim();
+          let out = await this.$seneca.post('sys:search, cmd:search',
+            { query: searchTerm, params: this.search_config }
+          );
+          
+          // Update search results
+          this.tag_items = out.data.hits
+            .filter(v => v && v.doc)  // Filter out null/undefined items
+            .map(v => tag_alias(v.doc))
+            .filter(item => item !== null);
+            
+          console.log('Asset search results:', this.tag_items);
+          
+          // Emit search event for other components to listen to
+          this.$emit('asset-search-completed', {
+            term: searchTerm,
+            results: out.data.hits
+          });
+          
+          // Dispatch to trigger system for PqsOneView.vue integration
+          this.$store.dispatch('trigger_asset_search', {
+            term: searchTerm,
+            results: out.data.hits,
+            mode: 'assetsearch'
+          });
+          
+        } else {
+          // Reset to show all items when search is empty
+          if (this.items != undefined) {
+            this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null);
+          }
+        }
+      } catch (error) {
+        console.error('Error performing asset search:', error);
+      }
     }
   },
 

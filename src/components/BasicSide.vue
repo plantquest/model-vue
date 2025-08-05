@@ -298,6 +298,16 @@ const SpecShape = Gubu({
 })
 
 function tag_alias(asset) {
+  // Handle null/undefined asset
+  if (!asset || typeof asset !== 'object') {
+    return null
+  }
+  
+  // Handle missing tag property
+  if (!asset.tag) {
+    return null
+  }
+  
   if (null != asset.custom12) {
     return asset.tag + '(' + asset.custom12 + ')'
   }
@@ -371,8 +381,8 @@ export default {
       this.items2 = [ ...tool.assets]
       if(this.items.length != 0) {
         // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
-        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias)
-        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias)
+        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
         this.setupMiniSearch(this.items)
         this.setupMiniSearch(this.items2)
         clearInterval(load_assets)
@@ -414,7 +424,7 @@ export default {
       this.search = term
       if(term == '' && this.$refs.search) {
         this.$refs.search.reset()
-        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias)
+        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
         console.log('query changes search is being triggerecd')
          // Set pathData to null
        // this.$store.commit('set_path_data', null)
@@ -448,7 +458,7 @@ export default {
       if(term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
-        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias)
+        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
       //  this.$store.commit('set_path_data', null)
       }
       this.$router.replace({
@@ -525,7 +535,7 @@ export default {
       immediate: true,
       handler (query) {
         // Handle route initialization when mode is 'route'
-        console.log('query:', query.a, query.b)
+        //console.log('query:', query.a, query.b)
 
         if (query.mode === 'route') {
           // check that this only on first dom load else skip
@@ -772,7 +782,7 @@ export default {
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if(this.items != undefined)
-          this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias) 
+          this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null) 
         }
 
       }, 11)
@@ -796,7 +806,7 @@ export default {
         else {
         
           if(this.items2 != undefined)
-          this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias)
+          this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
         }
 
         
@@ -826,7 +836,8 @@ export default {
     },
 
     clearFilter () {
-  
+  console.log('clearFilter activated')
+
       this.$store.dispatch('vxg_trigger_clear');
       this.search = '';
       this.$store.state.trigger.search.a = '';
@@ -836,6 +847,8 @@ export default {
       this.$store.commit('clear_path_data');
       this.$store.state.showExpansion = true; 
       this.$store.commit('clearMatchingConnectorData');
+      //need to clear the routes on the map 
+      this.$store.dispatch('clear_path_data');
       // next lets update the search fields
       this.$nextTick(() => {
         this.search = '';

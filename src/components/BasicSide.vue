@@ -360,6 +360,9 @@ export default {
     '$store.state.trigger.search.a'(term) {
 
       this.search = term
+      if (typeof term === 'object') {
+        term = term.tag
+      }
       if (term == '' && this.$refs.search) {
         this.$refs.search.reset()
         this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
@@ -408,10 +411,14 @@ export default {
       //   console.log('PathData: ', data)
       // })
 
-      console.log('search.b is being triggered')
+      // if term is an object then return term.tag
+      if (typeof term === 'object') {
+        term = term.tag
+      }
       const termStr = String(term);
       term = termStr.replace(/\(.*?\)/g, "").trim();
-
+      console.log('search2 is being triggered', term)
+      
       this.search2 = term
       if (term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
@@ -461,9 +468,6 @@ export default {
    
     
     // Convert to string, handling numbers and other types
-    let termStr = String(term);
-    term = termStr.replace(/\(.*?\)/g, "").trim();
-      console.log('search2 is being triggered', term)
       this.$store.dispatch('trigger_search', { b: term })
 
       // this.search2 = val

@@ -409,6 +409,8 @@ export default {
       // })
 
       console.log('search.b is being triggered')
+      const termStr = String(term);
+      term = termStr.replace(/\(.*?\)/g, "").trim();
 
       this.search2 = term
       if (term == '' && this.$refs.search2) {
@@ -431,6 +433,16 @@ export default {
         }
       })
     },
+     removeAlias(term) {
+    // Handle null, undefined, or non-string values
+    if (!term && term !== 0) {
+      return '';
+    }
+    
+    // Convert to string, handling numbers and other types
+    const termStr = String(term);
+    return termStr.replace(/\(.*?\)/g, "").trim();
+  },
     search(val) {
       let term = val || ''
       term = term.trim()
@@ -444,8 +456,14 @@ export default {
     },
     search2(val) {
       let term = val || ''
-      term = term.trim()
-      console.log('search2 is being triggered')
+      // Ensure term is a string before calling trim()
+
+   
+    
+    // Convert to string, handling numbers and other types
+    let termStr = String(term);
+    term = termStr.replace(/\(.*?\)/g, "").trim();
+      console.log('search2 is being triggered', term)
       this.$store.dispatch('trigger_search', { b: term })
 
       // this.search2 = val
@@ -742,7 +760,7 @@ export default {
           // this.tag_items = out.data.hits.map(v => v.id)
           this.tag_items = out.data.hits
             .filter(v => v && v.doc)  // Filter out null/undefined items
-            .map(v => tag_alias(v.doc))
+            .map(v => tag_alias(v.doc)) .filter(item => item !== null)
         }
         else {
           // this.tag_items = this.items.map(v => v.tag)
@@ -766,6 +784,7 @@ export default {
           this.tag_items2 = out.data.hits
             .filter(v => v && v.doc)  // Filter out null/undefined items
             .map(v => tag_alias(v.doc))
+            .filter(item => item !== null)
           console.log('tag items are ', this.tag_items2)
         }
         else {

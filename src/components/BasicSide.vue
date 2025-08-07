@@ -585,11 +585,22 @@ export default {
       if (this.menuView.mode !== 'standard') return [];
 
       const { items, order } = this.menuView.menu;
-      return order.split(/\s*,\s*/).map(code => ({
+      const menuItems = order.split(/\s*,\s*/).map(code => ({
         ...items[code],
         code,
         klass: { 'vxg-router-link': true }
       }));
+
+      // Add "Hardware" manually
+      menuItems.push({
+        title: 'Hardware',
+        path: '/hardware',  // or whatever route you want
+        code: 'hardware',
+        icon: 'chip',
+        klass: { 'vxg-router-link': true }
+      });
+
+      return menuItems;
     },
     filterIcon() {
       return this.$store.state.vxg.cmp.BasicHead.show.filter

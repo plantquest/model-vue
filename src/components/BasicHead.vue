@@ -624,7 +624,7 @@
       @keydown="changeSearch($event)"
       @click:clear="changeSearch($event)"
       @change="handleChangeSearch($event)"
-      :items="tag_items"
+    
       flat
       hide-details
       outlined

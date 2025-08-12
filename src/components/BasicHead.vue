@@ -96,7 +96,7 @@
   
     <v-combobox ref="search" class="comboxSearch d-flex justify-space-between" v-model="search"
           @keydown="changeSearch($event)" @click:clear="changeSearch($event)" @change="handleChangeSearch($event)"
-          :items="tag_items" flat hide-details outlined dense clearable placeholder="" @click:append="filter"
+           flat hide-details outlined dense clearable placeholder="" @click:append="filter"
           :filter="customFilter" :prepend-inner-icon="prependIcon" @click="handleClick" @blur="handleBlur">
 
   
@@ -624,7 +624,7 @@
       @keydown="changeSearch($event)"
       @click:clear="changeSearch($event)"
       @change="handleChangeSearch($event)"
-    
+      :items="tag_items"
       flat
       hide-details
       outlined

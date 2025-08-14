@@ -94,25 +94,11 @@
       v-if="show('remove') && tool.remove.active"
       vertical style="margin:0px 16px;"></v-divider>
   
-    <!-- <v-combobox
-      ref="search"
-      v-if="tool.search.active && show('search')"
-      v-model="search"
-      @keydown="changeSearch($event)"
-      @click:clear="changeSearch($event)"
-      :items="tag_items"
-      flat
-      hide-details
-      outlined
-      dense
-      clearable
-      placeholder="Search"
-      :append-icon="filterIcon?'mdi-tune':undefined"
-      @click:append="filter"
-      :filter="customFilter"
-      >
-    </v-combobox>  -->
-  
+    <v-combobox ref="search" class="comboxSearch d-flex justify-space-between" v-model="search"
+          @keydown="changeSearch($event)" @click:clear="changeSearch($event)" @change="handleChangeSearch($event)"
+           flat hide-details outlined dense clearable placeholder="" @click:append="filter"
+          :filter="customFilter" :prepend-inner-icon="prependIcon" @click="handleClick" @blur="handleBlur">
+
   
     <v-spacer
       v-if="tool.avatar.active || tool.expandMain.active"
@@ -215,6 +201,11 @@
   
   
   function tag_alias(asset) {
+    // Add null check for asset
+    if (!asset || !asset.tag) {
+      return null;  // Return null for invalid assets
+    }
+    
     if (null != asset.custom12) {
       return asset.tag + '(' + asset.custom12 + ')'
     }
@@ -247,9 +238,10 @@
         this.items = tool.assets
         
         if(this.items.length != 0) {
-         
-          // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
-          this.tag_items = this.items.map(tag_alias)
+          // Filter out null values
+          this.tag_items = this.items
+            .map(tag_alias)
+            .filter(item => item !== null)
           this.setupMiniSearch(this.items)
           clearInterval(load_assets)
         } 
@@ -264,23 +256,15 @@
   
     watch: {
       '$store.state.trigger.search.term' (term) {
-        if(term == '' && this.$refs.search) {
-          this.$refs.search.reset()
-          // this.tag_items = this.items.map(v => v.tag)
-          this.tag_items = this.items.map(tag_alias)
+        if(term == '' && this.$refs.search2) {  // Restored to search2
+          this.$refs.search2.reset()
+          // Filter out null values
+          this.tag_items = this.items
+            .map(tag_alias)
+            .filter(item => item !== null)
         }
       },
-      search (val) {
-        let term = val || ''
-        term = term.trim()
-        // Todo: Is it necessary?
-        // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
-        // if(m) {
-        //   term = m[1].trim()
-        // }
-        // this.$store.dispatch('trigger_search', {term:this.search})
-        this.$store.dispatch('trigger_search', {term})
-      },
+      
       select () {
         this.$store.dispatch('trigger_select', {value:this.select})
       },
@@ -306,9 +290,20 @@
           if(view && view.head) {
             this.view.tool = view.head.tool
           }
-  
+
+          // Clear search when switching routes
+          this.search = ''
+          this.$store.state.trigger.search.term = ''
+          if (this.$refs.search2) {
+            this.$refs.search2.reset()
+          }
+          // Reset tag_items to show all items
+          if (this.items && this.items.length > 0) {
+            this.tag_items = this.items.map(tag_alias)
+          }
+
           this.defaults()
-  
+
         }
       }
     },
@@ -356,31 +351,88 @@
         }
       },
       
-      // bypass default combobox filter
-      customFilter (item, queryText, itemText) {
-        return 1
-      },
-  
-      // on-keydown and on-clear logic
-      changeSearch(event) {
-  
-        setTimeout(async ()=> { // wait for input
-          let term
-          term = event.target ? event.target._value : null
+      async performSearch(term) {
+        try {
           if(term) {
             let out = await this.$seneca.post('sys:search, cmd:search', 
               { query: term, params: this.search_config }
             )
-            // this.tag_items = out.data.hits.map(v => v.id)
-            this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+            // Filter out null values after mapping
+            this.tag_items = out.data.hits
+              .map(v => tag_alias(v.doc))
+              .filter(item => item !== null)
+          } else {
+            if (this.items && this.items.length > 0) {
+              // Filter out null values after mapping
+              this.tag_items = this.items
+                .map(tag_alias)
+                .filter(item => item !== null)
+            }
           }
-          else {
-            // this.tag_items = this.items.map(v => v.tag)
-            this.tag_items = this.items.map(tag_alias)
+        } catch (error) {
+          console.error('Search error:', error)
+        }
+      },
+      
+      // Custom filter for combobox autosuggest
+      customFilter (item, queryText, itemText) {
+        if (!queryText) return true
+        
+        // Filter items that contain the query text (case insensitive)
+        const searchText = queryText.toLowerCase()
+        const itemContent = (item || '').toLowerCase()
+        
+        return itemContent.includes(searchText)
+      },
+  
+      changeSearch(event) {
+  
+        setTimeout(async ()=> { // wait for input
+          let term
+          term = event.target ? event.target.value : null
+          
+          console.log('searching.. term', term)
+          
+          // Update BOTH store properties for complete Assets search integration
+          this.$store.state.trigger.search.term = term || ''  // For BasicLed data table
+          this.$store.state.trigger.search.a = term || ''     // For BasicSide search 1
+          
+          // Always update tag_items for autosuggest functionality
+          await this.performSearch(term)
+          
+          // Skip URL navigation if other components are handling search
+          if (this.$route.query.mode === 'assetsearch' || 
+              this.$route.query.mode === 'filtersearch' || 
+              this.$route.query.mode === 'route') {
+            return
+          }
+          
+          // Use URL-based search for consistency
+          if (term) {
+            this.$router.push({
+              path: this.$route.path,
+              query: {
+                mode: 'headsearch',
+                term: term
+              }
+            }).catch(err => {
+              if (err.name !== 'NavigationDuplicated') {
+                console.error('Router navigation error:', err);
+              }
+            })
+          } else {
+            // Clear search by removing query parameters
+            this.$router.push({
+              path: this.$route.path,
+              query: {}
+            }).catch(err => {
+              if (err.name !== 'NavigationDuplicated') {
+                console.error('Router navigation error:', err);
+              }
+            })
           }
           
         }, 11)
-        
       },
       
       filterAssets () {
@@ -457,6 +509,12 @@
   
       action(name) {
         this.$emit('action', name)
+      },
+      handleChangeSearch(event) {
+        console.log('handleChangeSearch called with:', this.search)
+        // Update both store states
+        this.$store.state.trigger.search.term = this.search || ''  // For BasicLed
+        this.$store.state.trigger.search.a = this.search || ''     // For BasicSide search 1
       }
     }
   };
@@ -560,11 +618,12 @@
       vertical style="margin:0px 16px;"></v-divider>
   
     <v-combobox
-      ref="search"
-      v-if="tool.search.active && show('search')"
+      ref="search2"
+     
       v-model="search"
       @keydown="changeSearch($event)"
       @click:clear="changeSearch($event)"
+      @change="handleChangeSearch($event)"
       :items="tag_items"
       flat
       hide-details
@@ -679,6 +738,11 @@
   
   
   function tag_alias(asset) {
+    // Add null check for asset
+    if (!asset || !asset.tag) {
+      return null;  // Return null for invalid assets
+    }
+    
     if (null != asset.custom12) {
       return asset.tag + '(' + asset.custom12 + ')'
     }
@@ -711,9 +775,10 @@
         this.items = tool.assets
         
         if(this.items.length != 0) {
-         
-          // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
-          this.tag_items = this.items.map(tag_alias)
+          // Filter out null values
+          this.tag_items = this.items
+            .map(tag_alias)
+            .filter(item => item !== null)
           this.setupMiniSearch(this.items)
           clearInterval(load_assets)
         } 
@@ -728,23 +793,15 @@
   
     watch: {
       '$store.state.trigger.search.term' (term) {
-        if(term == '' && this.$refs.search) {
-          this.$refs.search.reset()
-          // this.tag_items = this.items.map(v => v.tag)
-          this.tag_items = this.items.map(tag_alias)
+        if(term == '' && this.$refs.search2) {  // Restored to search2
+          this.$refs.search2.reset()
+          // Filter out null values
+          this.tag_items = this.items
+            .map(tag_alias)
+            .filter(item => item !== null)
         }
       },
-      search (val) {
-        let term = val || ''
-        term = term.trim()
-        // Todo: Is it necessary?
-        // let m = term.match(/^([^(]+)\s*\([^)]+\)$/)
-        // if(m) {
-        //   term = m[1].trim()
-        // }
-        // this.$store.dispatch('trigger_search', {term:this.search})
-        this.$store.dispatch('trigger_search', {term})
-      },
+      
       select () {
         this.$store.dispatch('trigger_select', {value:this.select})
       },
@@ -770,9 +827,20 @@
           if(view && view.head) {
             this.view.tool = view.head.tool
           }
-  
+
+          // Clear search when switching routes
+          this.search = ''
+          this.$store.state.trigger.search.term = ''
+          if (this.$refs.search2) {
+            this.$refs.search2.reset()
+          }
+          // Reset tag_items to show all items
+          if (this.items && this.items.length > 0) {
+            this.tag_items = this.items.map(tag_alias)
+          }
+
           this.defaults()
-  
+
         }
       }
     },
@@ -829,32 +897,88 @@
         }
       },
       
-      // bypass default combobox filter
-      customFilter (item, queryText, itemText) {
-        return 1
-      },
-    
-      // on-keydown and on-clear logic
-      changeSearch(event) {
-  
-        setTimeout(async ()=> { // wait for input
-          let term
-          term = event.target ? event.target._value : null
-          this.search = term
+      async performSearch(term) {
+        try {
           if(term) {
             let out = await this.$seneca.post('sys:search, cmd:search', 
               { query: term, params: this.search_config }
             )
-            // this.tag_items = out.data.hits.map(v => v.id)
-            this.tag_items = out.data.hits.map(v=>tag_alias(v.doc))
+            // Filter out null values after mapping
+            this.tag_items = out.data.hits
+              .map(v => tag_alias(v.doc))
+              .filter(item => item !== null)
+          } else {
+            if (this.items && this.items.length > 0) {
+              // Filter out null values after mapping
+              this.tag_items = this.items
+                .map(tag_alias)
+                .filter(item => item !== null)
+            }
           }
-          else {
-            // this.tag_items = this.items.map(v => v.tag)
-            this.tag_items = this.items.map(tag_alias)
+        } catch (error) {
+          console.error('Search error:', error)
+        }
+      },
+      
+      // Custom filter for combobox autosuggest
+      customFilter (item, queryText, itemText) {
+        if (!queryText) return true
+        
+        // Filter items that contain the query text (case insensitive)
+        const searchText = queryText.toLowerCase()
+        const itemContent = (item || '').toLowerCase()
+        
+        return itemContent.includes(searchText)
+      },
+  
+      changeSearch(event) {
+  
+        setTimeout(async ()=> { // wait for input
+          let term
+          term = event.target ? event.target.value : null
+          
+          console.log('searching.. term', term)
+          
+          // Update BOTH store properties for complete Assets search integration
+          this.$store.state.trigger.search.term = term || ''  // For BasicLed data table
+          this.$store.state.trigger.search.a = term || ''     // For BasicSide search 1
+          
+          // Always update tag_items for autosuggest functionality
+          await this.performSearch(term)
+          
+          // Skip URL navigation if other components are handling search
+          if (this.$route.query.mode === 'assetsearch' || 
+              this.$route.query.mode === 'filtersearch' || 
+              this.$route.query.mode === 'route') {
+            return
+          }
+          
+          // Use URL-based search for consistency
+          if (term) {
+            this.$router.push({
+              path: this.$route.path,
+              query: {
+                mode: 'headsearch',
+                term: term
+              }
+            }).catch(err => {
+              if (err.name !== 'NavigationDuplicated') {
+                console.error('Router navigation error:', err);
+              }
+            })
+          } else {
+            // Clear search by removing query parameters
+            this.$router.push({
+              path: this.$route.path,
+              query: {}
+            }).catch(err => {
+              if (err.name !== 'NavigationDuplicated') {
+                console.error('Router navigation error:', err);
+              }
+            })
           }
           
         }, 11)
-        
       },
       
       filterAssets () {
@@ -931,6 +1055,12 @@
   
       action(name) {
         this.$emit('action', name)
+      },
+      handleChangeSearch(event) {
+        console.log('handleChangeSearch called with:', this.search)
+        // Update both store states
+        this.$store.state.trigger.search.term = this.search || ''  // For BasicLed
+        this.$store.state.trigger.search.a = this.search || ''     // For BasicSide search 1
       }
     }
   };

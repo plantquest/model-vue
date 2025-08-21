@@ -533,6 +533,16 @@
       v-if="!drawerOpen && tool.expandSide.active"
       vertical style="margin:0px 16px;"></v-divider>
   
+    <v-select
+      style="max-width:20%;display:inline-block;margin: 0 10px;"
+      v-model="selectedSap"
+      :items="sapData"
+      :return-object="true"
+      outlined
+      dense
+      hide-details
+    >
+    </v-select>
   
     <!-- <v-btn
       v-if="show('clear') && tool.clear.active"
@@ -760,6 +770,8 @@
         view: {
           tool: {}
         },
+        sapData: ["PlantQuest Assets", "SAP PM Assets", "Auxis Assets"],
+        selectedSap: "PlantQuest Assets",
         featuresMenu: [],
         items: [],
         tag_items: [],
@@ -804,6 +816,9 @@
       
       select () {
         this.$store.dispatch('trigger_select', {value:this.select})
+      },
+      selectedSap () {
+        this.$store.dispatch('setShowAssetType', this.selectedSap);
       },
       '$store.state.trigger.select.value' (val) {
         this.select = val

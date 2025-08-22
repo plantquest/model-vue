@@ -579,19 +579,6 @@
       v-if="(show('select') && tool.select.active) || (show('go') && tool.go.active)"
       vertical style="margin:0px 16px;"></v-divider> -->
   
-  
-    <v-btn
-      v-if="show('add') && tool.add.active"
-      tile
-      class="vxg-head-btn"
-      @click="addItem"
-      >
-      <v-icon left medium>
-        mdi-map-marker-path
-      </v-icon>
-      Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
-    </v-btn>
-  
     
    <!-- <v-btn
       v-if="show('addmobile') && tool.add.active"
@@ -651,6 +638,18 @@
     <v-spacer
       v-if="tool.avatar.active || tool.expandMain.active"
       ></v-spacer>
+
+    <v-btn
+      v-if="show('add') && tool.add.active"
+      tile
+      class="vxg-head-btn"
+      @click="addItem"
+      >
+      <v-icon left medium>
+        mdi-map-marker-path
+      </v-icon>
+      Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
+    </v-btn>
   
     <v-icon
       v-if="tool.avatar.active"

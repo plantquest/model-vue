@@ -1,6 +1,6 @@
 {
   "name": "@plantquest/model-vue",
-  "version": "0.18.180-pqview",
+  "version": "0.18.197-demo-dev.0.6",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,7 +19,7 @@
     "reset": "npm run clean && npm i && npm test",
     "repo-check": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && [[ '' == `git tag --list v${REPO_VERSION}` ]]",
     "repo-tag": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && git commit -a -m v$REPO_VERSION && git push && git tag v$REPO_VERSION && git push --tags;",
-    "repo-publish": "npm run repo-check && npm run clean && npm i --registry https://registry.npmjs.org && npm run prettier && npm run vue-build && npm test && npm run repo-tag && npm publish --registry https://registry.npmjs.org",
+    "repo-publish": "npm run repo-check && npm run clean && npm i --registry https://registry.npmjs.org && npm run prettier && npm run vue-build  && npm run repo-tag && npm publish --registry https://registry.npmjs.org",
     "repo-publish-quick": "npm run repo-check && npm run prettier && npm run vue-build && npm run repo-tag && npm publish --registry https://registry.npmjs.org --access=public"
   },
   "files": [

@@ -276,6 +276,7 @@ export default {
       menuView: null,
       roomName: '',
       search: '',
+      sapItems: [],
       //aprxTime: 0,
       // aprxDistance: 0,
 
@@ -338,7 +339,39 @@ export default {
       
       if (this.items.length != 0) {
         // Assets for search 1
-        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+        const response = await fetch('/BIOCORK_SAP_DATA_POC_7K.csv');
+        const csvText = await response.text();
+
+        const lines = csvText.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim());
+
+        const data = lines.slice(1).map(line => {
+          const values = line.split(',').map(v => v.trim());
+          const obj = {};
+          headers.forEach((header, i) => {
+            obj[header] = values[i];
+          });
+          return obj;
+        });
+        this.$store.dispatch('set_sap_item_values', data)
+
+        const assetCodes = lines.slice(1).map(line => {
+          const values = line.split(',').map(v => v.trim());
+          const obj = {};
+          headers.forEach((header, i) => {
+            obj[header] = values[i];
+          });
+          return obj.Asset_code || null;
+        }).filter(Boolean);
+
+        this.sapItems = assetCodes;
+
+        this.tag_items = [
+          ...this.items.filter(v => v && v.tag).map(v => v.tag_alias).filter(Boolean),
+          ...assetCodes
+        ];
         
         // Determine how to map search2 items based on data type
         if (this.items2.length > 0 && this.items2[0].email) {
@@ -793,14 +826,14 @@ export default {
             { query: term, params: this.search_config }
           )
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits
+          this.tag_items = [...out.data.hits
             .filter(v => v && v.doc)  // Filter out null/undefined items
-            .map(v => tag_alias(v.doc)) .filter(item => item !== null)
+            .map(v => tag_alias(v.doc)) .filter(item => item !== null), ...this.sapItems]
         }
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if (this.items != undefined)
-            this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+            this.tag_items = [...this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null), ...this.sapItems]
         }
 
       }, 11)

@@ -520,7 +520,7 @@
   };
   </script>
   <template>
-  <v-app-bar app class="vxg-app-bar">
+  <v-app-bar app :style="{ display: $route.name == 'asset-item' ? 'none' : 'block' }" class="vxg-app-bar">
   
     <v-icon
       v-if="!drawerOpen && tool.expandSide.active"
@@ -533,6 +533,16 @@
       v-if="!drawerOpen && tool.expandSide.active"
       vertical style="margin:0px 16px;"></v-divider>
   
+    <v-select
+      style="max-width:20%;display:inline-block;margin: 0 10px;"
+      v-model="selectedSap"
+      :items="sapData"
+      :return-object="true"
+      outlined
+      dense
+      hide-details
+    >
+    </v-select>
   
     <!-- <v-btn
       v-if="show('clear') && tool.clear.active"
@@ -568,19 +578,6 @@
     <!-- <v-divider
       v-if="(show('select') && tool.select.active) || (show('go') && tool.go.active)"
       vertical style="margin:0px 16px;"></v-divider> -->
-  
-  
-    <v-btn
-      v-if="show('add') && tool.add.active"
-      tile
-      class="vxg-head-btn"
-      @click="addItem"
-      >
-      <v-icon left medium>
-        mdi-map-marker-path
-      </v-icon>
-      Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
-    </v-btn>
   
     
    <!-- <v-btn
@@ -641,6 +638,18 @@
     <v-spacer
       v-if="tool.avatar.active || tool.expandMain.active"
       ></v-spacer>
+
+    <v-btn
+      v-if="show('add') && tool.add.active"
+      tile
+      class="vxg-head-btn"
+      @click="addItem"
+      >
+      <v-icon left medium>
+        mdi-map-marker-path
+      </v-icon>
+      Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
+    </v-btn>
   
     <v-icon
       v-if="tool.avatar.active"
@@ -760,6 +769,8 @@
         view: {
           tool: {}
         },
+        sapData: ["PlantQuest Assets", "SAP PM Assets", "Auxis Assets"],
+        selectedSap: "PlantQuest Assets",
         featuresMenu: [],
         items: [],
         tag_items: [],
@@ -804,6 +815,9 @@
       
       select () {
         this.$store.dispatch('trigger_select', {value:this.select})
+      },
+      selectedSap () {
+        this.$store.dispatch('setShowAssetType', this.selectedSap);
       },
       '$store.state.trigger.select.value' (val) {
         this.select = val

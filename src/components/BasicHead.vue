@@ -633,7 +633,46 @@
       :filter="customFilter"
       >
     </v-combobox> 
-  
+
+    <div v-if="$route.name == 'asset'" class="text-center">
+      <v-menu
+        v-model="isColumnVisibility"
+        :close-on-content-click="false"
+        offset-y
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            class="px-5 ml-4"
+            outlined
+            style="background: white;"
+            v-bind="attrs"
+            v-on="on"
+            @click="isColumnVisibility = !isColumnVisibility"
+          >
+            <div style="width: 250px; color: rgba(0, 0, 0, 0.6) !important;" class="d-flex justify-space-between align-center text-capitalize">
+              Column Visibility
+              <v-icon :style="{transform: isColumnVisibility ? 'rotate(180deg)' : 'rotate(0deg)',transition: 'transform 0.3s ease'}">
+                mdi-menu-down
+              </v-icon>
+            </div>
+          </v-btn>
+        </template>
+
+        <v-card dense style="width: 100%;height: 180px;">
+          <div style="padding: 1px 15px 20px;width: 100%;background: white;">
+            <div v-for="(item, index) in headers" :key="index">
+              <v-checkbox
+                v-model="selectedColumns"
+                @change="handleColumnChange"
+                :hide-details="true"
+                :label="item.text"
+                :value="item"
+              ></v-checkbox>
+            </div>
+          </div>
+        </v-card>
+      </v-menu>
+    </div>
   
     <v-spacer
       v-if="tool.avatar.active || tool.expandMain.active"
@@ -771,6 +810,31 @@
         },
         sapData: ["PlantQuest Assets", "SAP PM Assets", "Auxis Assets"],
         selectedSap: "PlantQuest Assets",
+        headers: [
+          { value: 'atype', text: 'Asset Type', order: 1 },
+          { value: 'discipline1', text: 'Discipline', order: 2 },
+          { value: 'description', text: 'Description', order: 3 },
+          { value: 'manufacturer', text: 'Manufacturer', order: 4 },
+          { value: 'model', text: 'Model', order: 5 },
+          { value: 'serial', text: 'Serial Number', order: 6 },
+          { value: 'building', text: 'Building', order: 7 },
+          { value: 'level', text: 'Level', order: 8 },
+          { value: 'room', text: 'Room Number', order: 9 },
+          { value: 'drawing1', text: 'Drawing 1', order: 10 },
+          { value: 'drawing2', text: 'Owner', order: 11 },
+          { value: 'system', text: 'System', order: 12 },
+          { value: 'subsys', text: 'Subsystem', order: 13 },
+          { value: 'custom12', text: 'Alias', order: 14 }
+        ],
+        selectedColumns: [
+          { value: 'tag', text: 'Asset Tag', order: 0 },
+          { value: 'atype', text: 'Asset Type', order: 1 },
+          { value: 'description', text: 'Description', order: 3 },
+          { value: 'building', text: 'Building', order: 7 },
+          { value: 'level', text: 'Level', order: 8 },
+          { value: 'room', text: 'Room Number', order: 9 },
+        ],
+        isColumnVisibility: false,
         featuresMenu: [],
         items: [],
         tag_items: [],
@@ -933,6 +997,42 @@
           console.error('Search error:', error)
         }
       },
+      customFilter (item, queryText, itemText) {
+        return 1
+      },
+      handleColumnChange() {
+        const sorted = this.selectedColumns.sort((a, b) => a.order - b.order);
+        this.$store.dispatch('updateSelectedColumns', sorted)
+      },
+      // on-keydown and on-clear logic
+      changeSearch(event) {
+  
+        setTimeout(async ()=> { // wait for input
+          try{
+          let term
+          term = event.target ? event.target._value : null
+          this.search = term
+          if(term) {
+            let out = await this.$seneca.post('sys:search, cmd:search', 
+              { query: term, params: this.search_config }
+            )
+            // Filter out null values after mapping
+            this.tag_items = out.data.hits
+              .map(v => tag_alias(v.doc))
+              .filter(item => item !== null)
+          } else {
+            if (this.items && this.items.length > 0) {
+              // Filter out null values after mapping
+              this.tag_items = this.items
+                .map(tag_alias)
+                .filter(item => item !== null)
+            }
+          }
+        } catch (error) {
+          console.error('Search error:', error)
+        }
+      }, 11)
+    },
       
       // Custom filter for combobox autosuggest
       customFilter (item, queryText, itemText) {

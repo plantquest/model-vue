@@ -1,6 +1,6 @@
 {
   "name": "@plantquest/model-vue",
-  "version": "0.18.198-SAP-DESKTOP-468",
+  "version": "0.18.199-SAP-DESKTOP-468",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -22,6 +22,7 @@
     "repo-publish": "npm run repo-check && npm run clean && npm i --registry https://registry.npmjs.org && npm run prettier && npm run vue-build  && npm run repo-tag && npm publish --registry https://registry.npmjs.org",
     "repo-publish-quick": "npm run repo-check && npm run prettier && npm run vue-build && npm run repo-tag && npm publish --registry https://registry.npmjs.org --access=public"
   },
+
   "files": [
     "dist/*",
     "src/*",

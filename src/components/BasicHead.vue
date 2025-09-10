@@ -520,7 +520,7 @@
   };
   </script>
   <template>
-  <v-app-bar app class="vxg-app-bar">
+  <v-app-bar app class="vxg-app-bar" :style="{ display: $route.name == 'asset-item' ? 'none' : 'block' }">
   
     <v-icon
       v-if="!drawerOpen && tool.expandSide.active"

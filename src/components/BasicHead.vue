@@ -687,7 +687,7 @@
       <v-icon left medium>
         mdi-map-marker-path
       </v-icon>
-      Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
+      Add {{ itemName == 'Asset' ? 'Asset' : itemName }}
     </v-btn>
   
     <v-icon

@@ -687,7 +687,8 @@
       <v-icon left medium>
         mdi-map-marker-path
       </v-icon>
-      Add {{ itemName == 'Asset' ? 'Asset' : itemName }}
+      <span v-if="selectedSap !== 'SAP PM Assets'">Add {{ itemName == 'Asset' ? 'Asset' : itemName }}</span>
+      <span v-else>Assign Asset Code</span>
     </v-btn>
   
     <v-icon

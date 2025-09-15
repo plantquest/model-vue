@@ -534,11 +534,12 @@
       vertical style="margin:0px 16px;"></v-divider>
   
     <v-select
+      v-if="$route.name == 'asset'"
       style="max-width:20%;display:inline-block;margin: 0 10px;"
       v-model="selectedSap"
       :items="sapData"
       :return-object="true"
-      outlined
+      solo
       dense
       hide-details
     >
@@ -594,7 +595,7 @@
     -->
   
     <v-divider
-      v-if="show('add') && tool.add.active"
+      v-if="show('add') && tool.add.active && $route.name == 'asset'"
       vertical style="margin:0px 16px;"></v-divider>
   
   
@@ -612,27 +613,7 @@
     
     <v-divider
       v-if="show('remove') && tool.remove.active"
-      vertical style="margin:0px 16px;"></v-divider>
-  
-    <v-combobox
-      ref="search2"
-     
-      v-model="search"
-      @keydown="changeSearch($event)"
-      @click:clear="changeSearch($event)"
-      @change="handleChangeSearch($event)"
-      :items="tag_items"
-      flat
-      hide-details
-      outlined
-      dense
-      clearable
-      placeholder="Search"
-      :append-icon="filterIcon?'mdi-tune':undefined"
-      @click:append="filter"
-      :filter="customFilter"
-      >
-    </v-combobox> 
+      vertical style="margin:0px 16px;"></v-divider> 
 
     <div v-if="$route.name == 'asset'" class="text-center">
       <v-menu
@@ -642,8 +623,8 @@
       >
         <template v-slot:activator="{ on, attrs }">
           <v-btn
-            class="px-5 ml-4"
-            outlined
+            class="px-5 mr-4"
+            elevation="2"
             style="background: white;"
             v-bind="attrs"
             v-on="on"
@@ -682,6 +663,25 @@
         </v-card>
       </v-menu>
     </div>
+
+    <v-combobox
+      ref="search2"
+     
+      v-model="search"
+      @keydown="changeSearch($event)"
+      @click:clear="changeSearch($event)"
+      @change="handleChangeSearch($event)"
+      :items="tag_items"
+      hide-details
+      solo
+      dense
+      clearable
+      placeholder="Search"
+      :append-icon="filterIcon?'mdi-tune':undefined"
+      @click:append="filter"
+      :filter="customFilter"
+      >
+    </v-combobox>
   
     <v-spacer
       v-if="tool.avatar.active || tool.expandMain.active"
@@ -690,13 +690,15 @@
     <v-btn
       v-if="show('add') && tool.add.active"
       tile
+      elevation="2"
       class="vxg-head-btn"
       @click="addItem"
       >
       <v-icon left medium>
         mdi-map-marker-path
       </v-icon>
-      Add {{ itemName == 'Asset' ? 'Asset' : itemName }}
+      <span v-if="selectedSap !== 'SAP PM Assets'">Add {{ itemName == 'Asset' ? 'Asset' : itemName }}</span>
+      <span v-else>Assign Asset Location</span>
     </v-btn>
   
     <v-icon

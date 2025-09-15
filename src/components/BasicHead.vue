@@ -534,6 +534,7 @@
       vertical style="margin:0px 16px;"></v-divider>
   
     <v-select
+      v-if="$route.name == 'asset'"
       style="max-width:20%;display:inline-block;margin: 0 10px;"
       v-model="selectedSap"
       :items="sapData"
@@ -594,7 +595,7 @@
     -->
   
     <v-divider
-      v-if="show('add') && tool.add.active"
+      v-if="show('add') && tool.add.active && $route.name == 'asset'"
       vertical style="margin:0px 16px;"></v-divider>
   
   

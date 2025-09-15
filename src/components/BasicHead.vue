@@ -660,10 +660,19 @@
 
         <v-card dense style="width: 100%;height: 180px;">
           <div style="padding: 1px 15px 20px;width: 100%;background: white;">
-            <div v-for="(item, index) in headers" :key="index">
+            <div v-if="selectedSap == 'PlantQuest Assets'" v-for="(item, index) in headers" :key="index">
               <v-checkbox
                 v-model="selectedColumns"
                 @change="handleColumnChange"
+                :hide-details="true"
+                :label="item.text"
+                :value="item"
+              ></v-checkbox>
+            </div>
+            <div v-if="selectedSap == 'SAP PM Assets'" v-for="(item, index) in sapHeaders" :key="index">
+              <v-checkbox
+                v-model="selectedSapColumns"
+                @change="handleSapColumnChange"
                 :hide-details="true"
                 :label="item.text"
                 :value="item"
@@ -825,6 +834,52 @@
           { value: 'system', text: 'System', order: 12 },
           { value: 'subsys', text: 'Subsystem', order: 13 },
           { value: 'custom12', text: 'Alias', order: 14 }
+        ],
+        sapHeaders: [
+          { value: 'Asset_code', text: 'Asset Code', order: 1 },
+          { value: 'Asset_description', text: 'Asset Description', order: 2 },
+          { value: 'Asset_criticality', text: 'Asset Criticality', order: 3 },
+          { value: 'Asset_Criticality_description', text: 'Criticality Description', order: 4 },
+          { value: 'Catalog_profile', text: 'Catalog Profile', order: 5 },
+          { value: 'Inactive', text: 'Inactive', order: 6 },
+          { value: 'Instrument_Make', text: 'Instrument Make', order: 7 },
+          { value: 'Instrument_Model_Number', text: 'Instrument Model Number', order: 8 },
+          { value: 'Location', text: 'Location', order: 9 },
+          { value: 'Maintenance_Plant', text: 'Maintenance Plant', order: 10 },
+          { value: 'Manufacturer', text: 'Manufacturer', order: 11 },
+          { value: 'Manufacturer_part_number', text: 'Manufacturer Part Number', order: 12 },
+          { value: 'Manufacturer_serial_number', text: 'Manufacturer Serial Number', order: 13 },
+          { value: 'Object_type', text: 'Object Type', order: 14 },
+          { value: 'Planner_group', text: 'Planner Group', order: 15 },
+          { value: 'Plant_section', text: 'Plant Section', order: 16 },
+          { value: 'SAP_Asset_Type', text: 'SAP Asset Type', order: 17 },
+          { value: 'System_status_codes', text: 'System Status Codes', order: 18 },
+          { value: 'System_status_description', text: 'System Status Description', order: 19 },
+          { value: 'User_status_codes', text: 'User Status Codes', order: 20 },
+          { value: 'User_status_description', text: 'User Status Description', order: 21 }
+        ],
+        selectedSapColumns:[
+          { value: 'Asset_code', text: 'Asset Code', order: 1 },
+          { value: 'Asset_description', text: 'Asset Description', order: 2 },
+          { value: 'Asset_criticality', text: 'Asset Criticality', order: 3 },
+          { value: 'Asset_Criticality_description', text: 'Criticality Description', order: 4 },
+          { value: 'Catalog_profile', text: 'Catalog Profile', order: 5 },
+          { value: 'Inactive', text: 'Inactive', order: 6 },
+          { value: 'Instrument_Make', text: 'Instrument Make', order: 7 },
+          { value: 'Instrument_Model_Number', text: 'Instrument Model Number', order: 8 },
+          { value: 'Location', text: 'Location', order: 9 },
+          { value: 'Maintenance_Plant', text: 'Maintenance Plant', order: 10 },
+          { value: 'Manufacturer', text: 'Manufacturer', order: 11 },
+          { value: 'Manufacturer_part_number', text: 'Manufacturer Part Number', order: 12 },
+          { value: 'Manufacturer_serial_number', text: 'Manufacturer Serial Number', order: 13 },
+          { value: 'Object_type', text: 'Object Type', order: 14 },
+          { value: 'Planner_group', text: 'Planner Group', order: 15 },
+          { value: 'Plant_section', text: 'Plant Section', order: 16 },
+          { value: 'SAP_Asset_Type', text: 'SAP Asset Type', order: 17 },
+          { value: 'System_status_codes', text: 'System Status Codes', order: 18 },
+          { value: 'System_status_description', text: 'System Status Description', order: 19 },
+          { value: 'User_status_codes', text: 'User Status Codes', order: 20 },
+          { value: 'User_status_description', text: 'User Status Description', order: 21 }
         ],
         selectedColumns: [
           { value: 'tag', text: 'Asset Tag', order: 0 },
@@ -1002,6 +1057,10 @@
       },
       handleColumnChange() {
         const sorted = this.selectedColumns.sort((a, b) => a.order - b.order);
+        this.$store.dispatch('updateSelectedColumns', sorted)
+      },
+      handleSapColumnChange(){
+        const sorted = this.selectedSapColumns.sort((a, b) => a.order - b.order);
         this.$store.dispatch('updateSelectedColumns', sorted)
       },
       // on-keydown and on-clear logic

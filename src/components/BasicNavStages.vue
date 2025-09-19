@@ -136,6 +136,7 @@ export default {
       this.routeMassages = []; // Clear stages on error
     }
     // Dispatch the action (optional)
+    console.log('data.asset123!!', data.asset123)
     this.$store.dispatch('set_path_data', { pathDetails: data.asset123 })
       .then(result => {
         console.log('Dispatch result:', result);
@@ -186,7 +187,8 @@ methods: {
       parseLines(data){
         if (data)
           return data.map(lineData => {
-              //console.log(lineData.detail)
+            // console.log('lineData', lineData);
+             // console.log(lineData.detail)
               let data = lineData.detail.split(',')
               return {
                   id : data[0],
@@ -199,8 +201,23 @@ methods: {
         else return [];
          
       },
+        filterConnectors(steps) {
+    return steps.filter((step, i, arr) => {
+      if (step.type !== 'Connector') return true;
+      const prev = arr[i - 1];
+      const next = arr[i + 1];
+      // Keep if previous or next is also a Connector
+      if ((prev && prev.type === 'Connector') || (next && next.type === 'Connector')) {
+        return true;
+      }
+      // Remove if unique Connector
+      return false;
+    });
+  },
       async getRouteSteps(routeData){
           let steps = routeData;
+          
+        //  steps = this.filterConnectors(steps);
           let messages = [];
           // Add initial stage for starting point
           // change made here - offset set to zero instead of -3
@@ -231,6 +248,7 @@ methods: {
               
               })
             }
+            
             
           console.log('Steps:', steps);
           let map = steps[0].map == 1 ? 1 : steps[0].map-1

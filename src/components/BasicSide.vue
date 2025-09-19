@@ -316,14 +316,45 @@ export default {
     let load_assets = setInterval(async () => {
       await this.$store.dispatch('vxg_get_assets', tool)
       this.items = tool.assets
-      this.items2 = [...tool.assets]
+      
+      // Simple approach: check the current route to determine what data to use for search2
+      if (this.$route.path.includes('/user')) {
+        // If we're on a user route, try to get user data for search2
+        try {
+          // Try to load users from the store if available
+          if (this.$store.state.main_user && this.$store.state.main_user.length > 0) {
+            this.items2 = this.$store.state.main_user
+          } else {
+            // Fallback to assets if no user data
+            this.items2 = [...tool.assets]
+          }
+        } catch (error) {
+          this.items2 = [...tool.assets]
+        }
+      } else {
+        // For asset routes, use assets for both searches
+        this.items2 = [...tool.assets]
+      }
+      
       if (this.items.length != 0) {
-        // this.tag_items = this.items.map(v => v.tag+(''==v.custom12?'':' ('+v.custom12+')'))
+        // Assets for search 1
         this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
-        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+        
+        // Determine how to map search2 items based on data type
+        if (this.items2.length > 0 && this.items2[0].email) {
+          // User data mapping
+          this.tag_items2 = this.items2
+            .filter(v => v && (v.email || v.name))
+            .map(user => user.email || user.name)
+            .filter(item => item !== null)
+        } else {
+          // Asset data mapping
+          this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+        }
+        
         this.setupMiniSearch(this.items)
         this.setupMiniSearch(this.items2)
-        clearInterval(load_assets)
+        clearInterval(load_assets)  // This ensures the loop stops
       }
     }, 111)
   },
@@ -847,6 +878,7 @@ export default {
       this.$store.commit('clear_path_data');
       this.$store.state.showExpansion = true;
       this.$store.commit('clearMatchingConnectorData');
+      this.$store.dispatch('set_cmp_flags',{name:'BasicMain', flags:{show:false}})
       //need to clear the routes on the map 
       this.$store.dispatch('clear_path_data');
       // next lets update the search fields

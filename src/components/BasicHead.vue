@@ -819,7 +819,7 @@
         view: {
           tool: {}
         },
-        sapData: ["PlantQuest Assets", "SAP PM Assets", "Auxis Assets"],
+        sapData: ["PlantQuest Assets", "SAP PM Assets", "Aucxis Assets"],
         selectedSap: "PlantQuest Assets",
         headers: [
           { value: 'atype', text: 'Asset Type', order: 1 },

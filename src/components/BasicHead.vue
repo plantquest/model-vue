@@ -98,7 +98,7 @@
           @keydown="changeSearch($event)" @click:clear="changeSearch($event)" @change="handleChangeSearch($event)"
            flat hide-details outlined dense clearable placeholder="" @click:append="filter"
           :filter="customFilter" :prepend-inner-icon="prependIcon" @click="handleClick" @blur="handleBlur">
-
+</v-combobox> 
   
     <v-spacer
       v-if="tool.avatar.active || tool.expandMain.active"

@@ -546,13 +546,15 @@ export default {
         // Handle route initialization when mode is 'route'
         //console.log('query:', query.a, query.b)
 
-        if (query.mode === 'route') {
+        if (query.mode == 'route') {
           // check that this only on first dom load else skip
 
           // Enable navigation mode
-          if (!this.showSearch2) {
-            this.toggleSearch2();
-          }
+          // if (!this.showSearch2) {
+          //   this.toggleSearch2();
+
+          //   console.log('mode _Search2 toggled', this.search);
+          // }
 
           // Set search values from URL parameters
           this.search = query.a || ''
@@ -833,18 +835,28 @@ export default {
     },
 
     handleRoute() {
-      // detect from the url if mode=route , a has a value and b has a value
+      // If showSearch2 is true and previous mode was assetsearch, move term to b and clear a if it matches
+      let prevQuery = this.$route.query;
+      let bValue = this.search2 || '';
+      let aValue = this.search || '';
+      if (this.showSearch2 && prevQuery.mode === 'assetsearch' && prevQuery.term) {
+        bValue = prevQuery.term;
+        this.search2 = bValue;
+        // If a matches the term, clear it
+        if (aValue === bValue) {
+          aValue = '';
+          this.search = '';
+        }
+      }
       if (!this.showSearch2) {
         this.toggleSearch2();
       }
-
-
       this.$router.replace({
         path: this.$route.path,
         query: {
           mode: 'route',
-          a: this.search || '',
-          b: this.search2 || ''
+          a: aValue,
+          b: bValue
         }
       }).catch(err => {
         // Ignore NavigationDuplicated errors

@@ -633,7 +633,7 @@
       outlined
       dense
       clearable
-      placeholder="Search"
+      placeholder="Search!!!"
       :append-icon="filterIcon?'mdi-tune':undefined"
       @click:append="filter"
       :filter="customFilter"
@@ -802,6 +802,13 @@
           this.tag_items = this.items
             .map(tag_alias)
             .filter(item => item !== null)
+
+
+          this.$nextTick(() => {
+          if (this.$refs.search2) {
+            this.$refs.search2.isMenuActive = false
+          }
+        });
         }
       },
       
@@ -835,12 +842,21 @@
           this.search = ''
           this.$store.state.trigger.search.term = ''
           if (this.$refs.search2) {
-            this.$refs.search2.reset()
+            this.$refs.search2.reset();
+            if (this.$refs.search2.blur) this.$refs.search2.blur();
           }
+
           // Reset tag_items to show all items
           if (this.items && this.items.length > 0) {
             this.tag_items = this.items.map(tag_alias)
           }
+
+           // Force close dropdown after DOM update
+    this.$nextTick(() => {
+      if (this.$refs.search2) {
+        this.$refs.search2.isMenuActive = false
+      }
+    })
 
           this.defaults()
 

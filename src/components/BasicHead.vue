@@ -455,6 +455,7 @@
       },
       
       showTags() {
+        console.log('showTags triggered');
         this.$store.dispatch('adjust_trigger_bookmark')
       },
       
@@ -570,7 +571,7 @@
       vertical style="margin:0px 16px;"></v-divider> -->
   
   
-    <v-btn
+  <v-btn
       v-if="show('add') && tool.add.active"
       tile
       class="vxg-head-btn"
@@ -581,6 +582,8 @@
       </v-icon>
       Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
     </v-btn>
+ 
+  
   
     
    <!-- <v-btn

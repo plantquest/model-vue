@@ -633,7 +633,7 @@
       outlined
       dense
       clearable
-      placeholder="Search!!!"
+      placeholder="Search"
       :append-icon="filterIcon?'mdi-tune':undefined"
       @click:append="filter"
       :filter="customFilter"

@@ -339,38 +339,30 @@ export default {
       
       if (this.items.length != 0) {
         // Assets for search 1
-        const response = await fetch('/BIOCORK_SAP_DATA_POC_7K.csv');
-        const csvText = await response.text();
+        let assets = await this.$seneca.entity('pqs/sap').list$({
+          custom$: {
+            lister: true
+          },
+          
+          fields$:[
+            'id',
+            'asset_code',
+            'maintenance_plant',
+            'type',
+            'description',       
+            'status', 
+            'system_status_codes',        
+            'last_updated',       
+          ]
+          
+        })
+        this.$store.dispatch('set_sap_item_values', assets)
 
-        const lines = csvText.trim().split(/\r?\n/);
-        if (lines.length < 2) return [];
-
-        const headers = lines[0].split(',').map(h => h.trim());
-
-        const data = lines.slice(1).map(line => {
-          const values = line.split(',').map(v => v.trim());
-          const obj = {};
-          headers.forEach((header, i) => {
-            obj[header] = values[i];
-          });
-          return obj;
-        });
-        this.$store.dispatch('set_sap_item_values', data)
-
-        const assetCodes = lines.slice(1).map(line => {
-          const values = line.split(',').map(v => v.trim());
-          const obj = {};
-          headers.forEach((header, i) => {
-            obj[header] = values[i];
-          });
-          return obj.Asset_code || null;
-        }).filter(Boolean);
-
-        this.sapItems = assetCodes;
+        this.sapItems = assets.map(a => a.asset_code);
 
         this.tag_items = [
           ...this.items.filter(v => v && v.tag).map(v => v.tag_alias).filter(Boolean),
-          ...assetCodes
+          ...this.sapItems
         ];
         
         // Determine how to map search2 items based on data type

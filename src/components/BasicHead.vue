@@ -802,13 +802,6 @@
           this.tag_items = this.items
             .map(tag_alias)
             .filter(item => item !== null)
-
-
-          this.$nextTick(() => {
-          if (this.$refs.search2) {
-            this.$refs.search2.isMenuActive = false
-          }
-        });
         }
       },
       
@@ -828,35 +821,41 @@
           this.$forceUpdate()
         }
       },
+
       '$route.name': {
-        immediate: true,
-        handler (val) {
-          let name = this.$route.name
-          
-          let view = this.$model.main.app.web.view[name]
-          if(view && view.head) {
-            this.view.tool = view.head.tool
-          }
+         immediate: true,
+  handler (val) {
+    let name = this.$route.name;
+    let view = this.$model.main.app.web.view[name];
+    if(view && view.head) {
+      this.view.tool = view.head.tool;
+    }
 
-          // Clear search when switching routes
-          this.search = ''
-          this.$store.state.trigger.search.term = ''
-          if (this.$refs.search2) {
-            this.$refs.search2.reset();
-            if (this.$refs.search2.blur) this.$refs.search2.blur();
-          }
+    // Always blur and close dropdown when leaving /asset
+    if (this.$refs.search2) {
+      // Blur first to remove focus
+      this.$refs.search2.blur && this.$refs.search2.blur();
+      // Then, after DOM updates, close the dropdown
+      this.$nextTick(() => {
+        if (this.$refs.search2) {
+          this.$refs.search2.isMenuActive = false;
+        }
+      });
+    }
 
-          // Reset tag_items to show all items
-          if (this.items && this.items.length > 0) {
-            this.tag_items = this.items.map(tag_alias)
-          }
+    // Clear search when switching routes
+    this.search = '';
+    this.$store.state.trigger.search.term = '';
+    if (this.$refs.search2) {
+      this.$refs.search2.reset();
+    }
 
-           // Force close dropdown after DOM update
-    this.$nextTick(() => {
-      if (this.$refs.search2) {
-        this.$refs.search2.isMenuActive = false
-      }
-    })
+    // Reset tag_items to show all items
+    if (this.items && this.items.length > 0) {
+      this.tag_items = this.items.map(tag_alias).filter(item => item !== null);
+    }
+
+  
 
           this.defaults()
 

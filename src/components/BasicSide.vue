@@ -400,6 +400,7 @@ export default {
         console.log('query changes search is being triggerecd')
         // Set pathData to null
         // this.$store.commit('set_path_data', null)
+        
       }
       let search_mode = ''
      // search_mode = this.$router.query.mode

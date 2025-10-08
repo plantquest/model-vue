@@ -875,6 +875,7 @@ export default {
       this.$store.state.trigger.search.a = '';
       this.search = '';
       this.$store.state.trigger.search.b = '';
+      this.$store.dispatch('setLastTrackedSearch', null);
       this.$store.state.showSearch2 = false;
       this.$store.commit('clear_path_data');
       this.$store.state.showExpansion = true;

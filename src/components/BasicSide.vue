@@ -884,11 +884,11 @@ export default {
       this.$store.commit('clear_path_data');
       this.$store.state.showExpansion = true;
       this.$store.commit('clearMatchingConnectorData');
-      this.$store.dispatch('set_cmp_flags',{name:'BasicMain', flags:{show:false}})
       //need to clear the routes on the map 
       this.$store.dispatch('clear_path_data');
       // next lets update the search fields
       this.$nextTick(() => {
+        this.$store.dispatch('set_cmp_flags',{name:'BasicMain', flags:{show:false}})
         this.search = '';
         this.search2 = '';
       })

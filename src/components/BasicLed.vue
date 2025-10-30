@@ -151,12 +151,14 @@
             </div>
             
             <div style="position: relative;">
-              <vxg-basic-field-pick
-                v-if="field.type ==='status'"
-                :field="field"
-                :param="{item:item}"
-                :disabled="editing==false && (field.title=='Status')"
-              ></vxg-basic-field-pick>
+              <v-select
+                v-if="field.type === 'status'"
+                :items="selection(field)"
+                :label="field.title"
+                v-model="item[field.name]"
+                outlined
+                :disabled="$store.state.current_user.profile == 'sea' && item.profile=='System Owner'"
+              ></v-select>
 
              
             </div>
@@ -526,8 +528,9 @@
       },
   
       selection (field) {
+        
         let kinds = field.kind && Object.entries(field.kind) 
-        let selects = kinds ? kinds.map(([n,d])=>({text:d.title,value:n})) : []
+        let selects = kinds ? kinds.map(([n,d])=>({text:d.title,value:n,disabled: d.title == "System Owner" && this.$store.state.current_user.profile != "gea"})) : []
         return selects
       },
   

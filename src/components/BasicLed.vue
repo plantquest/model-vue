@@ -157,7 +157,6 @@
                 :label="field.title"
                 v-model="item[field.name]"
                 outlined
-                :disabled="$store.state.current_user.profile == 'sea' && item.profile=='System Owner'"
               ></v-select>
 
              
@@ -176,7 +175,6 @@
               :label="field.title"
               v-model="item[field.name]"
               outlined
-              :disabled="$store.state.current_user.profile == 'sea' && item.profile == 'System Owner'"
             >
             </v-select>
           </div>
@@ -527,10 +525,26 @@
       },
   
       selection (field) {
+        let kinds = field.kind && Object.entries(field.kind);
+        if (!kinds) return [];
         
-        let kinds = field.kind && Object.entries(field.kind) 
-        let selects = kinds ? kinds.map(([n,d])=>({text:d.title,value:n,disabled: d.title == "System Owner" && this.$store.state.current_user.profile != "gea"})) : []
-        return selects
+        let selects = kinds.map(([n, d]) => ({
+          text: d.title,
+          value: n,
+          disabled: false
+        }));
+        
+        // If current user is Admin (sea), remove System Owner (gea) from options
+        if (this.$store.state.current_user.profile === 'sea') {
+          selects = selects.filter(item => item.value !== 'gea');
+        }
+        
+        // If current user is User (ob), remove System Owner and Admin from options
+        if (this.$store.state.current_user.profile === 'ob') {
+          selects = selects.filter(item => item.value !== 'gea' && item.value !== 'sea');
+        }
+        
+        return selects;
       },
   
       customAction (action) {

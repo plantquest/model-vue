@@ -151,12 +151,13 @@
             </div>
             
             <div style="position: relative;">
-              <vxg-basic-field-pick
-                v-if="field.type ==='status'"
-                :field="field"
-                :param="{item:item}"
-                :disabled="editing==false && (field.title=='Status')"
-              ></vxg-basic-field-pick>
+              <v-select
+                v-if="field.type === 'status'"
+                :items="selection(field)"
+                :label="field.title"
+                v-model="item[field.name]"
+                outlined
+              ></v-select>
 
              
             </div>
@@ -526,9 +527,26 @@
       },
   
       selection (field) {
-        let kinds = field.kind && Object.entries(field.kind) 
-        let selects = kinds ? kinds.map(([n,d])=>({text:d.title,value:n})) : []
-        return selects
+        let kinds = field.kind && Object.entries(field.kind);
+        if (!kinds) return [];
+        
+        let selects = kinds.map(([n, d]) => ({
+          text: d.title,
+          value: n,
+          disabled: false
+        }));
+        
+        // If current user is Admin (sea), remove System Owner (gea) from options
+        if (this.$store.state.current_user.profile === 'sea') {
+          selects = selects.filter(item => item.value !== 'gea');
+        }
+        
+        // If current user is User (ob), remove System Owner and Admin from options
+        if (this.$store.state.current_user.profile === 'ob') {
+          selects = selects.filter(item => item.value !== 'gea' && item.value !== 'sea');
+        }
+        
+        return selects;
       },
   
       customAction (action) {

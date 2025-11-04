@@ -45,6 +45,20 @@ export default {
       let picks = kinds
           .filter(this.makeFieldFilter(field))
           .map(([n,d])=>({text:d.title,value:n}))
+      
+      // Filter based on current user profile - same logic as BasicLed.vue
+      if (this.$store && this.$store.state.current_user) {
+        // If current user is Admin (sea), remove System Owner (gea) from options
+        if (this.$store.state.current_user.profile === 'sea') {
+          picks = picks.filter(item => item.value !== 'gea');
+        }
+        
+        // If current user is User (ob), remove System Owner and Admin from options
+        if (this.$store.state.current_user.profile === 'ob') {
+          picks = picks.filter(item => item.value !== 'gea' && item.value !== 'sea');
+        }
+      }
+      
       return picks
     },
 

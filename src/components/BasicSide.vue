@@ -836,22 +836,23 @@ export default {
     },
 
     handleRoute() {
-      // If showSearch2 is true and previous mode was assetsearch, move term to b and clear a if it matches
+      // When transitioning to navigation mode, preserve search context
       let prevQuery = this.$route.query;
-      let bValue = this.search2 || '';
       let aValue = this.search || '';
-      if (this.showSearch2 && prevQuery.mode === 'assetsearch' && prevQuery.term) {
+      let bValue = this.search2 || '';
+      
+      // When transitioning from assetsearch to route mode
+      if (prevQuery.mode === 'assetsearch' && prevQuery.term && !bValue) {
+        // Only populate destination if it's empty
+        // Keep source (a) unchanged to preserve user's search context
         bValue = prevQuery.term;
         this.search2 = bValue;
-        // If a matches the term, clear it
-        if (aValue === bValue) {
-          aValue = '';
-          this.search = '';
-        }
       }
+      
       if (!this.showSearch2) {
         this.toggleSearch2();
       }
+      
       this.$router.replace({
         path: this.$route.path,
         query: {

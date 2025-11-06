@@ -97,7 +97,7 @@
 
         <v-combobox class="comboxSearch2" ref="search2" v-show="showSearch2" v-model="search2"
           @keydown="changeSearch2($event)" @click:clear="changeSearch2($event)" :items="tag_items2" flat hide-details
-          outlined dense clearable @click:append="filter" :filter="customFilter">
+          outlined dense clearable :filter="customFilter">
 
         </v-combobox>
         <div v-if="showSearch2">
@@ -853,6 +853,9 @@ export default {
         this.toggleSearch2();
       }
       
+      // Hide the side info card (blue route start box) when entering navigation mode
+      this.toggleSideInfoCardVisibility(false);
+      
       this.$router.replace({
         path: this.$route.path,
         query: {
@@ -916,7 +919,12 @@ export default {
 
 
     filter(event) {
-      // aaaaaaaaaaaa
+      // Don't switch to filter mode if we're in navigation mode (route mode)
+      if (this.$route.query.mode === 'route') {
+        console.log('Filter ignored - currently in navigation mode');
+        return;
+      }
+      
       if (this.$route.query.mode !== 'filtersearch') {
         this.$router.replace({
           path: this.$route.path,
@@ -1027,7 +1035,7 @@ export default {
   mounted() {
     const mode = this.$route.query.mode
     if (mode === 'filtersearch') {
-      this.$store.dispatch('trigger_toggle_filter');
+      //this.$store.dispatch('trigger_toggle_filter');
     }
   },
   // beforeDestroy() {

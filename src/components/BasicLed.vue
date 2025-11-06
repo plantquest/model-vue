@@ -331,8 +331,12 @@
       }
     },
   
-    mounted() {
-      console.log('mounted', this.spec,'KD')
+  mounted() {
+    console.log('mounted', this.spec,'KD')
+    
+    // Only modify profile.kind if the profile field exists (not all entities have profiles)
+    if (this.spec.ent.primary.field.profile && 
+        this.spec.ent.primary.field.profile.kind) {
       
       Object.keys(this.spec.ent.primary.field.profile.kind).forEach(key => {
         delete this.spec.ent.primary.field.profile.kind[key];
@@ -343,8 +347,9 @@
         sea: { title: "Admin", level: 2 },
         ob: { title: "User", level: 3 }
       });
-      
-    },
+    }
+    
+  },
     
   
     async created () {

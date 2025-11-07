@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app class="vxg-app-bar">
-  <h2>Hello4</h2>
+
     <v-icon
       v-if="!drawerOpen && tool.expandSide.active"
       large
@@ -291,15 +291,23 @@
             this.view.tool = view.head.tool
           }
 
-          // Clear search when switching routes
-          this.search = ''
-          this.$store.state.trigger.search.term = ''
-          if (this.$refs.search2) {
-            this.$refs.search2.reset()
-          }
-          // Reset tag_items to show all items
-          if (this.items && this.items.length > 0) {
-            this.tag_items = this.items.map(tag_alias)
+          // DESKTOP-771: Don't clear search when in assetsearch mode or staying in admin context
+          const preserveSearch = this.$route && (
+            this.$route.query.mode === 'assetsearch' || 
+            (this.$route.name === 'admin' && this.$route.query.tab === 'assets')
+          );
+          
+          if (!preserveSearch) {
+            // Clear search when switching routes
+            this.search = ''
+            this.$store.state.trigger.search.term = ''
+            if (this.$refs.search2) {
+              this.$refs.search2.reset()
+            }
+            // Reset tag_items to show all items
+            if (this.items && this.items.length > 0) {
+              this.tag_items = this.items.map(tag_alias)
+            }
           }
 
           this.defaults()
@@ -843,16 +851,24 @@
       });
     }
 
-    // Clear search when switching routes
-    this.search = '';
-    this.$store.state.trigger.search.term = '';
-    if (this.$refs.search2) {
-      this.$refs.search2.reset();
-    }
+    // DESKTOP-771: Don't clear search when in assetsearch mode or staying in admin context
+    const preserveSearch = this.$route && (
+      this.$route.query.mode === 'assetsearch' || 
+      (this.$route.name === 'admin' && this.$route.query.tab === 'assets')
+    );
+    
+    if (!preserveSearch) {
+      // Clear search when switching routes
+      this.search = '';
+      this.$store.state.trigger.search.term = '';
+      if (this.$refs.search2) {
+        this.$refs.search2.reset();
+      }
 
-    // Reset tag_items to show all items
-    if (this.items && this.items.length > 0) {
-      this.tag_items = this.items.map(tag_alias).filter(item => item !== null);
+      // Reset tag_items to show all items
+      if (this.items && this.items.length > 0) {
+        this.tag_items = this.items.map(tag_alias).filter(item => item !== null);
+      }
     }
 
   

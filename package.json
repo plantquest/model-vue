@@ -1,6 +1,6 @@
 {
   "name": "@plantquest/model-vue",
-  "version": "0.18.226-SAP-DESKTOP-468",
+  "version": "0.18.230-SAP-DESKTOP-468",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -15,7 +15,7 @@
     "coveralls": "lab -s -P test -r lcov | coveralls",
     "coverage": "lab -v -P test -r html > coverage.html",
     "prettier": "prettier --write --no-semi --single-quote *.js src/**/*.js test/*.js",
-    "clean": "rimraf node_modules yarn.lock package-lock.json",
+    "clean": "rm -rf node_modules yarn.lock package-lock.json",
     "reset": "npm run clean && npm i && npm test",
     "repo-check": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && [[ '' == `git tag --list v${REPO_VERSION}` ]]",
     "repo-tag": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && git commit -a -m v$REPO_VERSION && git push && git tag v$REPO_VERSION && git push --tags;",

@@ -169,16 +169,14 @@
          
               <a href="#" @click="toggleAccessMatrixDialog">User Access Matrix</a>
             </div>
-                <vxg-basic-field-pick
-                  v-if="'status'===field.type && editing==false"
-                  :field="field"
-                  :param="{item:item}"
-                  :disabled="editing==false && field.title!=='Role'"
-                 
-                  >  <div v-if="field.title!=='Role' && editing==false" 
-                   style="position: absolute;background-color: blue; height:100%; width:100%; background-color: rgba(255, 255, 255, 0.5); z-index: 1;">
-                <!-- This div overlays the field when not editing -->
-              </div></vxg-basic-field-pick>
+                          <v-select
+              v-if="'status' === field.type && editing == false"
+              :items="selection(field)"
+              :label="field.title"
+              v-model="item[field.name]"
+              outlined
+            >
+            </v-select>
           </div>
 
         

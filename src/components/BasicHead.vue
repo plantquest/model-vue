@@ -642,7 +642,7 @@
       dense
       clearable
       placeholder="Search"
-      :append-icon="filterIcon?'mdi-tune':undefined"
+      :append-icon="null"
       @click:append="filter"
       :filter="customFilter"
       >

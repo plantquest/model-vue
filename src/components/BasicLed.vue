@@ -152,7 +152,7 @@
             
             <div style="position: relative;">
               <v-select
-                v-if="field.type === 'status'"
+                v-if="field.type === 'status' && (field.title === 'Role' || field.title === 'Status')"
                 :items="selection(field)"
                 :label="field.title"
                 v-model="item[field.name]"
@@ -567,7 +567,17 @@
         this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
         console.log('Editing mode:',this.editing)
 
-        this.item = selitem;
+        this.item = { ...selitem };
+        
+        // Convert profile display value back to internal value for editing
+        if (this.item.profile) {
+          this.item.profile = 
+            this.item.profile === 'System Owner' ? 'gea' :
+            this.item.profile === 'Admin' ? 'sea' :
+            this.item.profile === 'User' ? 'ob' :
+            this.item.profile; // Keep original if it's already an internal value
+        }
+        
         this.readitem = { ...this.item };
 
         // TODO: from spec!

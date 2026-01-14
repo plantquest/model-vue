@@ -802,7 +802,7 @@
     },
     
   
-    watch: {
+    watchd: {
       '$store.state.trigger.search.term' (term) {
         if(term == '' && this.$refs.search2) {  // Restored to search2
           this.$refs.search2.reset()

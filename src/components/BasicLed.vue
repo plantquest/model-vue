@@ -439,6 +439,9 @@
   
       items () {
         let items = this.$store.state[this.spec.ent.store_name]
+        
+        // Create a deep copy to avoid mutating the store state
+        items = items.map(item => ({ ...item }))
 
         items.forEach((item) => {
           item.profile = 

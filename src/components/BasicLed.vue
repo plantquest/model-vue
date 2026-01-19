@@ -152,7 +152,7 @@
             
             <div style="position: relative;">
               <v-select
-                v-if="field.type === 'status'"
+                v-if="field.type === 'status' && (field.title === 'Role' || field.title === 'Status')"
                 :items="selection(field)"
                 :label="field.title"
                 v-model="item[field.name]"
@@ -567,7 +567,25 @@
         this.editing = !!selitem.id; // Assuming 'id' is the identifier for existing items
         console.log('Editing mode:',this.editing)
 
-        this.item = selitem;
+        this.item = { ...selitem };
+        
+        // Convert profile display value back to internal value for editing
+        if (this.item.profile) {
+          const originalProfile = this.item.profile;
+          if (originalProfile === 'System Owner') {
+            this.item.profile = 'gea';
+          } else if (originalProfile === 'Admin') {
+            this.item.profile = 'sea';
+          } else if (originalProfile === 'User') {
+            this.item.profile = 'ob';
+          } else if ([ 'gea', 'sea', 'ob' ].includes(originalProfile)) {
+            // Already an internal value; leave as-is.
+          } else {
+            // Unrecognized profile value; keep it but log a warning for visibility.
+            console.warn('Unrecognized profile value encountered in openItem:', originalProfile);
+          }
+        }
+        
         this.readitem = { ...this.item };
 
         // TODO: from spec!

@@ -362,13 +362,19 @@ beforeDestroy() {
   }
   .stage h3 {
       position: relative;
-      font-family: "Gill Sans", sans-serif;
+      //font-family: "Gill Sans", sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif ;
+      font-synthesis: none; // Prevents browser from faking bold/italic if font style is missing
+      font-weight: 700;
       top: 4px;
       left: 13px;
   }
   .stage p {
       position: relative;
-      font-family: "Gill Sans", sans-serif;
+      //font-family: "Gill Sans", sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif ;
+      font-synthesis: none;
+      font-weight: 400;
       font-size: 15px;
       width: 94%;
       top: 3px;

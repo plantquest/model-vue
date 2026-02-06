@@ -1,0 +1,22 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000016",
+  "title": "Multi-Window Session Handling",
+  "version": 1,
+  "lifecycle": {"state": "implemented"},
+  "timestamps": {
+    "created_at": "2023-09-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z"
+  },
+  "actors": {"author": "pqs-team", "approver": "technical-lead"},
+  "outcome": "Use localStorage for window_id (shared across tabs) with BroadcastChannel for cross-window communication. Multi-tab support with cross-browser conflict detection.",
+  "rationale": "Multiple tabs in same browser share session via shared window_id. Different browsers/devices have different window_ids triggering conflict detection. Real-time sync via BroadcastChannel (no polling).",
+  "risk": {"level": "low", "acceptance": "BroadcastChannel not in IE11 but modern browsers only. localStorage shared state tested extensively."},
+  "tags": ["multi-window", "session-management", "broadcastchannel", "localstorage"],
+  "related_decisions": ["DEC-000006"],
+  "scenarios": [
+    "Same browser, multiple tabs: Share session (no conflict)",
+    "Different browsers/devices: Conflict detection and dialog",
+    "Session transfer: Graceful ownership transfer between tabs"
+  ]
+}

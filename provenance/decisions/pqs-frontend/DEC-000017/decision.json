@@ -1,0 +1,124 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000017",
+  "title": "Vue 3 Migration Plan",
+  "version": 1,
+  "lifecycle": {
+    "state": "proposed",
+    "supersedes": ["DEC-000002"],
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2026-02-06T00:00:00Z",
+    "accepted_at": null,
+    "implemented_at": null,
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "Kieran Desmond",
+    "approver": "pending",
+    "bot": "cursor-ai"
+  },
+  "context": {
+    "jira_key": null,
+    "repo": "pqs-frontend",
+    "links": [
+      "https://v3-migration.vuejs.org/",
+      "https://pinia.vuejs.org/cookbook/migration-vuex.html"
+    ]
+  },
+  "options": [
+    "Phased Vue 3 migration over 12-16 weeks (recommended)",
+    "Stay on Vue 2 with extended support",
+    "Rewrite in different framework",
+    "Gradual migration with @vue/compat"
+  ],
+  "outcome": "Approve phased Vue 3 migration over 12-16 weeks: Phase 1 Preparation (2-3w), Phase 2 Core Framework (3-4w), Phase 3 Code Migration (5-7w), Phase 4 Testing (2-3w).",
+  "rationale": "Vue 2 EOL passed (Dec 2023). Need long-term support, security updates, performance improvements, modern ecosystem. 7 core decisions affected, 100+ components to migrate, 1660-line store to Pinia.",
+  "risk": {
+    "level": "high",
+    "acceptance": "@plantquest/model-vue Vue 3 compatibility is critical blocker. Large Vuex store (1660 lines) complex. NavVis component (2793 lines) needs refactor. Mitigation: compatibility wrappers, incremental migration, extensive testing."
+  },
+  "scope": [
+    "src/**/*.vue (100+ components)",
+    "src/plugins/store.js (1660 lines → Pinia stores)",
+    "src/router/router.js",
+    "src/components/PqsNavvisView.vue (2793 lines)",
+    "package.json dependencies",
+    "Build configuration"
+  ],
+  "links": [
+    "https://v3-migration.vuejs.org/",
+    "https://pinia.vuejs.org/cookbook/migration-vuex.html",
+    "https://router.vuejs.org/guide/migration/"
+  ],
+  "tags": [
+    "vue3",
+    "migration",
+    "architecture",
+    "modernization",
+    "technical-debt"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000002",
+    "DEC-000003",
+    "DEC-000004",
+    "DEC-000008",
+    "DEC-000011"
+  ],
+  "impact_analysis": {
+    "high_impact": [
+      "DEC-000002 (Vue 2 Framework) - 6-8 weeks",
+      "DEC-000003 (Promise-based Async) - 3-4 weeks",
+      "DEC-000004 (Vuex) - 4-5 weeks",
+      "DEC-000008 (@plantquest/model-vue) - 2-3 weeks"
+    ],
+    "medium_impact": [
+      "DEC-000011 (Vue Router) - 1-2 weeks",
+      "DEC-000009 (Leaflet) - 1-2 weeks",
+      "DEC-000012 (Babel) - 1 week",
+      "DEC-000010 (NavVis) - 2-3 weeks"
+    ],
+    "low_impact": [
+      "DEC-000005 (Kinde OAuth) - None",
+      "DEC-000006 (Session Mgmt) - 1 week",
+      "DEC-000007 (Seneca) - None",
+      "DEC-000013 (Env Config) - None",
+      "DEC-000014 (HttpOnly) - None",
+      "DEC-000015 (Connection Pool) - None",
+      "DEC-000016 (Multi-Window) - None"
+    ]
+  },
+  "resource_estimation": {
+    "approach": "AI-assisted hybrid",
+    "team": "1 Senior Vue Dev (full-time), Cursor AI Agents, 1 QA Engineer (full-time), 1 Backend Dev (part-time 20%)",
+    "timeline": "6-8 weeks (vs 12-16 manual)",
+    "effort": "13-20 person-weeks (vs 23-35 manual)",
+    "cost_savings": "$65K-$85K (55-65% reduction)",
+    "efficiency_gain": "40-45% effort reduction"
+  },
+  "go_no_go_criteria": [
+    "@plantquest/model-vue Vue 3 compatibility confirmed",
+    "Test coverage >70% before migration",
+    "1 senior developer allocated (full-time, 6-8 weeks)",
+    "Cursor AI agent access configured",
+    "6-8 week timeline approved (vs 12-16 manual)",
+    "Stakeholder buy-in for AI-assisted approach",
+    "Code review process for AI-generated code established"
+  ],
+  "ai_assistance": {
+    "component_conversion": "60-70% reduction (100+ components)",
+    "promise_to_async": "50-60% reduction",
+    "vuex_to_pinia": "40-50% reduction",
+    "router_migration": "40% reduction",
+    "test_generation": "30-40% reduction",
+    "human_oversight": "Senior dev reviews all AI conversions",
+    "ai_limitations": "Complex logic, architecture decisions, performance optimization require human"
+  }
+}

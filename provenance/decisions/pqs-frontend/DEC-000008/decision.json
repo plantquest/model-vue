@@ -1,0 +1,68 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000008",
+  "title": "@plantquest/model-vue Component Library",
+  "version": 1,
+  "lifecycle": {
+    "state": "implemented",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2020-06-01T00:00:00Z",
+    "accepted_at": "2020-06-01T00:00:00Z",
+    "implemented_at": "2020-06-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "pqs-team",
+    "approver": "technical-lead",
+    "bot": null
+  },
+  "context": {
+    "jira_key": null,
+    "repo": "pqs-frontend",
+    "links": []
+  },
+  "options": [
+    "@plantquest/model-vue library (chosen)",
+    "Custom component implementation",
+    "Vuetify components only",
+    "Build custom library"
+  ],
+  "outcome": "Use @plantquest/model-vue for core UI components (BasicNavStages, BasicSide, BasicHead, BasicMain) with strict state compatibility via vxg store object.",
+  "rationale": "Consistent UI across @plantquest applications. Standardized navigation and toolbar patterns. Shared maintenance. Proven components in production.",
+  "risk": {
+    "level": "low",
+    "acceptance": "State compatibility requirements are strict but well-documented. Version dependency requires coordination but acceptable for consistent UX."
+  },
+  "scope": [
+    "src/plugins/store.js (vxg state)",
+    "src/components/** (imports)",
+    ".cursor/rules (compatibility docs)"
+  ],
+  "links": [],
+  "tags": [
+    "component-library",
+    "ui",
+    "model-vue",
+    "dependencies",
+    "state-management"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000002",
+    "DEC-000004"
+  ],
+  "components": [
+    "BasicNavStages - Stage-based navigation",
+    "BasicSide - Collapsible side panel",
+    "BasicHead - Toolbar with actions",
+    "BasicMain - Main content area"
+  ]
+}

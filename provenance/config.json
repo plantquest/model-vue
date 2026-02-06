@@ -1,0 +1,23 @@
+{
+  "decisionPath": "provenance/decisions",
+  "riskApprovalThreshold": "medium",
+  "requireDecisionOnPaths": [
+    "src/",
+    "infra/",
+    "security/"
+  ],
+  "requireDecisionOnLabels": [
+    "security",
+    "breaking-change",
+    "architecture"
+  ],
+  "allowNoDecisionForDocsOnly": true,
+  "access": {
+    "editorTeams": [
+      "decision-admins"
+    ],
+    "viewerTeams": [
+      "decision-readers"
+    ]
+  }
+}

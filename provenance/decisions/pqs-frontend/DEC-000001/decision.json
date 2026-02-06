@@ -1,0 +1,54 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000001",
+  "title": "Adopt decision records starter pack",
+  "version": 1,
+  "lifecycle": {
+    "state": "accepted",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2026-02-05T00:00:00Z",
+    "accepted_at": "2026-02-05T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "user:starter",
+    "approver": "user:starter",
+    "bot": null
+  },
+  "context": {
+    "jira_key": "DEC-000001",
+    "repo": "example-repo",
+    "links": [
+      "https://example.com/decision/DEC-000001"
+    ]
+  },
+  "options": [
+    "Keep decisions in ad-hoc notes",
+    "Adopt a decision record structure in the repo"
+  ],
+  "outcome": "Adopt the ProvenanceCode decision record structure.",
+  "rationale": "A consistent decision trail helps maintainers and reviewers.",
+  "risk": {
+    "level": "low",
+    "acceptance": null
+  },
+  "scope": [
+    "governance",
+    "documentation"
+  ],
+  "links": [
+    "https://example.com/decision/DEC-000001"
+  ],
+  "tags": [
+    "provenance",
+    "decision-records"
+  ],
+  "integrity": {
+    "receipt_path": "provenance/decisions/DEC-000001/acceptance.receipt.json",
+    "commit_sha": null
+  },
+  "attestations": []
+}

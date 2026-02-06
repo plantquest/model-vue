@@ -1,0 +1,71 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000002",
+  "title": "Vue 2.x Framework Selection",
+  "version": 1,
+  "lifecycle": {
+    "state": "implemented",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2020-06-01T00:00:00Z",
+    "accepted_at": "2020-06-01T00:00:00Z",
+    "implemented_at": "2020-06-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "pqs-team",
+    "approver": "technical-lead",
+    "bot": null
+  },
+  "context": {
+    "jira_key": null,
+    "repo": "pqs-frontend",
+    "links": [
+      "https://v2.vuejs.org/",
+      "https://github.com/vuejs/vue/blob/dev/CHANGELOG.md"
+    ]
+  },
+  "options": [
+    "Vue 2.6.12 with Options API (chosen)",
+    "Vue 3 with Composition API",
+    "React with Hooks",
+    "Angular"
+  ],
+  "outcome": "Use Vue 2.6.12 with Options API for all frontend development. No Composition API or Vue 3 features.",
+  "rationale": "Stable, mature ecosystem with full compatibility for @plantquest/model-vue component library. Vue 3 was too new with immature ecosystem. Team expertise in Vue 2 Options API.",
+  "risk": {
+    "level": "medium",
+    "acceptance": "Vue 2 EOL on 2023-12-31 creates migration pressure. Extended support available. Migration planned when ecosystem matures."
+  },
+  "scope": [
+    "src/**/*.vue",
+    "src/components/**",
+    "src/plugins/**"
+  ],
+  "links": [
+    "https://v2.vuejs.org/",
+    "https://v2.vuejs.org/lts/",
+    "https://v3-migration.vuejs.org/"
+  ],
+  "tags": [
+    "frontend",
+    "framework",
+    "vue",
+    "architecture",
+    "core-dependency"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000003",
+    "DEC-000004",
+    "DEC-000008",
+    "DEC-000011"
+  ]
+}

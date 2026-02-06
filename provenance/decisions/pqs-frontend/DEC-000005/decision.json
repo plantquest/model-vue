@@ -1,0 +1,81 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000005",
+  "title": "Kinde OAuth Authentication",
+  "version": 1,
+  "lifecycle": {
+    "state": "implemented",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2023-03-01T00:00:00Z",
+    "accepted_at": "2023-03-01T00:00:00Z",
+    "implemented_at": "2023-03-15T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "pqs-security-team",
+    "approver": "technical-lead",
+    "bot": null
+  },
+  "context": {
+    "jira_key": "DESKTOP-XXX",
+    "repo": "pqs-frontend",
+    "links": [
+      "https://kinde.com/docs/",
+      "https://tools.ietf.org/html/rfc7636"
+    ]
+  },
+  "options": [
+    "Kinde OAuth with PKCE (chosen)",
+    "Custom JWT authentication",
+    "Auth0",
+    "AWS Cognito",
+    "Firebase Auth"
+  ],
+  "outcome": "Use Kinde OAuth with PKCE flow via @plantquest/kinde-auth-pkce-js for authentication. Dual-layer auth with Kinde + Seneca backend.",
+  "rationale": "Enterprise-grade OAuth 2.0 with PKCE security. Centralized user management, long-lived refresh tokens, automatic token refresh, role-based access, multi-device support.",
+  "risk": {
+    "level": "medium",
+    "acceptance": "External dependency on Kinde service. Vendor lock-in but acceptable tradeoff for security and user management features. Migration to other OAuth provider possible but requires refactoring."
+  },
+  "scope": [
+    "src/components/PqsKindeAuth.vue",
+    "src/services/SessionManager.js",
+    "src/router/router.js",
+    "src/plugins/store.js (auth state)"
+  ],
+  "links": [
+    "https://kinde.com/docs/",
+    "https://tools.ietf.org/html/rfc7636",
+    "https://oauth.net/2/pkce/"
+  ],
+  "tags": [
+    "authentication",
+    "oauth",
+    "kinde",
+    "security",
+    "pkce",
+    "user-management"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000006",
+    "DEC-000007",
+    "DEC-000011",
+    "DEC-000014"
+  ],
+  "security_considerations": [
+    "XSS Protection: HttpOnly cookies prevent JavaScript access",
+    "CSRF Protection: State parameter validation in PKCE flow",
+    "Token Theft: Short-lived access tokens with long-lived refresh tokens",
+    "Replay Attacks: PKCE code verifier prevents reuse",
+    "Man-in-the-Middle: HTTPS required for all communication"
+  ]
+}

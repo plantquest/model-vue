@@ -1,0 +1,79 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000004",
+  "title": "Vuex State Management Architecture",
+  "version": 1,
+  "lifecycle": {
+    "state": "implemented",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2020-06-01T00:00:00Z",
+    "accepted_at": "2020-06-01T00:00:00Z",
+    "implemented_at": "2020-06-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "pqs-team",
+    "approver": "technical-lead",
+    "bot": null
+  },
+  "context": {
+    "jira_key": null,
+    "repo": "pqs-frontend",
+    "links": [
+      "https://v3.vuex.vuejs.org/"
+    ]
+  },
+  "options": [
+    "Vuex 3.4.0 centralized store (chosen)",
+    "Component-local state only",
+    "Event bus pattern",
+    "Pinia (requires Vue 3)",
+    "Redux"
+  ],
+  "outcome": "Single Vuex 3.4.0 store managing all application state with strict mutation/action patterns.",
+  "rationale": "Complex state (sessions, assets, UI, map, NavVis) requires centralized management. Single source of truth, time travel debugging, predictable mutations, compatible with model-vue components.",
+  "risk": {
+    "level": "low",
+    "acceptance": "Large single store (1660 lines) should be modularized but acceptable for Vue 2. Migration to Pinia required for Vue 3."
+  },
+  "scope": [
+    "src/plugins/store.js",
+    "src/**/*.vue (state access)",
+    "src/components/** (dispatch/commit)"
+  ],
+  "links": [
+    "https://v3.vuex.vuejs.org/",
+    "https://devtools.vuejs.org/",
+    "https://pinia.vuejs.org/cookbook/migration-vuex.html"
+  ],
+  "tags": [
+    "vuex",
+    "state-management",
+    "vue",
+    "architecture",
+    "core-dependency"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000002",
+    "DEC-000003",
+    "DEC-000006",
+    "DEC-000007",
+    "DEC-000008"
+  ],
+  "technical_debt": [
+    {
+      "issue": "Large single store (1660 lines)",
+      "impact": "Hard to navigate and maintain",
+      "resolution": "Split into modules when migrating to Pinia/Vue 3"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000012",
+  "title": "Babel Transpilation Strategy",
+  "version": 1,
+  "lifecycle": {"state": "implemented"},
+  "timestamps": {
+    "created_at": "2020-06-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z"
+  },
+  "actors": {"author": "pqs-team", "approver": "technical-lead"},
+  "outcome": "Use @vue/cli-plugin-babel/preset targeting '> 1%, last 2 versions, not dead'. Special AWS SDK transpilation with optional chaining and nullish coalescing.",
+  "rationale": "Modern JavaScript features for older browsers. 96%+ browser coverage. AWS SDK compatibility.",
+  "risk": {"level": "low"},
+  "tags": ["babel", "transpilation", "browser-compatibility", "build"],
+  "related_decisions": ["DEC-000002", "DEC-000003"]
+}

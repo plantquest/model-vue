@@ -1,0 +1,91 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000006",
+  "title": "Session Management System (DESKTOP-794)",
+  "version": 1,
+  "lifecycle": {
+    "state": "implemented",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2023-09-01T00:00:00Z",
+    "accepted_at": "2023-09-15T00:00:00Z",
+    "implemented_at": "2023-10-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "pqs-security-team",
+    "approver": "technical-lead",
+    "bot": null
+  },
+  "context": {
+    "jira_key": "DESKTOP-794",
+    "repo": "pqs-frontend",
+    "links": [
+      "https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel"
+    ]
+  },
+  "options": [
+    "SessionManager with multi-window detection (chosen)",
+    "No session management",
+    "Backend-only session management",
+    "Polling-based conflict detection",
+    "Always enforce (no feature flag)"
+  ],
+  "outcome": "Implement SessionManager service with multi-window conflict detection, inactivity timeout (15min), auto-token refresh, connection pool management (4 max), environment flags for opt-in deployment.",
+  "rationale": "Enterprise security requires inactivity timeout and multi-window detection. BroadcastChannel enables performant conflict detection. Connection pool prevents browser stalls. Feature flags enable gradual rollout.",
+  "risk": {
+    "level": "medium",
+    "acceptance": "Complex implementation (2244 lines) but necessary for enterprise security. BroadcastChannel not in IE11 but acceptable (modern browsers only). Gradual rollout via feature flags mitigates deployment risk."
+  },
+  "scope": [
+    "src/services/SessionManager.js",
+    "src/components/PqsSessionConflict.vue",
+    "src/components/PqsInactivityWarning.vue",
+    "src/plugins/store.js (session state)"
+  ],
+  "links": [
+    "https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel",
+    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Connection_management_in_HTTP_1.x"
+  ],
+  "tags": [
+    "session-management",
+    "security",
+    "authentication",
+    "multi-window",
+    "inactivity-timeout",
+    "connection-pool"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000005",
+    "DEC-000007",
+    "DEC-000004",
+    "DEC-000014"
+  ],
+  "technical_debt": [
+    {
+      "issue": "SessionManager uses async/await (violates DEC-000003)",
+      "impact": "Code style inconsistency",
+      "resolution": "Accept as technical debt, convert during Vue 3 migration"
+    },
+    {
+      "issue": "Connection pool max is conservative (4 vs 6-10 browser limit)",
+      "impact": "Possible request queuing",
+      "resolution": "Monitor and increase after production testing"
+    }
+  ],
+  "deployment_strategy": [
+    "Phase 1: Deploy with VUE_APP_SESSION_MANAGEMENT_ENABLED=false",
+    "Phase 2: Enable for internal testing",
+    "Phase 3: Enable for pilot customers",
+    "Phase 4: Enable for all users after 2 weeks testing",
+    "Rollback: Set feature flag to false if issues"
+  ]
+}

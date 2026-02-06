@@ -1,0 +1,82 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000007",
+  "title": "Seneca Microservice Backend",
+  "version": 1,
+  "lifecycle": {
+    "state": "implemented",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2020-06-01T00:00:00Z",
+    "accepted_at": "2020-06-01T00:00:00Z",
+    "implemented_at": "2020-06-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "pqs-backend-team",
+    "approver": "technical-lead",
+    "bot": null
+  },
+  "context": {
+    "jira_key": null,
+    "repo": "pqs-frontend",
+    "links": [
+      "https://senecajs.org/",
+      "https://senecajs.org/docs/tutorials/understanding-data-entities.html"
+    ]
+  },
+  "options": [
+    "Seneca.js with entity pattern (chosen)",
+    "REST API with Axios",
+    "GraphQL",
+    "Raw Fetch API",
+    "tRPC"
+  ],
+  "outcome": "Use Seneca.js with entity-based data model (pqs/asset, sys/user, etc.) for backend communication. Message patterns for non-CRUD operations.",
+  "rationale": "Flexible message pattern routing, entity-based CRUD is intuitive, backend can change without frontend changes, custom middleware for cross-cutting concerns, browser compatible.",
+  "risk": {
+    "level": "medium",
+    "acceptance": "Seneca.js less common than REST/GraphQL (team unfamiliarity, limited ecosystem). Migration to REST would require significant refactoring (100+ calls). Acceptable tradeoff for flexibility and microservice architecture."
+  },
+  "scope": [
+    "src/plugins/store.js (40+ entity calls)",
+    "src/**/*.vue (Vuex dispatch)",
+    "Backend integration"
+  ],
+  "links": [
+    "https://senecajs.org/",
+    "https://senecajs.org/docs/tutorials/understanding-data-entities.html",
+    "https://github.com/senecajs/seneca-browser"
+  ],
+  "tags": [
+    "backend",
+    "seneca",
+    "microservices",
+    "entities",
+    "api",
+    "message-patterns"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000004",
+    "DEC-000003",
+    "DEC-000005",
+    "DEC-000006"
+  ],
+  "entities": [
+    "pqs/asset - Main assets",
+    "pqs/device - Mobile devices",
+    "sys/user - Users",
+    "pqs/collect - Work pack collections",
+    "pqs/attach - Photo/document attachments",
+    "pqs/audit - Audit trail",
+    "pqs/group - Asset groups"
+  ]
+}

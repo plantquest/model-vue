@@ -1,0 +1,23 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000014",
+  "title": "HttpOnly Cookie Authentication",
+  "version": 1,
+  "lifecycle": {"state": "implemented"},
+  "timestamps": {
+    "created_at": "2023-03-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z"
+  },
+  "actors": {"author": "pqs-security-team", "approver": "technical-lead"},
+  "outcome": "Use HttpOnly cookies for Seneca backend session tokens. Dual-token system: Kinde JWT (memory) + Seneca session (HttpOnly). Never localStorage for sensitive tokens.",
+  "rationale": "XSS protection (HttpOnly), CSRF protection (SameSite), secure transmission (HTTPS), automatic inclusion in requests.",
+  "risk": {"level": "low"},
+  "tags": ["security", "authentication", "httponly", "cookies", "xss-protection"],
+  "related_decisions": ["DEC-000005", "DEC-000006"],
+  "security_benefits": [
+    "XSS Prevention: HttpOnly prevents document.cookie access",
+    "CSRF Prevention: SameSite=Strict prevents cross-site requests",
+    "Secure Transmission: Secure flag requires HTTPS",
+    "Token Theft: Cannot steal HttpOnly cookies even with XSS"
+  ]
+}

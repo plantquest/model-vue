@@ -1,0 +1,77 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000003",
+  "title": "Promise-Based Async Operations",
+  "version": 1,
+  "lifecycle": {
+    "state": "implemented",
+    "supersedes": null,
+    "superseded_by": null
+  },
+  "timestamps": {
+    "created_at": "2020-06-01T00:00:00Z",
+    "accepted_at": "2020-06-01T00:00:00Z",
+    "implemented_at": "2020-06-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z",
+    "updated_at": null
+  },
+  "actors": {
+    "author": "pqs-team",
+    "approver": "technical-lead",
+    "bot": null
+  },
+  "context": {
+    "jira_key": null,
+    "repo": "pqs-frontend",
+    "links": [
+      "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+    ]
+  },
+  "options": [
+    "Promise-based async with .then()/.catch() (chosen)",
+    "async/await syntax throughout",
+    "Mixed approach (case-by-case)",
+    "Callback patterns"
+  ],
+  "outcome": "All asynchronous operations use Promise chains (.then()/.catch()). async/await syntax is prohibited.",
+  "rationale": "Vue 2.x compatibility, smaller bundle size (no regenerator-runtime), consistent patterns across codebase, better browser support.",
+  "risk": {
+    "level": "low",
+    "acceptance": "More verbose than async/await but acceptable tradeoff for Vue 2 compatibility and bundle size. Can migrate to async/await with Vue 3."
+  },
+  "scope": [
+    "src/**/*.js",
+    "src/**/*.vue",
+    "src/plugins/store.js",
+    "src/components/**"
+  ],
+  "links": [
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "https://v2.vuejs.org/v2/cookbook/using-axios-to-consume-apis.html"
+  ],
+  "tags": [
+    "javascript",
+    "async",
+    "promises",
+    "code-style",
+    "vue2-compatibility"
+  ],
+  "integrity": {
+    "receipt_path": null,
+    "commit_sha": null
+  },
+  "attestations": [],
+  "related_decisions": [
+    "DEC-000002",
+    "DEC-000004",
+    "DEC-000006",
+    "DEC-000012"
+  ],
+  "exceptions": [
+    {
+      "file": "src/services/SessionManager.js",
+      "reason": "Pre-existing code with complex async flows, uses async/await",
+      "resolution": "Accept as technical debt, convert during Vue 3 migration"
+    }
+  ]
+}

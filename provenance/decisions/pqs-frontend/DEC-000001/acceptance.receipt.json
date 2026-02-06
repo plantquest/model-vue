@@ -1,0 +1,9 @@
+{
+  "schema": "provenancecode.acceptance.v1",
+  "decision_id": "DEC-000001",
+  "accepted_at": "2026-02-05T00:00:00Z",
+  "accepted_by": "user:starter",
+  "decision_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "commit_sha": "0000000000000000000000000000000000000000",
+  "attestation": null
+}

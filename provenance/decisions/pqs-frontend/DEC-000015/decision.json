@@ -1,0 +1,20 @@
+{
+  "schema": "provenancecode.decision.v1",
+  "id": "DEC-000015",
+  "title": "Connection Pool Management",
+  "version": 1,
+  "lifecycle": {"state": "implemented"},
+  "timestamps": {
+    "created_at": "2023-09-01T00:00:00Z",
+    "documented_at": "2026-02-06T00:00:00Z"
+  },
+  "actors": {"author": "pqs-team", "approver": "technical-lead"},
+  "outcome": "Implement connection pool in SessionManager: 4 concurrent max, priority queuing, 30s cleanup, statistics tracking.",
+  "rationale": "Prevents browser connection pool exhaustion. Browsers limit 6-10 connections. Conservative limit (4) with priority queuing ensures critical requests (session checks) not stalled.",
+  "risk": {"level": "low", "acceptance": "Adds latency for queued requests but prevents stalls. Conservative limit (4) might increase after production testing."},
+  "tags": ["performance", "connection-pool", "browser-limits", "queuing"],
+  "related_decisions": ["DEC-000006"],
+  "technical_debt": [
+    {"issue": "Conservative limit (4 vs 6-10)", "resolution": "Monitor and increase after production testing"}
+  ]
+}

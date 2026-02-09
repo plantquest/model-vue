@@ -100,6 +100,14 @@ export interface BasicNavStagesProps {
   // Currently no props, but reserve for future
 }
 
+
+export interface FooterLink {
+  id: string
+  label: string
+  route?: string
+  href?: string
+}
+
 // ============================================================================
 // Side Drawer Types
 // ============================================================================
@@ -207,6 +215,14 @@ export interface BasicSideProps {
   spec: SideSpec
   logo?: string
 }
+
+
+export interface BasicFootProps {
+  links?: FooterLink[]
+  copyright?: string
+  version?: string
+}
+
 
 // ============================================================================
 // Event Types

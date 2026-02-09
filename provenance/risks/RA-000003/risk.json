@@ -1,0 +1,84 @@
+{
+  "schema": "provenancecode.risk@1.0",
+  "ra_id": "RA-000003",
+  "repo": {
+    "org": "plantquest",
+    "name": "model-vue-2"
+  },
+  "ref": "pc://plantquest/model-vue-2/risk/RA-000003",
+  "title": "Vue 3 Migration Execution Risks",
+  "status": "active",
+  "created_at": "2026-02-09T00:00:00Z",
+  "updated_at": "2026-02-09T00:00:00Z",
+  "risk_statement": "Executing Vue 3 migration using parallel agent approach carries risks of breaking consuming applications, introducing bugs through AI-generated code, and coordination failures between parallel agents.",
+  "severity": "medium",
+  "likelihood": "medium",
+  "scope": {
+    "paths": [
+      "packages/model-vue/**",
+      "src/**"
+    ],
+    "components": [
+      "All 9 components during migration",
+      "Build system",
+      "State management adapters",
+      "Plugin API",
+      "Consuming applications (pqs-frontend)"
+    ]
+  },
+  "acceptance": {
+    "accepted_by": "Engineering Team",
+    "accepted_at": "2026-02-09T00:00:00Z",
+    "expires_at": "2026-06-30T00:00:00Z",
+    "reason": "Migrating from Vue 2 to Vue 3 is necessary to eliminate critical security risks (RA-000002). While migration carries execution risks, staying on Vue 2 is riskier. Parallel agent approach is innovative but requires coordination. Mitigations in place reduce risk to acceptable level for 6-8 week migration period."
+  },
+  "mitigations": [
+    {
+      "type": "testing",
+      "detail": "Require >80% test coverage for all migrated components before acceptance"
+    },
+    {
+      "type": "review",
+      "detail": "Daily senior developer review and approval of all agent-generated code"
+    },
+    {
+      "type": "versioning",
+      "detail": "Maintain Vue 2 version as fallback during entire migration"
+    },
+    {
+      "type": "staged-rollout",
+      "detail": "Alpha/beta testing with pqs-frontend before stable release"
+    },
+    {
+      "type": "integration-testing",
+      "detail": "Comprehensive integration tests with both Vuex and Pinia adapters"
+    },
+    {
+      "type": "coordination",
+      "detail": "Non-overlapping component assignments to prevent agent conflicts"
+    },
+    {
+      "type": "continuous-integration",
+      "detail": "Daily merges to prevent big-bang integration issues"
+    },
+    {
+      "type": "patterns",
+      "detail": "Define migration patterns in .cursor/MIGRATION-PATTERNS.md for consistency"
+    },
+    {
+      "type": "rollback",
+      "detail": "Git branches and version pinning allow immediate rollback if needed"
+    },
+    {
+      "type": "monitoring",
+      "detail": "Track build outputs, bundle size, and performance metrics throughout"
+    }
+  ],
+  "links": {
+    "decisions": ["DEC-000018"],
+    "specs": ["SPEC-000002"],
+    "mistakes": [],
+    "issues": [],
+    "pull_requests": []
+  }
+}

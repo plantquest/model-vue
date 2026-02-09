@@ -1,0 +1,49 @@
+version: 2
+preset: standard
+blocking:
+  mode: selective
+specs:
+  requireOnLabels:
+    - feature
+    - enhancement
+    - breaking-change
+  requireOnPaths:
+    - src/api/
+    - src/core/
+    - frontend/state/
+  allowNoSpecForDocsOnly: true
+  requiredStatus:
+    - review
+    - approved
+  acceptanceCriteriaRequired: false
+  driftDetection: warn
+decisions:
+  requireOnLabels:
+    - security
+    - breaking-change
+    - risk-high
+  requireOnPaths:
+    - auth/
+    - payments/
+    - infra/
+  allowNoDecisionForDocsOnly: true
+  requireOnSpecRisk: medium
+  statusByRisk:
+    low: draft
+    medium: draft
+    high: accepted
+risks:
+  requireOnLabels:
+    - risk-accepted
+    - security-waiver
+  requireOnPaths:
+    - "**/auth/**"
+    - "**/security/**"
+    - "**/permissions/**"
+    - "**/crypto/**"
+  allowNoRiskForDocsOnly: true
+coherence:
+  requireDecisionSpecLink: true
+ai:
+  attributionRequired: false
+  attributionPattern: "AI Attribution"

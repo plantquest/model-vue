@@ -1,0 +1,10 @@
+{
+  "schema": "provenancecode.mistakes-enforcement@1.0",
+  "description": "Mistake Record enforcement rules for provenance validation.",
+  "rules": [
+    {
+      "rule_id": "PRV-MR-000001-require-mistake-guardrail-links",
+      "enforced_by": ["scripts/provenancecode/validate.js"]
+    }
+  ]
+}

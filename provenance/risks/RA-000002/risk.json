@@ -1,0 +1,67 @@
+{
+  "schema": "provenancecode.risk@1.0",
+  "ra_id": "RA-000002",
+  "repo": {
+    "org": "plantquest",
+    "name": "model-vue-2"
+  },
+  "ref": "pc://plantquest/model-vue-2/risk/RA-000002",
+  "title": "Continuing Vue 2 Usage 2+ Years Past EOL",
+  "status": "active",
+  "created_at": "2026-02-09T00:00:00Z",
+  "updated_at": "2026-02-09T00:00:00Z",
+  "risk_statement": "Continuing to use Vue 2 when it has been End-of-Life for over 2 years exposes the application to unpatched security vulnerabilities, ecosystem abandonment, and inability to hire qualified developers.",
+  "severity": "critical",
+  "likelihood": "high",
+  "scope": {
+    "paths": [
+      "src/**",
+      "packages/model-vue-v2/**"
+    ],
+    "components": [
+      "All Vue 2 components",
+      "Build system",
+      "Dependencies",
+      "State management"
+    ]
+  },
+  "acceptance": {
+    "accepted_by": "Engineering Team",
+    "accepted_at": "2023-12-31T00:00:00Z",
+    "expires_at": "2026-03-31T00:00:00Z",
+    "reason": "Migration planning and resource allocation required time. Originally expected to migrate within 6 months of EOL. Now at 2+ years past EOL, migration is URGENT. This risk acceptance expires Q1 2026 - migration must begin immediately."
+  },
+  "mitigations": [
+    {
+      "type": "immediate-action",
+      "detail": "Implement Content Security Policy headers to mitigate XSS attacks"
+    },
+    {
+      "type": "immediate-action",
+      "detail": "Run npm audit weekly to monitor dependency vulnerabilities"
+    },
+    {
+      "type": "immediate-action",
+      "detail": "Subscribe to Vue.js security mailing lists and CVE databases"
+    },
+    {
+      "type": "planned-migration",
+      "detail": "Execute Vue 3 migration per DEC-000018 within 6-8 weeks (by Q2 2026)"
+    },
+    {
+      "type": "monitoring",
+      "detail": "Weekly security scanning with Snyk or similar tools"
+    },
+    {
+      "type": "incident-response",
+      "detail": "Maintain emergency response plan for critical vulnerabilities"
+    }
+  ],
+  "links": {
+    "decisions": ["DEC-000018"],
+    "specs": ["SPEC-000002"],
+    "mistakes": [],
+    "issues": [],
+    "pull_requests": []
+  }
+}

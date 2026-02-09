@@ -1,0 +1,81 @@
+{
+  "schema": "provenancecode.mistake@1.0",
+  "mr_id": "MR-000001",
+  "repo": {
+    "org": "example-org",
+    "name": "example-repo"
+  },
+  "ref": "pc://example-org/example-repo/mistake/MR-000001",
+  "title": "Starter pack missed risk acceptance links",
+  "status": "open",
+  "created_at": "2026-02-01T12:30:00Z",
+  "updated_at": "2026-02-01T12:30:00Z",
+  "severity": "medium",
+  "failure_type": "compliance",
+  "scope": {
+    "repo": "current",
+    "paths": [
+      "provenance/**",
+      "scripts/**"
+    ],
+    "components": [
+      "provenance-validator"
+    ]
+  },
+  "trigger": {
+    "kind": "ci",
+    "ref": ".github/workflows/decision-records-validate.yml",
+    "signal": "Missing risk acceptance links in sample records"
+  },
+  "impact": {
+    "blast_radius": "governance",
+    "user_impact": "Risk acceptance examples could drift from enforcement expectations.",
+    "security_impact": "none",
+    "compliance_impact": "low"
+  },
+  "root_cause": {
+    "summary": "Starter pack omitted risk acceptance and mistake records, leaving enforcement examples incomplete.",
+    "tags": [
+      "starter-pack",
+      "governance",
+      "linking"
+    ]
+  },
+  "fix": {
+    "pr": "https://example.com/pull/1",
+    "commit": "pending",
+    "summary": "Add risk acceptance, mistake records, and learnings index to the starter pack."
+  },
+  "links": {
+    "decisions": [
+      "DEC-000001"
+    ]
+  },
+  "prevent_rule": {
+    "rule_id": "PRV-MR-000001-require-mistake-guardrail-links",
+    "statement": "Decision records must reference existing Mistake Records and guardrail IDs declared by those Mistake Records.",
+    "rationale": "Ensures prevention rules are traceable and enforceable."
+  },
+  "enforcement": [
+    {
+      "kind": "policy",
+      "ref": "provenance/policies/mistakes-enforcement.json",
+      "must_exist": true
+    },
+    {
+      "kind": "runtime",
+      "ref": "app:provenance-guardrails",
+      "must_exist": true
+    }
+  ],
+  "ai_hints": {
+    "do_not": [
+      "Do not declare guardrails without a corresponding Mistake Record",
+      "Do not skip mistake validation during enforcement checks"
+    ],
+    "prefer": [
+      "Validate guardrail IDs against Mistake Records",
+      "Keep mistake links current when risks are accepted"
+    ]
+  }
+}

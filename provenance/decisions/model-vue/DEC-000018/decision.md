@@ -59,15 +59,15 @@ model-vue is a **component library** consumed by multiple applications:
 
 ## Decision
 
-**Adopt Parallel Agent Hybrid Approach for Vue 3 Migration**
+**Adopt AI-Assisted Migration with Junior Developer + CTO Oversight**
 
 ### Migration Strategy
 
-1. **Parallel Agent Execution** (3-4x faster)
-   - Use 4 Cursor AI agents working simultaneously
-   - Senior Vue developer coordinates and reviews daily
-   - Non-overlapping component assignments
-   - Continuous integration (daily merges)
+1. **AI-Powered Parallel Execution** (with human validation)
+   - Use Cursor Ultra with parallel subagents (within single account)
+   - Junior Vue developer reviews AI output daily (20 hrs/week)
+   - CTO provides strategic oversight and key decisions (8 hrs/week)
+   - Continuous integration and testing
 
 2. **Dual-Version Support**
    - Maintain `@plantquest/model-vue-v2@0.18.x` (Vue 2) in maintenance mode
@@ -83,40 +83,62 @@ model-vue is a **component library** consumed by multiple applications:
    - **Exports**: Add tree-shakeable exports
    - **State**: Support both Vuex and Pinia via adapter pattern
 
-4. **Timeline**: 6-8 weeks
+4. **Timeline**: 11-13 weeks (both library & frontend)
 
    ```
-   Week 1:     Infrastructure setup (4 agents in parallel)
-   Week 2-3:   Component migration (all 9 in parallel!)
-   Week 4-5:   Ecosystem & testing (4 agents in parallel)
-   Week 6-8:   Consumer testing & stable release
+   MODEL-VUE LIBRARY:
+   Week 1-4:   Library migration (AI + junior dev review)
+   Week 5-6:   Alpha/beta testing & stable release
+   
+   PQS-FRONTEND APPLICATION:
+   Week 7-9:   Application migration (AI + junior dev review)
+   Week 10-11: Integration testing & deployment
+   
+   Complete: Early May 2026
    ```
 
-### Parallel Agent Task Division
+5. **Team Structure**:
+   - **Cursor Ultra AI**: Generates code via parallel subagents
+   - **Junior Developer**: Daily review, testing, documentation (20 hrs/week)
+   - **CTO**: Architecture decisions, complex issues, deployment approval (8 hrs/week)
 
-**Week 1: Infrastructure (Parallel)**
-- Agent 1: Repository structure, monorepo setup
-- Agent 2: Vite build configuration
-- Agent 3: TypeScript & composables
-- Agent 4: Testing infrastructure
+### AI Subagent Task Division (Cursor Composer)
 
-**Week 2-3: Components (Massive Parallelism)**
-- Agent 1: BasicLed, BasicFoot, BasicFieldPick (simple)
-- Agent 2: BasicAuth, BasicAdmin, BasicSide (medium)
-- Agent 3: BasicNavStages + split into sub-components
-- Agent 4: BasicHead (1100 lines) + BasicMain split & convert
+**Week 1-2: model-vue Infrastructure & Simple Components**
+- Cursor spawns parallel subagents for:
+  - Repository structure, monorepo setup
+  - Vite build configuration
+  - TypeScript & composables
+  - BasicLed, BasicFoot, BasicFieldPick
+- Junior dev reviews daily, runs tests
+- CTO reviews architecture setup
 
-**Week 4-5: Ecosystem (Parallel)**
-- Agent 1: Vuetify 3 migration
-- Agent 2: Day.js migration, tree-shaking
-- Agent 3: Integration tests
-- Agent 4: Documentation, alpha release
+**Week 3-4: model-vue Complex Components**
+- Parallel subagents handle:
+  - BasicAuth, BasicAdmin, BasicSide (medium complexity)
+  - BasicNavStages + split into sub-components
+  - BasicHead (1100 lines) + split
+  - BasicMain conversion
+- Junior dev validates each component
+- CTO reviews complex component decisions
 
-**Week 6-8: Consumer Validation**
-- pqs-frontend alpha testing
-- Bug fixes with agent assistance
-- Beta release
-- Stable v1.0.0 release
+**Week 5-6: model-vue Ecosystem & Release**
+- Parallel subagents:
+  - Vuetify 3 migration
+  - Day.js migration, tree-shaking
+  - Integration tests
+  - Documentation
+- Alpha/beta testing
+- CTO approves stable v1.0.0 release
+
+**Week 7-9: pqs-frontend Migration**
+- Parallel subagents migrate 100+ components
+- Junior dev reviews and tests
+- CTO oversees integration
+
+**Week 10-11: pqs-frontend Deployment**
+- Final testing
+- CTO approves production deployment
 
 ### Success Criteria
 

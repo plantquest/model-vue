@@ -9,9 +9,11 @@
   "scripts": {
     "build:all": "pnpm -r build",
     "test:all": "pnpm -r test",
-    "build:v2": "pnpm --filter @plantquest/model-vue-v2 build",
+    "build:v2": "pnpm --filter @plantquest/model-vue-v2 vue-build",
     "build:v3": "pnpm --filter @plantquest/model-vue build",
-    "dev:v3": "pnpm --filter @plantquest/model-vue dev"
+    "dev:v3": "pnpm --filter @plantquest/model-vue dev",
+    "preview:v3": "pnpm --filter @plantquest/model-vue preview",
+    "lint:v3": "pnpm --filter @plantquest/model-vue lint"
   },
   "engines": {
     "node": ">=16.0.0",

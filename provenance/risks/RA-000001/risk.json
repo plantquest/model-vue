@@ -1,0 +1,59 @@
+{
+  "schema": "provenancecode.risk@1.0",
+  "ra_id": "RA-000001",
+  "repo": {
+    "org": "example-org",
+    "name": "example-repo"
+  },
+  "ref": "pc://example-org/example-repo/risk/RA-000001",
+  "title": "Accept temporary regression risk on enforcement rollout",
+  "status": "active",
+  "created_at": "2026-02-01T12:00:00Z",
+  "updated_at": "2026-02-01T12:00:00Z",
+  "risk_statement": "Initial enforcement rollout may miss edge cases and block valid pull requests until guardrails mature.",
+  "severity": "medium",
+  "likelihood": "medium",
+  "scope": {
+    "paths": [
+      "provenance/",
+      "src/"
+    ],
+    "components": [
+      "provenance-validator",
+      "enforcement-policy"
+    ]
+  },
+  "acceptance": {
+    "accepted_by": "starter-team",
+    "accepted_at": "2026-02-01T12:00:00Z",
+    "expires_at": "2026-12-31T00:00:00Z",
+    "reason": "Ship governance with a planned stabilization window."
+  },
+  "mitigations": [
+    {
+      "type": "monitoring",
+      "detail": "Review enforcement warnings weekly during rollout."
+    },
+    {
+      "type": "process",
+      "detail": "Add guardrails for new failure modes before expanding scope."
+    }
+  ],
+  "links": {
+    "decisions": [
+      "DEC-000001"
+    ],
+    "specs": [
+      "SPEC-000001"
+    ],
+    "mistakes": [
+      "MR-000001"
+    ],
+    "issues": [
+      "EX-1001"
+    ],
+    "pull_requests": [
+      "1"
+    ]
+  }
+}

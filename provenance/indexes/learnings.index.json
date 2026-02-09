@@ -1,0 +1,20 @@
+{
+  "schema": "provenancecode.learnings-index@1.0",
+  "generated_at": "2026-02-01T13:00:00Z",
+  "learnings": [
+    {
+      "mr_id": "MR-000001",
+      "rule_id": "PRV-MR-000001-require-mistake-guardrail-links",
+      "status": "open",
+      "severity": "medium",
+      "failure_type": "compliance",
+      "scoped_paths": [
+        "provenance/**",
+        "scripts/**"
+      ],
+      "decisions": [
+        "DEC-000001"
+      ]
+    }
+  ]
+}

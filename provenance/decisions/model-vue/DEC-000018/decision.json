@@ -1,0 +1,71 @@
+{
+  "schema": "provenancecode.decision.v2",
+  "decision_id": "DEC-000018",
+  "title": "Vue 3 Migration for model-vue Library with Parallel Agent Approach",
+  "status": "draft",
+  "context": {
+    "problem": "Vue 2 reached End of Life on December 31, 2023. The model-vue library requires migration to Vue 3 to support modern apps, receive security updates, and maintain long-term viability.",
+    "constraints": [
+      "model-vue is a library consumed by multiple applications (pqs-frontend, pqs-mobile, future apps)",
+      "Breaking changes affect all consumers simultaneously",
+      "Must coordinate migration with all consuming apps",
+      "Cannot break consuming apps during migration",
+      "2+ years past Vue 2 EOL (critical security risk)"
+    ],
+    "requirements": [
+      "Maintain backward compatibility during transition",
+      "Support both Vue 2 and Vue 3 versions",
+      "Coordinate with pqs-frontend (primary consumer)",
+      "Complete migration within 6-8 weeks using parallel agents",
+      "Minimize cost while maximizing quality"
+    ],
+    "alternatives_considered": [
+      {
+        "name": "Big Bang Migration",
+        "rejected_reason": "Too risky for library - breaks all consumers immediately with no rollback"
+      },
+      {
+        "name": "Compatibility Build (@vue/compat)",
+        "rejected_reason": "Technical debt, performance penalty, larger bundle, temporary solution"
+      },
+      {
+        "name": "Rewrite from Scratch",
+        "rejected_reason": "Too expensive (6-12 months), reintroduces bugs, loses institutional knowledge"
+      },
+      {
+        "name": "Stay on Vue 2 Forever",
+        "rejected_reason": "EOL security risk, ecosystem abandonment, can't hire Vue 2 developers"
+      },
+      {
+        "name": "Sequential AI-Assisted Migration",
+        "rejected_reason": "Takes 12-15 weeks vs 6-8 weeks with parallel approach"
+      }
+    ]
+  },
+  "decision": "Adopt AI-assisted migration with junior developer supervision and CTO oversight. Use Cursor Ultra parallel subagents for code generation, junior developer for daily review and testing (20 hrs/week), and CTO for strategic decisions (8 hrs/week). Maintain both Vue 2 (v0.x) and Vue 3 (v1.x) versions during 11-week migration covering both model-vue library and pqs-frontend application. Use monorepo structure, Vite build system, Composition API, TypeScript, and tree-shakeable exports. Timeline: 6 weeks library + 5 weeks frontend with overlap.",
+  "consequences": "POSITIVE: 91% cost reduction ($24K vs $280K manual), eliminates CRITICAL security risk (2+ years unpatched), modern ecosystem access, junior developer upskills in Vue 3, CTO maintains strategic oversight, AI handles 80% of code generation. Completes both library and frontend migration in 11-13 weeks. NEGATIVE: Slightly longer timeline than full senior dev approach, requires CTO time commitment (8 hrs/week), junior dev learning curve, short-term dual version maintenance. RISKS: See RA-000002 for Vue 2 continuation risk, RA-000003 for migration execution risks.",
+  "links": {
+    "pr": "TBD",
+    "issues": [],
+    "specs": ["SPEC-000002"],
+    "risks": ["RA-000002", "RA-000003"],
+    "related_decisions": ["DEC-000017"]
+  },
+  "related_mistakes": [],
+  "guardrails": [
+    "All 9 components must have >80% test coverage before considered complete",
+    "Daily senior dev review and merge cycle required for agent outputs",
+    "No breaking changes to existing Vue 2 API without deprecation warning",
+    "Alpha/beta testing with pqs-frontend required before stable release",
+    "Maintain Vue 2 version for minimum 12 months after Vue 3 stable release",
+    "All agents must follow patterns defined in .cursor/MIGRATION-PATTERNS.md",
+    "Integration tests with both Vuex and Pinia adapters required"
+  ],
+  "risk": {
+    "score": 3,
+    "rationale": "Medium risk. Junior developer may miss subtle issues, but mitigated by CTO oversight on critical decisions and AI-generated code quality. Library nature means bugs affect multiple consumers. Mitigated by: comprehensive testing (>80% coverage), alpha/beta releases, maintaining Vue 2 fallback, daily junior dev review, CTO approval on key decisions, and AI parallel subagents reducing human error."
+  },
+  "review": {
+    "human": "Pending - requires senior Vue developer and stakeholder approval. Parallel agent approach is innovative and significantly reduces cost/timeline compared to manual or sequential approaches."
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "id": "SPEC-000002",
+  "title": "Vue 3 Migration Technical Specification for model-vue Library",
+  "status": "draft",
+  "risk": "medium",
+  "acceptanceCriteria": [
+    "All 9 components successfully migrated to Vue 3 Composition API",
+    "Test coverage maintained at >80% for all components",
+    "Build system produces valid ESM, UMD, and CJS outputs",
+    "Tree-shaking verified working (bundle size reduced or maintained)",
+    "TypeScript definitions complete and accurate",
+    "Integration tests passing with both Vuex 4 and Pinia adapters",
+    "Vuetify 3 integration complete with no visual regressions",
+    "Day.js successfully replaces Moment.js (97% bundle size reduction)",
+    "Alpha version successfully tested by pqs-frontend with no P0/P1 bugs",
+    "Documentation complete including migration guide for consumers",
+    "Stable v1.0.0 published to npm registry",
+    "Vue 2 version (v0.18.x) maintained in separate package for 12 months"
+  ],
+  "affectedPaths": [
+    "packages/model-vue/**",
+    "packages/model-vue-v2/**",
+    "src/components/**",
+    "src/composables/**",
+    "src/types/**",
+    "vite.config.js",
+    "package.json",
+    "pnpm-workspace.yaml",
+    ".cursor/MIGRATION-PATTERNS.md",
+    "README.md",
+    "docs/migration-guide.md"
+  ],
+  "relatedDecisions": [
+    "DEC-000018"
+  ],
+  "technicalRequirements": {
+    "vue": {
+      "from": "^2.6.12",
+      "to": "^3.3.0",
+      "breaking_changes": [
+        "Options API to Composition API",
+        "Global API changes (Vue.use → app.use)",
+        "$on/$off/$once removed",
+        "Filters removed",
+        "v-model changes"
+      ]
+    },
+    "vuetify": {
+      "from": "^2.5.1",
+      "to": "^3.4.0",
+      "breaking_changes": [
+        "v-btn outlined → variant='outlined'",
+        "v-icon syntax changes",
+        "Color system changes",
+        "Theme configuration changes"
+      ]
+    },
+    "build_system": {
+      "from": "Vue CLI (webpack)",
+      "to": "Vite 5",
+      "changes": [
+        "Faster build times (10-100x)",
+        "Better HMR",
+        "Native ESM support",
+        "Better tree-shaking"
+      ]
+    },
+    "date_library": {
+      "from": "Moment.js (~70KB)",
+      "to": "Day.js (~2KB)",
+      "size_reduction": "97%"
+    },
+    "state_management": {
+      "current": "Vuex 3 (Vue 2)",
+      "target": "Vuex 4 + Pinia support via adapters",
+      "approach": "State adapter pattern for flexibility"
+    },
+    "typescript": {
+      "new": true,
+      "purpose": "Type safety, better DX, prevents bugs",
+      "coverage": "All components, composables, and types"
+    }
+  },
+  "componentMigrationPlan": {
+    "agent_1_simple": [
+      "BasicLed (~50 lines, minimal logic)",
+      "BasicFoot (~80 lines, minimal logic)",
+      "BasicFieldPick (~120 lines, simple state)"
+    ],
+    "agent_2_medium": [
+      "BasicAuth (~200 lines, auth logic)",
+      "BasicAdmin (~250 lines, admin features)",
+      "BasicSide (~180 lines, drawer state)"
+    ],
+    "agent_3_complex": [
+      "BasicNavStages (~392 lines, routing logic, split into sub-components first)",
+      "BasicMain (~300 lines, split if needed)"
+    ],
+    "agent_4_complex": [
+      "BasicHead (~1100+ lines, complex search/actions, split into sub-components first)"
+    ]
+  },
+  "testingStrategy": {
+    "unit_tests": ">80% coverage required for each component",
+    "integration_tests": [
+      "Vuex 4 adapter integration",
+      "Pinia adapter integration",
+      "Component interaction tests"
+    ],
+    "consumer_tests": [
+      "Alpha testing with pqs-frontend",
+      "Beta testing in staging environment",
+      "Production validation"
+    ],
+    "build_tests": [
+      "ESM output validation",
+      "UMD output validation",
+      "CJS output validation",
+      "Tree-shaking verification",
+      "Bundle size comparison"
+    ]
+  },
+  "deliverables": [
+    "Monorepo structure with Vue 2 and Vue 3 packages",
+    "All 9 components migrated to Composition API",
+    "Composables library (useVxgStore, useVxgPermissions, etc.)",
+    "TypeScript type definitions",
+    "Vite build configuration",
+    "Test suite with >80% coverage",
+    "State management adapters (Vuex and Pinia)",
+    "Migration guide for consumers",
+    "API documentation",
+    "Component examples",
+    "Alpha release (v1.0.0-alpha.1)",
+    "Beta release (v1.0.0-beta.1)",
+    "Stable release (v1.0.0)",
+    ".cursor/MIGRATION-PATTERNS.md for agent guidance"
+  ],
+  "timeline": {
+    "week_1": "Infrastructure setup (monorepo, Vite, TypeScript, testing) - 4 agents parallel",
+    "week_2_3": "Component migration (all 9 components) - 4 agents parallel",
+    "week_4_5": "Ecosystem (Vuetify 3, Day.js, testing, docs) - 4 agents parallel",
+    "week_6_8": "Consumer testing, bug fixes, stable release",
+    "total_duration": "6-8 weeks"
+  },
+  "success_metrics": {
+    "bundle_size": "Maintained or reduced (Day.js alone saves 97%)",
+    "performance": "Improved or maintained (Proxy-based reactivity)",
+    "test_coverage": ">80% maintained",
+    "consumer_satisfaction": "pqs-frontend reports no P0/P1 bugs",
+    "migration_time": "6-8 weeks (vs 16-22 weeks manual)",
+    "cost": "$30-40K (vs $120-160K manual)"
+  }
+}

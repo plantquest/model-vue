@@ -1,0 +1,22 @@
+{
+  "id": "SPEC-000001",
+  "title": "Starter pack hybrid rules structure",
+  "status": "draft",
+  "risk": "low",
+  "acceptanceCriteria": [
+    "Starter pack includes rule folders for Cursor, Copilot, and Replit.",
+    "Rules point to the ProvenanceCode decision and draft locations.",
+    "README documents the hybrid rules layout and provenance paths."
+  ],
+  "affectedPaths": [
+    ".cursor/",
+    ".copilot/",
+    ".replit/",
+    ".provenancecode/",
+    "provenance/",
+    "README.md"
+  ],
+  "relatedDecisions": [
+    "DEC-000001"
+  ]
+}

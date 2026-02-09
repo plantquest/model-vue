@@ -1,0 +1,23 @@
+{
+  "schema": "provenancecode.decision.v2",
+  "decision_id": "DEC-000001",
+  "title": "Adopt decision records starter pack",
+  "status": "accepted",
+  "context": {
+    "repo": "example-repo",
+    "summary": "Adopt a decision record structure in the repo."
+  },
+  "decision": "Adopt the ProvenanceCode decision record structure.",
+  "consequences": "A consistent decision trail helps maintainers and reviewers.",
+  "links": {
+    "pr": "https://example.com/pull/1",
+    "doc": "https://example.com/decision/DEC-000001"
+  },
+  "risk": {
+    "score": 1,
+    "rationale": "Low risk adoption of documentation standards."
+  },
+  "review": {
+    "human": "@starter"
+  }
+}

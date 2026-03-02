@@ -246,7 +246,7 @@ function tag_alias(asset) {
     return null
   }
 
-  if (null != asset.custom12) {
+  if (asset.custom12 != null && String(asset.custom12).trim() !== '') {
     return asset.tag + '(' + asset.custom12 + ')'
   }
   return asset.tag

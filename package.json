@@ -19,8 +19,12 @@
     "reset": "npm run clean && npm i && npm test",
     "repo-check": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && [[ '' == `git tag --list v${REPO_VERSION}` ]]",
     "repo-tag": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && git commit -a -m v$REPO_VERSION && git push && git tag v$REPO_VERSION && git push --tags;",
+    "repo-tag:dev": "git rev-parse --verify refs/heads/develop && git tag -fa dev refs/heads/develop -m \"Stable dev tag from refs/heads/develop\"",
+    "repo-tag:production": "git rev-parse --verify refs/heads/prod && git tag -fa production refs/heads/prod -m \"Stable production tag from refs/heads/prod\"",
     "repo-publish": "npm run repo-check && npm run clean && npm i --registry https://registry.npmjs.org && npm run prettier && npm run vue-build  && npm run repo-tag && npm publish --registry https://registry.npmjs.org",
-    "repo-publish-quick": "npm run repo-check && npm run prettier && npm run vue-build && npm run repo-tag && npm publish --registry https://registry.npmjs.org --access=public"
+    "repo-publish-quick": "npm run repo-check && npm run prettier && npm run vue-build && npm run repo-tag && npm publish --registry https://registry.npmjs.org --access=public",
+    "repo-publish:dev": "npm run vue-build && npm run test-off && npm run repo-tag:dev && git push origin refs/tags/dev --force",
+    "repo-publish:production": "npm run vue-build && npm run test-off && npm run repo-tag:production && git push origin refs/tags/production --force"
   },
   "files": [
     "dist/*",

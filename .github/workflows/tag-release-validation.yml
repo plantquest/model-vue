@@ -1,0 +1,49 @@
+name: Tag Release Validation
+
+on:
+  push:
+    tags:
+      - dev
+      - production
+
+jobs:
+  validate-release-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tagged code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Resolve deploy environment
+        id: resolve-environment
+        shell: bash
+        run: |
+          case "${GITHUB_REF_NAME}" in
+            dev)
+              echo "deploy_environment=dev" >> "$GITHUB_OUTPUT"
+              ;;
+            production)
+              echo "deploy_environment=production" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unsupported tag: ${GITHUB_REF_NAME}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Build
+        run: npm run vue-build
+
+      - name: Test
+        run: npm run test-off
+
+      - name: Release validation message
+        run: echo "Release validation passed for ${GITHUB_REF_NAME} (${{ steps.resolve-environment.outputs.deploy_environment }})"

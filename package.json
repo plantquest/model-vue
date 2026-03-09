@@ -1,6 +1,6 @@
 {
   "name": "@plantquest/model-vue",
-   "version": "0.18.250-demo-dev",
+   "version": "0.18.260-demo-dev",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,12 +19,15 @@
     "reset": "npm run clean && npm i && npm test",
     "repo-check": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && [[ '' == `git tag --list v${REPO_VERSION}` ]]",
     "repo-tag": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && git commit -a -m v$REPO_VERSION && git push && git tag v$REPO_VERSION && git push --tags;",
+    "repo-version:dev": "node -e \"const fs=require('fs'); const path='./package.json'; const pkg=JSON.parse(fs.readFileSync(path,'utf8')); const match=/^(\\d+)\\.(\\d+)\\.(\\d+)(-.+)?$/.exec(pkg.version); if(!match){ throw new Error('Unsupported version format: '+pkg.version); } pkg.version=[match[1],match[2],String(Number(match[3])+5)].join('.')+(match[4]||''); fs.writeFileSync(path, JSON.stringify(pkg, null, 2)+'\\n'); console.log(pkg.version);\"",
     "repo-tag:dev": "git rev-parse --verify refs/heads/develop && git tag -fa dev refs/heads/develop -m \"Stable dev tag from refs/heads/develop\"",
     "repo-tag:production": "git rev-parse --verify refs/heads/prod && git tag -fa production refs/heads/prod -m \"Stable production tag from refs/heads/prod\"",
+    "repo-npm-tag:dev": "PACKAGE_NAME=`node -p \"require('./package.json').name\"` && PACKAGE_VERSION=`node -p \"require('./package.json').version\"` && if npm view \"$PACKAGE_NAME@$PACKAGE_VERSION\" version --registry https://registry.npmjs.org >/dev/null 2>&1; then npm dist-tag add \"$PACKAGE_NAME@$PACKAGE_VERSION\" dev --registry https://registry.npmjs.org; else npm publish --registry https://registry.npmjs.org --tag dev --access=public; fi",
+    "repo-npm-tag:production": "PACKAGE_NAME=`node -p \"require('./package.json').name\"` && PACKAGE_VERSION=`node -p \"require('./package.json').version\"` && if npm view \"$PACKAGE_NAME@$PACKAGE_VERSION\" version --registry https://registry.npmjs.org >/dev/null 2>&1; then npm dist-tag add \"$PACKAGE_NAME@$PACKAGE_VERSION\" latest --registry https://registry.npmjs.org; else npm publish --registry https://registry.npmjs.org --access=public; fi",
     "repo-publish": "npm run repo-check && npm run clean && npm i --registry https://registry.npmjs.org && npm run prettier && npm run vue-build  && npm run repo-tag && npm publish --registry https://registry.npmjs.org",
     "repo-publish-quick": "npm run repo-check && npm run prettier && npm run vue-build && npm run repo-tag && npm publish --registry https://registry.npmjs.org --access=public",
-    "repo-publish:dev": "npm run vue-build && npm run test-off && npm run repo-tag:dev && git push origin refs/tags/dev --force",
-    "repo-publish:production": "npm run vue-build && npm run test-off && npm run repo-tag:production && git push origin refs/tags/production --force"
+    "repo-publish:dev": "npm run repo-version:dev && npm run vue-build && npm run repo-tag:dev && git push origin refs/tags/dev --force && npm run repo-npm-tag:dev",
+    "repo-publish:production": "npm run vue-build && npm run repo-tag:production && git push origin refs/tags/production --force && npm run repo-npm-tag:production"
   },
   "files": [
     "dist/*",

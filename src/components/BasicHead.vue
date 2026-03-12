@@ -97,7 +97,7 @@
     <v-combobox ref="search" class="comboxSearch d-flex justify-space-between" v-model="search"
           @keydown="changeSearch($event)" @click:clear="changeSearch($event)" @change="handleChangeSearch($event)"
            flat hide-details outlined dense clearable placeholder="" @click:append="filter"
-          :filter="customFilter" :prepend-inner-icon="prependIcon" @click="handleClick" @blur="handleBlur">
+          :filter="customFilter" :prepend-inner-icon="prependIcon" @click="onSearchOpen" @blur="handleBlur">
 </v-combobox> 
   
     <v-spacer
@@ -362,19 +362,46 @@
       async performSearch(term) {
         try {
           if(term) {
-            let out = await this.$seneca.post('sys:search, cmd:search', 
-              { query: term, params: this.search_config }
+            const cleanTerm = term.toLowerCase().trim()
+
+            // MiniSearch's default limit is 10.  For hyphenated IDs the exact
+            // match may score lower than 10 fuzzy neighbours (all sharing the
+            // same hyphen-split tokens), so we raise the limit to 100 to make
+            // sure the exact match is always included in the result set.
+            // We also enable prefix matching so partially-typed IDs are found.
+            var searchParams = Object.assign({}, this.search_config, {
+              limit: 100,
+              prefix: true
+            })
+
+            var out = await this.$seneca.post('sys:search, cmd:search',
+              { query: term, params: searchParams }
             )
-            // Filter out null values after mapping
-            this.tag_items = out.data.hits
-              .map(v => tag_alias(v.doc))
-              .filter(item => item !== null)
+            var hits = out.data.hits
+              .map(function(v) { return tag_alias(v.doc) })
+              .filter(function(item) { return item !== null })
+
+            console.log('[BasicHead] performSearch term:', term, 'raw hits (first 5):', hits.slice(0, 5))
+
+            hits.sort(function(a, b) {
+              var aTag = (a || '').split('(')[0].toLowerCase().trim()
+              var bTag = (b || '').split('(')[0].toLowerCase().trim()
+              var aPriority = aTag === cleanTerm ? 0
+                : aTag.startsWith(cleanTerm) ? 1
+                : aTag.includes(cleanTerm) ? 2 : 3
+              var bPriority = bTag === cleanTerm ? 0
+                : bTag.startsWith(cleanTerm) ? 1
+                : bTag.includes(cleanTerm) ? 2 : 3
+              if (aPriority !== bPriority) return aPriority - bPriority
+              return aTag.length - bTag.length
+            })
+
+            this.tag_items = hits
           } else {
             if (this.items && this.items.length > 0) {
-              // Filter out null values after mapping
               this.tag_items = this.items
                 .map(tag_alias)
-                .filter(item => item !== null)
+                .filter(function(item) { return item !== null })
             }
           }
         } catch (error) {
@@ -382,15 +409,25 @@
         }
       },
       
-      // Custom filter for combobox autosuggest
+      // When queryText is empty (dropdown opened without new typing), fall back
+      // to this.search so items are still filtered by the current search value.
       customFilter (item, queryText, itemText) {
-        if (!queryText) return true
-        
-        // Filter items that contain the query text (case insensitive)
-        const searchText = queryText.toLowerCase()
-        const itemContent = (item || '').toLowerCase()
-        
-        return itemContent.includes(searchText)
+        const effectiveTerm = (queryText || this.search || '').toLowerCase().trim()
+        if (!effectiveTerm) return true
+
+        const itemTag = (item || '').split('(')[0].toLowerCase().trim()
+        const itemFull = (item || '').toLowerCase()
+
+        return itemTag === effectiveTerm
+          || itemTag.startsWith(effectiveTerm)
+          || itemTag.includes(effectiveTerm)
+          || itemFull.includes(effectiveTerm)
+      },
+
+      onSearchOpen () {
+        if (this.search) {
+          this.performSearch(this.search)
+        }
       },
   
       changeSearch(event) {
@@ -635,6 +672,7 @@
       @keydown="changeSearch($event)"
       @click:clear="changeSearch($event)"
       @change="handleChangeSearch($event)"
+      @click="onSearchOpen"
       :items="tag_items"
       flat
       hide-details
@@ -934,19 +972,46 @@
       async performSearch(term) {
         try {
           if(term) {
-            let out = await this.$seneca.post('sys:search, cmd:search', 
-              { query: term, params: this.search_config }
+            const cleanTerm = term.toLowerCase().trim()
+
+            // MiniSearch's default limit is 10.  For hyphenated IDs the exact
+            // match may score lower than 10 fuzzy neighbours (all sharing the
+            // same hyphen-split tokens), so we raise the limit to 100 to make
+            // sure the exact match is always included in the result set.
+            // We also enable prefix matching so partially-typed IDs are found.
+            var searchParams = Object.assign({}, this.search_config, {
+              limit: 100,
+              prefix: true
+            })
+
+            var out = await this.$seneca.post('sys:search, cmd:search',
+              { query: term, params: searchParams }
             )
-            // Filter out null values after mapping
-            this.tag_items = out.data.hits
-              .map(v => tag_alias(v.doc))
-              .filter(item => item !== null)
+            var hits = out.data.hits
+              .map(function(v) { return tag_alias(v.doc) })
+              .filter(function(item) { return item !== null })
+
+            console.log('[BasicHead] performSearch term:', term, 'raw hits (first 5):', hits.slice(0, 5))
+
+            hits.sort(function(a, b) {
+              var aTag = (a || '').split('(')[0].toLowerCase().trim()
+              var bTag = (b || '').split('(')[0].toLowerCase().trim()
+              var aPriority = aTag === cleanTerm ? 0
+                : aTag.startsWith(cleanTerm) ? 1
+                : aTag.includes(cleanTerm) ? 2 : 3
+              var bPriority = bTag === cleanTerm ? 0
+                : bTag.startsWith(cleanTerm) ? 1
+                : bTag.includes(cleanTerm) ? 2 : 3
+              if (aPriority !== bPriority) return aPriority - bPriority
+              return aTag.length - bTag.length
+            })
+
+            this.tag_items = hits
           } else {
             if (this.items && this.items.length > 0) {
-              // Filter out null values after mapping
               this.tag_items = this.items
                 .map(tag_alias)
-                .filter(item => item !== null)
+                .filter(function(item) { return item !== null })
             }
           }
         } catch (error) {
@@ -954,15 +1019,25 @@
         }
       },
       
-      // Custom filter for combobox autosuggest
+      // When queryText is empty (dropdown opened without new typing), fall back
+      // to this.search so items are still filtered by the current search value.
       customFilter (item, queryText, itemText) {
-        if (!queryText) return true
-        
-        // Filter items that contain the query text (case insensitive)
-        const searchText = queryText.toLowerCase()
-        const itemContent = (item || '').toLowerCase()
-        
-        return itemContent.includes(searchText)
+        const effectiveTerm = (queryText || this.search || '').toLowerCase().trim()
+        if (!effectiveTerm) return true
+
+        const itemTag = (item || '').split('(')[0].toLowerCase().trim()
+        const itemFull = (item || '').toLowerCase()
+
+        return itemTag === effectiveTerm
+          || itemTag.startsWith(effectiveTerm)
+          || itemTag.includes(effectiveTerm)
+          || itemFull.includes(effectiveTerm)
+      },
+
+      onSearchOpen () {
+        if (this.search) {
+          this.performSearch(this.search)
+        }
       },
   
       changeSearch(event) {

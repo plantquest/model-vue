@@ -849,16 +849,16 @@ export default {
           )
 
 
-          this.tag_items2 = out.data.hits
+          this.tag_items2 = [...out.data.hits
             .filter(v => v && v.doc)  // Filter out null/undefined items
             .map(v => tag_alias(v.doc))
-            .filter(item => item !== null)
+            .filter(item => item !== null), ...this.sapItems]
           console.log('tag items are ', this.tag_items2)
         }
         else {
 
           if (this.items2 != undefined)
-            this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+            this.tag_items2 = [...this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null), ...this.sapItems]
         }
 
 

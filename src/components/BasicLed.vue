@@ -676,6 +676,43 @@
           .reduce((a,c)=>
                   (a.push({title: c, field:c, old:cm[c][0],new:cm[c][1]}),a),[])
   
+        // Combine parent relationship audit fields into a single "Parent" row when present.
+        // Parent is stored as two fields (tag + description), but users expect it as one change.
+        try {
+          const parentTagField = (process && process.env && process.env.VUE_APP_PARENT_TAG_FIELD) || 'custom8'
+          const parentDescField = (process && process.env && process.env.VUE_APP_PARENT_DESC_FIELD) || 'custom9'
+
+          const tagChange = cm[parentTagField]
+          const descChange = cm[parentDescField]
+          if (tagChange || descChange) {
+            const oldTag = tagChange ? tagChange[0] : (cm[parentTagField] && cm[parentTagField][0])
+            const newTag = tagChange ? tagChange[1] : (cm[parentTagField] && cm[parentTagField][1])
+            const oldDesc = descChange ? descChange[0] : (cm[parentDescField] && cm[parentDescField][0])
+            const newDesc = descChange ? descChange[1] : (cm[parentDescField] && cm[parentDescField][1])
+
+            const fmt = (tag, desc) => {
+              const t = null == tag ? '' : String(tag).trim()
+              const d = null == desc ? '' : String(desc).trim()
+              if (t && d) return `${t} — ${d}`
+              return t || d || ''
+            }
+
+            const combinedOld = fmt(oldTag, oldDesc)
+            const combinedNew = fmt(newTag, newDesc)
+
+            // Drop the two raw fields and replace with a single combined row.
+            chs = chs.filter(v => v.field !== parentTagField && v.field !== parentDescField)
+            chs.unshift({
+              title: 'Parent',
+              field: '__parent',
+              old: combinedOld,
+              new: combinedNew,
+            })
+          }
+        } catch (e) {
+          // If env/process is unavailable, fall back to default per-field rows.
+        }
+
         if(this.customInfoFields) {
           chs = chs.filter(v => {
             let field

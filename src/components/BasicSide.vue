@@ -284,6 +284,8 @@ export default {
       tag_items2: [],
       publicPath: process.env.BASE_URL || '/',
       showIcon: true, // Data property to control icon visibility
+      // Skip handleChangeSearch URL updates while handleRoute (or similar) sets search/search2
+      suppressSearchChangeNavigation: false,
       //  showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
@@ -402,11 +404,9 @@ export default {
         // this.$store.commit('set_path_data', null)
         
       }
-      let search_mode = ''
-     // search_mode = this.$router.query.mode
-      // use the js way to get the mode from the url using window.location.search
-      search_mode = new URLSearchParams(window.location.search).get('mode')
-      let asset = new URLSearchParams(window.location.search).get('asset')
+      // Use route state so this stays in sync with router.replace (window.location can lag one tick)
+      const search_mode = this.$route.query.mode || ''
+      const asset = this.$route.query.asset
       console.log('asset is ', asset)
       
       if (search_mode == 'route') {
@@ -747,6 +747,9 @@ export default {
     },
 
     handleChangeSearch(event) {
+      if (this.suppressSearchChangeNavigation) {
+        return
+      }
       if (!this.showSearch2) {
         this.$router.push({
           path: this.$route.path,
@@ -836,19 +839,34 @@ export default {
     },
 
     handleRoute() {
-      // When transitioning to navigation mode, preserve search context
-      let prevQuery = this.$route.query;
-      let aValue = this.search || '';
-      let bValue = this.search2 || '';
-      
-      // When transitioning from assetsearch to route mode
-      if (prevQuery.mode === 'assetsearch' && prevQuery.term && !bValue) {
-        // Only populate destination if it's empty
-        // Keep source (a) unchanged to preserve user's search context
-        bValue = prevQuery.term;
-        this.search2 = bValue;
+      const prevQuery = this.$route.query;
+
+      const strFrom = (v) => {
+        if (v == null || v === '') return ''
+        if (typeof v === 'object' && v && v.tag != null) return String(v.tag).trim()
+        return String(v).trim()
       }
-      
+
+      let aValue = strFrom(this.search)
+      let bValue = strFrom(this.search2)
+
+      // Destination empty: put the only value in B (from field A and/or URL term), clear A
+      if (!bValue) {
+        const fromTerm =
+          prevQuery.mode === 'assetsearch' && prevQuery.term
+            ? String(prevQuery.term).trim()
+            : ''
+        bValue = aValue || fromTerm
+        aValue = ''
+        // Set destination before clearing origin so @change / URL sync see correct B
+        this.suppressSearchChangeNavigation = true
+        this.search2 = bValue
+        this.search = ''
+        this.$nextTick(() => {
+          this.suppressSearchChangeNavigation = false
+        })
+      }
+
       if (!this.showSearch2) {
         this.toggleSearch2();
       }

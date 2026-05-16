@@ -211,6 +211,25 @@
     }
     return asset.tag
   }
+
+  function applyHeadSearchToStore(store, term, options) {
+    options = options || {}
+    const value = term == null || term === undefined ? '' : String(term)
+    const isEmpty = value.trim() === ''
+    const search = store.state.trigger && store.state.trigger.search
+    if (!search) {
+      return
+    }
+    if (isEmpty && options.userInitiatedClear === true) {
+      search.userClear = true
+    } else if (isEmpty) {
+      search.userClear = false
+    } else {
+      search.userClear = false
+    }
+    search.term = isEmpty ? '' : value
+    search.a = search.term
+  }
   
   
   export default {
@@ -300,7 +319,7 @@
           if (!preserveSearch) {
             // Clear search when switching routes
             this.search = ''
-            this.$store.state.trigger.search.term = ''
+            applyHeadSearchToStore(this.$store, '', { userInitiatedClear: false })
             if (this.$refs.search2) {
               this.$refs.search2.reset()
             }
@@ -401,9 +420,8 @@
           
           console.log('searching.. term', term)
           
-          // Update BOTH store properties for complete Assets search integration
-          this.$store.state.trigger.search.term = term || ''  // For BasicLed data table
-          this.$store.state.trigger.search.a = term || ''     // For BasicSide search 1
+          const isEmpty = term == null || String(term).trim() === ''
+          applyHeadSearchToStore(this.$store, term, { userInitiatedClear: isEmpty })
           
           // Always update tag_items for autosuggest functionality
           await this.performSearch(term)
@@ -521,9 +539,9 @@
       },
       handleChangeSearch(event) {
         console.log('handleChangeSearch called with:', this.search)
-        // Update both store states
-        this.$store.state.trigger.search.term = this.search || ''  // For BasicLed
-        this.$store.state.trigger.search.a = this.search || ''     // For BasicSide search 1
+        const term = this.search == null ? '' : this.search
+        const isEmpty = String(term).trim() === ''
+        applyHeadSearchToStore(this.$store, term, { userInitiatedClear: isEmpty })
       }
     }
   };
@@ -759,6 +777,25 @@
     }
     return asset.tag
   }
+
+  function applyHeadSearchToStore(store, term, options) {
+    options = options || {}
+    const value = term == null || term === undefined ? '' : String(term)
+    const isEmpty = value.trim() === ''
+    const search = store.state.trigger && store.state.trigger.search
+    if (!search) {
+      return
+    }
+    if (isEmpty && options.userInitiatedClear === true) {
+      search.userClear = true
+    } else if (isEmpty) {
+      search.userClear = false
+    } else {
+      search.userClear = false
+    }
+    search.term = isEmpty ? '' : value
+    search.a = search.term
+  }
   
   
   export default {
@@ -860,7 +897,7 @@
     if (!preserveSearch) {
       // Clear search when switching routes
       this.search = '';
-      this.$store.state.trigger.search.term = '';
+      applyHeadSearchToStore(this.$store, '', { userInitiatedClear: false });
       if (this.$refs.search2) {
         this.$refs.search2.reset();
       }
@@ -973,9 +1010,8 @@
           
           console.log('searching.. term', term)
           
-          // Update BOTH store properties for complete Assets search integration
-          this.$store.state.trigger.search.term = term || ''  // For BasicLed data table
-          this.$store.state.trigger.search.a = term || ''     // For BasicSide search 1
+          const isEmpty = term == null || String(term).trim() === ''
+          applyHeadSearchToStore(this.$store, term, { userInitiatedClear: isEmpty })
           
           // Always update tag_items for autosuggest functionality
           await this.performSearch(term)
@@ -1092,9 +1128,9 @@
       },
       handleChangeSearch(event) {
         console.log('handleChangeSearch called with:', this.search)
-        // Update both store states
-        this.$store.state.trigger.search.term = this.search || ''  // For BasicLed
-        this.$store.state.trigger.search.a = this.search || ''     // For BasicSide search 1
+        const term = this.search == null ? '' : this.search
+        const isEmpty = String(term).trim() === ''
+        applyHeadSearchToStore(this.$store, term, { userInitiatedClear: isEmpty })
       }
     }
   };

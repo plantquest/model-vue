@@ -409,8 +409,10 @@
       changeSearch(event) {
   
         setTimeout(async ()=> { // wait for input
-          let term
-          term = event.target ? event.target.value : null
+          let term = event.target ? event.target.value : null
+          if (term == null && this.search != null) {
+            term = this.search
+          }
           
           console.log('searching.. term', term)
           
@@ -534,7 +536,9 @@
       handleChangeSearch(event) {
         console.log('handleChangeSearch called with:', this.search)
         const term = this.search == null ? '' : this.search
-        // @change also fires on programmatic v-model updates; user clears use changeSearch
+        if (String(term).trim() === '') {
+          return
+        }
         applyHeadSearchToStore(this.$store, term, { userInitiatedClear: false })
       }
     }
@@ -993,8 +997,10 @@
       changeSearch(event) {
   
         setTimeout(async ()=> { // wait for input
-          let term
-          term = event.target ? event.target.value : null
+          let term = event.target ? event.target.value : null
+          if (term == null && this.search != null) {
+            term = this.search
+          }
           
           console.log('searching.. term', term)
           
@@ -1117,7 +1123,9 @@
       handleChangeSearch(event) {
         console.log('handleChangeSearch called with:', this.search)
         const term = this.search == null ? '' : this.search
-        // @change also fires on programmatic v-model updates; user clears use changeSearch
+        if (String(term).trim() === '') {
+          return
+        }
         applyHeadSearchToStore(this.$store, term, { userInitiatedClear: false })
       }
     }

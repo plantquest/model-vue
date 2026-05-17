@@ -220,13 +220,7 @@
     if (!search) {
       return
     }
-    if (isEmpty && options.userInitiatedClear === true) {
-      search.userClear = true
-    } else if (isEmpty) {
-      search.userClear = false
-    } else {
-      search.userClear = false
-    }
+    search.userClear = isEmpty && options.userInitiatedClear === true
     search.term = isEmpty ? '' : value
     search.a = search.term
   }
@@ -540,8 +534,8 @@
       handleChangeSearch(event) {
         console.log('handleChangeSearch called with:', this.search)
         const term = this.search == null ? '' : this.search
-        const isEmpty = String(term).trim() === ''
-        applyHeadSearchToStore(this.$store, term, { userInitiatedClear: isEmpty })
+        // @change also fires on programmatic v-model updates; user clears use changeSearch
+        applyHeadSearchToStore(this.$store, term, { userInitiatedClear: false })
       }
     }
   };
@@ -786,13 +780,7 @@
     if (!search) {
       return
     }
-    if (isEmpty && options.userInitiatedClear === true) {
-      search.userClear = true
-    } else if (isEmpty) {
-      search.userClear = false
-    } else {
-      search.userClear = false
-    }
+    search.userClear = isEmpty && options.userInitiatedClear === true
     search.term = isEmpty ? '' : value
     search.a = search.term
   }
@@ -1129,8 +1117,8 @@
       handleChangeSearch(event) {
         console.log('handleChangeSearch called with:', this.search)
         const term = this.search == null ? '' : this.search
-        const isEmpty = String(term).trim() === ''
-        applyHeadSearchToStore(this.$store, term, { userInitiatedClear: isEmpty })
+        // @change also fires on programmatic v-model updates; user clears use changeSearch
+        applyHeadSearchToStore(this.$store, term, { userInitiatedClear: false })
       }
     }
   };

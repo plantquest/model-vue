@@ -286,6 +286,8 @@ export default {
       showIcon: true, // Data property to control icon visibility
       // Skip handleChangeSearch URL updates while handleRoute (or similar) sets search/search2
       suppressSearchChangeNavigation: false,
+      searchIndexedCount: 0,
+      loadAssetsInterval: null,
       //  showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
@@ -313,55 +315,43 @@ export default {
     this.menuView = this.menuViewList[route.index]
     this.menuViewIndex = route.index
 
-    let tool = {}
+    this.syncAssetsFromStore()
 
-    let load_assets = setInterval(async () => {
+    let tool = {}
+    let lastLen = 0
+    let stableTicks = 0
+
+    this.loadAssetsInterval = setInterval(async () => {
       await this.$store.dispatch('vxg_get_assets', tool)
-      this.items = tool.assets
-      
-      // Simple approach: check the current route to determine what data to use for search2
-      if (this.$route.path.includes('/user')) {
-        // If we're on a user route, try to get user data for search2
-        try {
-          // Try to load users from the store if available
-          if (this.$store.state.main_user && this.$store.state.main_user.length > 0) {
-            this.items2 = this.$store.state.main_user
-          } else {
-            // Fallback to assets if no user data
-            this.items2 = [...tool.assets]
+      const len = tool.assets ? tool.assets.length : 0
+      if (len > 0) {
+        this.syncAssetsFromStore(tool.assets)
+        if (len === lastLen) {
+          stableTicks++
+          if (stableTicks >= 3 || len > 500) {
+            clearInterval(this.loadAssetsInterval)
+            this.loadAssetsInterval = null
           }
-        } catch (error) {
-          this.items2 = [...tool.assets]
-        }
-      } else {
-        // For asset routes, use assets for both searches
-        this.items2 = [...tool.assets]
-      }
-      
-      if (this.items.length != 0) {
-        // Assets for search 1
-        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
-        
-        // Determine how to map search2 items based on data type
-        if (this.items2.length > 0 && this.items2[0].email) {
-          // User data mapping
-          this.tag_items2 = this.items2
-            .filter(v => v && (v.email || v.name))
-            .map(user => user.email || user.name)
-            .filter(item => item !== null)
         } else {
-          // Asset data mapping
-          this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+          stableTicks = 0
+          lastLen = len
         }
-        
-        this.setupMiniSearch(this.items)
-        this.setupMiniSearch(this.items2)
-        clearInterval(load_assets)  // This ensures the loop stops
       }
     }, 111)
+
+    this.onMainAssetLoaded = () => {
+      this.syncAssetsFromStore()
+    }
+    window.addEventListener('pqs-main-asset-loaded', this.onMainAssetLoaded)
   },
 
   watch: {
+
+    '$store.state.main_asset.length'(len, prev) {
+      if (len > 0 && len !== prev) {
+        this.syncAssetsFromStore()
+      }
+    },
 
     showSearch2(newVal) {
       if (newVal) {
@@ -728,8 +718,82 @@ export default {
       }
     },
 
-    async setupMiniSearch() {
+    syncAssetsFromStore(assets) {
+      const source = assets || this.$store.state.main_asset || []
+      if (!source.length) {
+        return
+      }
+      this.items = source
 
+      if (this.$route.path.includes('/user')) {
+        try {
+          if (this.$store.state.main_user && this.$store.state.main_user.length > 0) {
+            this.items2 = this.$store.state.main_user
+          } else {
+            this.items2 = [...source]
+          }
+        } catch (error) {
+          this.items2 = [...source]
+        }
+      } else {
+        this.items2 = [...source]
+      }
+
+      this.tag_items = this.tagItemsFromAssets(this.items)
+      if (this.items2.length > 0 && this.items2[0].email) {
+        this.tag_items2 = this.items2
+          .filter(v => v && (v.email || v.name))
+          .map(user => user.email || user.name)
+          .filter(item => item !== null)
+      } else {
+        this.tag_items2 = this.tagItemsFromAssets(this.items2)
+      }
+
+      this.setupMiniSearch(this.items)
+    },
+
+    tagItemsFromAssets(assets, term) {
+      let list = (assets || []).filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+      if (term) {
+        const q = String(term).trim().toLowerCase()
+        if (q) {
+          list = list.filter(label => String(label).toLowerCase().includes(q))
+        }
+      }
+      return list
+    },
+
+    tagItemsFromSearchHits(hits, term) {
+      let list = (hits || [])
+        .filter(v => v && v.doc)
+        .map(v => tag_alias(v.doc))
+        .filter(item => item !== null)
+      if ((!list || list.length === 0) && term) {
+        list = this.tagItemsFromAssets(this.$store.state.main_asset, term)
+      }
+      return list
+    },
+
+    async setupMiniSearch(items) {
+      if (!items || !items.length || !this.$seneca) {
+        return
+      }
+      const start = this.searchIndexedCount || 0
+      if (start >= items.length) {
+        return
+      }
+      for (let i = start; i < items.length; i++) {
+        const item = items[i]
+        if (!item || item.id == null) {
+          continue
+        }
+        try {
+          await this.$seneca.post('sys:search, cmd:add', { doc: item })
+        } catch (e) {
+          // duplicate id or transient add failure — continue indexing remainder
+        }
+      }
+      this.searchIndexedCount = items.length
     },
 
 
@@ -799,9 +863,7 @@ export default {
             { query: term, params: this.search_config }
           )
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits
-            .filter(v => v && v.doc)  // Filter out null/undefined items
-            .map(v => tag_alias(v.doc)) .filter(item => item !== null)
+          this.tag_items = this.tagItemsFromSearchHits(out.data.hits, term)
         }
         else {
           // this.tag_items = this.items.map(v => v.tag)
@@ -822,10 +884,7 @@ export default {
           )
 
 
-          this.tag_items2 = out.data.hits
-            .filter(v => v && v.doc)  // Filter out null/undefined items
-            .map(v => tag_alias(v.doc))
-            .filter(item => item !== null)
+          this.tag_items2 = this.tagItemsFromSearchHits(out.data.hits, term)
           console.log('tag items are ', this.tag_items2)
         }
         else {
@@ -1017,12 +1076,8 @@ export default {
             { query: searchTerm, params: this.search_config }
           );
           
-          // Update search results
-          this.tag_items = out.data.hits
-            .filter(v => v && v.doc)  // Filter out null/undefined items
-            .map(v => tag_alias(v.doc))
-            .filter(item => item !== null);
-            
+          this.tag_items = this.tagItemsFromSearchHits(out.data.hits, searchTerm)
+
           console.log('Asset search results:', this.tag_items);
           
           // Emit search event for other components to listen to
@@ -1054,6 +1109,17 @@ export default {
     const mode = this.$route.query.mode
     if (mode === 'filtersearch') {
       //this.$store.dispatch('trigger_toggle_filter');
+    }
+    this.syncAssetsFromStore()
+  },
+
+  beforeDestroy() {
+    if (this.loadAssetsInterval) {
+      clearInterval(this.loadAssetsInterval)
+      this.loadAssetsInterval = null
+    }
+    if (this.onMainAssetLoaded) {
+      window.removeEventListener('pqs-main-asset-loaded', this.onMainAssetLoaded)
     }
   },
   // beforeDestroy() {

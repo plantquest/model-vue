@@ -58,7 +58,7 @@
       <v-icon left medium>
         mdi-map-marker-path
       </v-icon>
-      Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
+      {{ itemName == 'Asset' ? (mobileAssetsEnabled ? 'Add Asset' : 'Add Fixed Asset') : ('Add ' + itemName) }}
     </v-btn>
     
     <v-btn
@@ -348,6 +348,9 @@
       detailOpen() {
         return !this.$store.state.vxg.cmp.BasicMain.show
       },
+      mobileAssetsEnabled() {
+        return !!this.$store.state.mobileAssetsEnabled
+      },
       itemName() {
         return this.$store.state.vxg.ent.meta.name
       },
@@ -604,7 +607,7 @@
       <v-icon left medium>
         mdi-map-marker-path
       </v-icon>
-      Add {{ itemName == 'Asset' ? 'Fixed Asset' : itemName }}
+      {{ itemName == 'Asset' ? (mobileAssetsEnabled ? 'Add Asset' : 'Add Fixed Asset') : ('Add ' + itemName) }}
     </v-btn>
  
   
@@ -938,6 +941,9 @@
         }
       }
         return this.$store.state.vxg.ent.meta.name
+      },
+      mobileAssetsEnabled() {
+        return !!this.$store.state.mobileAssetsEnabled
       },
       tool() {
         // TODO: better if main.app.web.parts.head was provided directly

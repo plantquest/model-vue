@@ -1,11 +1,11 @@
 {
   "name": "@plantquest/model-vue",
-  "version": "0.18.285-demo-dev",
+  "version": "0.18.310-demo-dev",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "vue-build": "vue-cli-service build --target lib --name Vxg --mode production ./src/vxg.js",
-    "vue-watch": "vue-cli-service build --target lib --name Vxg ./src/vxg.js --watch --report",
+    "vue-watch": "CHOKIDAR_USEPOLLING=1 vue-cli-service build --target lib --name Vxg ./src/vxg.js --watch --report",
     "lint": "vue-cli-service lint",
     "test-off": "npm run test-lab-lint && npm run test-mocha",
     "test": "npm run test-lab-lint",

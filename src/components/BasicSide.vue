@@ -187,7 +187,7 @@
         <template v-if="menuView.mode === 'standard'">
           <div class="router_items">
             <router-link v-for="item in menu"
-              v-if="allow(item) && item.code !== 'admin'"
+              v-if="allow(item) && item.code !== 'admin' && (item.title !== 'Devices' || mobileAssetsEnabled)"
               :key="item.code" :to="`/${item.code}`" :class="['vxg-router-link', item.klass]">
               <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
             </router-link>
@@ -594,6 +594,9 @@ export default {
 
 
   computed: {
+    mobileAssetsEnabled() {
+      return !!this.$store.state.mobileAssetsEnabled
+    },
     ...mapState(['showSearch2', 'showExpansion', 'pathData', 'currentStage']
 
     ),

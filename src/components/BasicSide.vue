@@ -187,7 +187,7 @@
         <template v-if="menuView.mode === 'standard'">
           <div class="router_items">
             <router-link v-for="item in menu"
-              v-if="allow(item) && item.code !== 'admin' && item.title !== 'Devices' && item.code !== 'devices'"
+              v-if="allow(item) && item.code !== 'admin'"
               :key="item.code" :to="`/${item.code}`" :class="['vxg-router-link', item.klass]">
               <v-icon v-once>mdi-{{ item.icon }}</v-icon> {{ item.title }}
             </router-link>

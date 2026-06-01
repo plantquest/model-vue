@@ -599,27 +599,40 @@
         this.show.item = true;
       },
       saveItem () {
-        if(this.spec.ent.store_name.includes('user') ) {
-          this.item.email = this.item.email.trim()
-          // make the email all lower case
-          this.item.email = this.item.email.toLowerCase()
-            if(this.editing ==false) {
-              console.log('Registering User: ')
-              this.$store.dispatch('register_user', this.item)           
-            } else {
-              console.log('Saving User: ')
-              this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
-              //this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
-  
+        const self = this
+        const isUser = this.spec.ent.store_name && this.spec.ent.store_name.includes('user')
+
+        function closeForm () {
+          self.show.table = true
+          self.show.item = false
+        }
+
+        if (isUser) {
+          this.item.name = (this.item.name || '').trim()
+          this.item.email = (this.item.email || '').trim().toLowerCase()
+
+          if (!this.item.name || !this.item.email) {
+            if (this.$toast) {
+              this.$toast.error('Name and Email are required.')
+            }
+            return
           }
+
+          if (this.editing === false) {
+            return this.$store.dispatch('register_user', this.item).then(function (result) {
+              if (result && result.ok) {
+                closeForm()
+              }
+            })
+          }
+
+          return this.$store.dispatch('save_' + this.spec.ent.store_name, this.item).then(function () {
+            closeForm()
+          })
         }
-        else
-        {
-          this.$store.dispatch('save_'+this.spec.ent.store_name, this.item)
-        }
-  
-        this.show.table = true
-        this.show.item = false
+
+        this.$store.dispatch('save_' + this.spec.ent.store_name, this.item)
+        closeForm()
       },
   
       removeItem() {

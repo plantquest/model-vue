@@ -607,6 +607,12 @@
           self.show.item = false
         }
 
+        function showSaveError () {
+          if (self.$toast) {
+            self.$toast.error('Save failed. Please try again.')
+          }
+        }
+
         if (isUser) {
           this.item.name = (this.item.name || '').trim()
           this.item.email = (this.item.email || '').trim().toLowerCase()
@@ -619,16 +625,34 @@
           }
 
           if (this.editing === false) {
-            return this.$store.dispatch('register_user', this.item).then(function (result) {
-              if (result && result.ok) {
-                closeForm()
-              }
-            })
+            return this.$store
+              .dispatch('register_user', this.item)
+              .then(function (result) {
+                if (result && result.ok) {
+                  closeForm()
+                } else {
+                  showSaveError()
+                }
+              })
+              .catch(function () {
+                showSaveError()
+              })
           }
 
-          return this.$store.dispatch('save_' + this.spec.ent.store_name, this.item).then(function () {
-            closeForm()
-          })
+          return this.$store
+            .dispatch('save_' + this.spec.ent.store_name, this.item)
+            .then(function (result) {
+              // Some store save actions don't return {ok:true}; treat "resolved with undefined"
+              // as success, but keep the form open if an explicit {ok:false} comes back.
+              if (result === undefined || (result && result.ok)) {
+                closeForm()
+              } else {
+                showSaveError()
+              }
+            })
+            .catch(function () {
+              showSaveError()
+            })
         }
 
         this.$store.dispatch('save_' + this.spec.ent.store_name, this.item)

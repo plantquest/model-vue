@@ -252,6 +252,13 @@ function tag_alias(asset) {
   return asset.tag
 }
 
+function isSearchVisible(v) {
+  if (!v || !v.tag) return false
+  if (v.atype === 'Partial Sprinkler Zone') return false
+  if (v.atype === 'Sprinkler Zone' && /\s+L\d+[a-zA-Z]*$/i.test(v.tag)) return false
+  return true
+}
+
 export default {
 
   components: {
@@ -340,7 +347,7 @@ export default {
       
       if (this.items.length != 0) {
         // Assets for search 1
-        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+        this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         
         // Determine how to map search2 items based on data type
         if (this.items2.length > 0 && this.items2[0].email) {
@@ -351,7 +358,7 @@ export default {
             .filter(item => item !== null)
         } else {
           // Asset data mapping
-          this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+          this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         }
         
         this.setupMiniSearch(this.items)
@@ -398,7 +405,7 @@ export default {
       }
       if (term == '' && this.$refs.search) {
         this.$refs.search.reset()
-        this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+        this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         console.log('query changes search is being triggerecd')
         // Set pathData to null
         // this.$store.commit('set_path_data', null)
@@ -455,7 +462,7 @@ export default {
       if (term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
-        this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+        this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         //  this.$store.commit('set_path_data', null)
       }
       this.$router.replace({
@@ -803,13 +810,13 @@ export default {
           )
           // this.tag_items = out.data.hits.map(v => v.id)
           this.tag_items = out.data.hits
-            .filter(v => v && v.doc)  // Filter out null/undefined items
-            .map(v => tag_alias(v.doc)) .filter(item => item !== null)
+            .filter(v => v && v.doc && isSearchVisible(v.doc))
+            .map(v => tag_alias(v.doc)).filter(item => item !== null)
         }
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if (this.items != undefined)
-            this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+            this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         }
 
       }, 11)
@@ -826,7 +833,7 @@ export default {
 
 
           this.tag_items2 = out.data.hits
-            .filter(v => v && v.doc)  // Filter out null/undefined items
+            .filter(v => v && v.doc && isSearchVisible(v.doc))
             .map(v => tag_alias(v.doc))
             .filter(item => item !== null)
           console.log('tag items are ', this.tag_items2)
@@ -834,7 +841,7 @@ export default {
         else {
 
           if (this.items2 != undefined)
-            this.tag_items2 = this.items2.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null)
+            this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         }
 
 
@@ -1000,7 +1007,6 @@ export default {
     getRoom() {
       const room = this.$store.state.room
       if (!room) {
-        console.warn('Room is not available')
         return null
       }
       return room
@@ -1022,7 +1028,7 @@ export default {
           
           // Update search results
           this.tag_items = out.data.hits
-            .filter(v => v && v.doc)  // Filter out null/undefined items
+            .filter(v => v && v.doc && isSearchVisible(v.doc))
             .map(v => tag_alias(v.doc))
             .filter(item => item !== null);
             
@@ -1044,7 +1050,7 @@ export default {
         } else {
           // Reset to show all items when search is empty
           if (this.items != undefined) {
-            this.tag_items = this.items.filter(v => v && v.tag).map(tag_alias).filter(item => item !== null);
+            this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null);
           }
         }
       } catch (error) {

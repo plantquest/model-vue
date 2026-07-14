@@ -416,7 +416,7 @@ export default {
       const asset = this.$route.query.asset
       console.log('asset is ', asset)
       
-      if (search_mode == 'route') {
+      if (search_mode == 'route' && this.showSearch2) {
         this.$router.replace({
           path: this.$route.path,
           query: {
@@ -465,19 +465,21 @@ export default {
         this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         //  this.$store.commit('set_path_data', null)
       }
-      this.$router.replace({
-        path: this.$route.path,
-        query: {
-          mode: 'route',
-          a: this.search,
-          b: this.search2
-        }
-      }).catch(err => {
-        // Ignore NavigationDuplicated errors
-        if (err.name !== 'NavigationDuplicated') {
-          console.error('Router navigation error:', err);
-        }
-      })
+      if (this.showSearch2) {
+        this.$router.replace({
+          path: this.$route.path,
+          query: {
+            mode: 'route',
+            a: this.search,
+            b: this.search2
+          }
+        }).catch(err => {
+          // Ignore NavigationDuplicated errors
+          if (err.name !== 'NavigationDuplicated') {
+            console.error('Router navigation error:', err);
+          }
+        })
+      }
     },
      removeAlias(term) {
     // Handle null, undefined, or non-string values

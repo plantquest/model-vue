@@ -1,0 +1,81 @@
+name: Publish dev dist-tag
+
+# Fires on every merge to develop (and can be manually re-run by any team member).
+# Sequence:
+#   1. Bump patch version in package.json  (repo-version:dev — preserves -demo-dev suffix)
+#   2. Commit + push version bump back to develop  [skip ci]
+#   3. Build the library  (vue-cli-service build --target lib)
+#   4. Force-push git tag 'dev' to develop HEAD
+#   5. npm run repo-npm-tag:dev  (publishes if new, or moves the dev dist-tag if already on npm)
+#   6. Trigger system-demo demo-dev deployment
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-model-vue-dev
+  cancel-in-progress: false  # never cancel mid-publish; queue instead
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # GH_PAT needed to push commits and force-push tags back to develop
+          token: ${{ secrets.GH_PAT }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure git identity
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Bump patch version
+        # repo-version:dev increments the numeric patch and preserves any pre-release
+        # suffix (e.g. -demo-dev) so the version stays in the correct format.
+        run: npm run repo-version:dev
+
+      - name: Commit and push version bump
+        run: |
+          git add package.json
+          git commit -m "chore: bump dev version [skip ci]"
+          git push origin develop
+
+      - name: Build library
+        # Vue CLI 4.x / Webpack 4 requires --openssl-legacy-provider on Node 18+
+        run: npm run vue-build
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+
+      - name: Push dev git tag to develop HEAD
+        run: npm run repo-tag:dev && git push origin refs/tags/dev --force
+
+      - name: Publish to npm with dev dist-tag
+        # repo-npm-tag:dev is smart: if this version is already on npm it moves the
+        # dist-tag; otherwise it publishes fresh with --tag dev.
+        run: npm run repo-npm-tag:dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Trigger system-demo demo-dev deploy
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          gh workflow run deploy-system-demo-frontend.yml \
+            --repo plantquest/system-demo \
+            --ref develop

@@ -51,6 +51,15 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
+      - name: Configure npm for @plantquest scoped packages
+        # Explicitly route all @plantquest scoped packages to the public npm registry.
+        # Without this, npm may time out (E522) trying to resolve private-scoped packages.
+        run: |
+          echo "@plantquest:registry=https://registry.npmjs.org/" >> ~/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies
         # NPM_TOKEN is needed here only to install private @plantquest/* packages.
         # It is NOT used for publishing — that uses OIDC (see NPM_CONFIG_PROVENANCE below).

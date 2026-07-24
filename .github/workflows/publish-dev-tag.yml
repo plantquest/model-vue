@@ -9,13 +9,19 @@ name: Publish dev dist-tag
 #   5. npm run repo-npm-tag:dev  (publishes if new, or moves the dev dist-tag if already on npm)
 #   6. Trigger system-demo demo-dev deployment
 #
-# Authentication: npm OIDC Trusted Publishing — no NPM_TOKEN stored in secrets.
-# One-time setup required in your npm account:
-#   npmjs.com → Account Settings → Trusted Publishers → Add publisher
-#     Provider : GitHub Actions
-#     Owner    : plantquest
-#     Repo     : model-vue
-#     Workflow : publish-dev-tag.yml
+# Authentication:
+#   Install : NPM_TOKEN (read access, to pull private @plantquest/* deps)
+#   Publish : NPM_PUBLISH_TOKEN (granular access token — write access to @plantquest/model-vue only)
+#
+# Why not OIDC Trusted Publishing?
+#   npm OIDC provenance requires the package to be public. @plantquest/model-vue is private,
+#   so OIDC publish fails with "Can't generate provenance for new or private package".
+#   Granular access tokens are npm's recommended replacement for automation tokens —
+#   they are scoped to specific packages/orgs and do not share the automation-token 2FA bypass.
+#
+# Create NPM_PUBLISH_TOKEN at npmjs.com → Access Tokens → Generate New Token → Granular:
+#   Expiration   : your preference (90d / 1y / no expiry)
+#   Packages     : @plantquest/model-vue — Read and write
 on:
   push:
     branches: [develop]
@@ -23,7 +29,6 @@ on:
 
 permissions:
   contents: write
-  id-token: write  # required for npm OIDC trusted publishing
 
 concurrency:
   group: publish-model-vue-dev
@@ -43,8 +48,6 @@ jobs:
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
-          # With id-token:write above, setup-node exchanges the GitHub OIDC token
-          # for a short-lived npm publish token — no NPM_TOKEN secret required.
 
       - name: Configure git identity
         run: |
@@ -61,8 +64,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install dependencies
-        # NPM_TOKEN is needed here only to install private @plantquest/* packages.
-        # It is NOT used for publishing — that uses OIDC (see NPM_CONFIG_PROVENANCE below).
         run: npm install --legacy-peer-deps
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -76,6 +77,7 @@ jobs:
         run: |
           git add package.json
           git commit -m "chore: bump dev version [skip ci]"
+          git pull --rebase origin develop
           git push origin develop
 
       - name: Build library
@@ -90,11 +92,9 @@ jobs:
       - name: Publish to npm with dev dist-tag
         # repo-npm-tag:dev is smart: if this version is already on npm it moves the
         # dist-tag via 'npm dist-tag add'; otherwise it publishes fresh with --tag dev.
-        # NPM_CONFIG_PROVENANCE=true enables the OIDC attestation required by
-        # npm Trusted Publishing (equivalent to 'npm publish --provenance').
         run: npm run repo-npm-tag:dev
         env:
-          NPM_CONFIG_PROVENANCE: "true"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
       - name: Trigger system-demo demo-dev deploy
         env:

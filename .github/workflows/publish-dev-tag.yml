@@ -52,8 +52,11 @@ jobs:
           git config user.name "github-actions[bot]"
 
       - name: Install dependencies
-        # @plantquest packages are publicly accessible — no auth token needed for install.
+        # NPM_TOKEN is needed here only to install private @plantquest/* packages.
+        # It is NOT used for publishing — that uses OIDC (see NPM_CONFIG_PROVENANCE below).
         run: npm install --legacy-peer-deps
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Bump patch version
         # repo-version:dev increments the numeric patch and preserves any pre-release

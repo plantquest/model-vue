@@ -92,9 +92,13 @@ jobs:
         # dist-tag via 'npm dist-tag add'; otherwise it publishes fresh with --tag dev.
         # NPM_CONFIG_PROVENANCE=true enables the OIDC attestation required by
         # npm Trusted Publishing (equivalent to 'npm publish --provenance').
+        # NPM_CONFIG_ACCESS=restricted overrides the --access=public flag in the script —
+        # the package is private on npm and trying to change it to public causes a 404
+        # because the OIDC token doesn't have org-level visibility-change permissions.
         run: npm run repo-npm-tag:dev
         env:
           NPM_CONFIG_PROVENANCE: "true"
+          NPM_CONFIG_ACCESS: "restricted"
 
       - name: Trigger system-demo demo-dev deploy
         env:

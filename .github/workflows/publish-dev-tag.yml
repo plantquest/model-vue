@@ -8,6 +8,14 @@ name: Publish dev dist-tag
 #   4. Force-push git tag 'dev' to develop HEAD
 #   5. npm run repo-npm-tag:dev  (publishes if new, or moves the dev dist-tag if already on npm)
 #   6. Trigger system-demo demo-dev deployment
+#
+# Authentication: npm OIDC Trusted Publishing — no NPM_TOKEN stored in secrets.
+# One-time setup required in your npm account:
+#   npmjs.com → Account Settings → Trusted Publishers → Add publisher
+#     Provider : GitHub Actions
+#     Owner    : plantquest
+#     Repo     : model-vue
+#     Workflow : publish-dev-tag.yml
 on:
   push:
     branches: [develop]
@@ -15,6 +23,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write  # required for npm OIDC trusted publishing
 
 concurrency:
   group: publish-model-vue-dev
@@ -34,6 +43,8 @@ jobs:
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
+          # With id-token:write above, setup-node exchanges the GitHub OIDC token
+          # for a short-lived npm publish token — no NPM_TOKEN secret required.
 
       - name: Configure git identity
         run: |
@@ -41,9 +52,8 @@ jobs:
           git config user.name "github-actions[bot]"
 
       - name: Install dependencies
+        # @plantquest packages are publicly accessible — no auth token needed for install.
         run: npm install --legacy-peer-deps
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Bump patch version
         # repo-version:dev increments the numeric patch and preserves any pre-release
@@ -67,10 +77,12 @@ jobs:
 
       - name: Publish to npm with dev dist-tag
         # repo-npm-tag:dev is smart: if this version is already on npm it moves the
-        # dist-tag; otherwise it publishes fresh with --tag dev.
+        # dist-tag via 'npm dist-tag add'; otherwise it publishes fresh with --tag dev.
+        # NPM_CONFIG_PROVENANCE=true enables the OIDC attestation required by
+        # npm Trusted Publishing (equivalent to 'npm publish --provenance').
         run: npm run repo-npm-tag:dev
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
 
       - name: Trigger system-demo demo-dev deploy
         env:

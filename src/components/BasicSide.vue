@@ -416,6 +416,8 @@ export default {
       const asset = this.$route.query.asset
       console.log('asset is ', asset)
       
+      // Decision: DEC-000019 — only sync route URL while navigation mode is active
+      // @see provenance/decisions/model-vue/DEC-000019/decision.md
       if (search_mode == 'route' && this.showSearch2) {
         this.$router.replace({
           path: this.$route.path,
@@ -465,6 +467,8 @@ export default {
         this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
         //  this.$store.commit('set_path_data', null)
       }
+      // Decision: DEC-000019 — do not force mode=route when navigation is closed
+      // @see provenance/decisions/model-vue/DEC-000019/decision.md
       if (this.showSearch2) {
         this.$router.replace({
           path: this.$route.path,

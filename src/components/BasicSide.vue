@@ -96,8 +96,8 @@
 
 
         <v-combobox class="comboxSearch2" ref="search2" v-show="showSearch2" v-model="search2"
-          @keydown="changeSearch2($event)" @click:clear="changeSearch2($event)" :items="tag_items2" flat hide-details
-          outlined dense clearable :filter="customFilter">
+          @keydown="changeSearch2($event)" :items="tag_items2" flat hide-details
+          outlined dense :filter="customFilter">
 
         </v-combobox>
         <div v-if="showSearch2">
@@ -454,10 +454,12 @@ export default {
       if (typeof term === 'object') {
         term = term.tag
       }
-      const termStr = String(term);
-      term = termStr.replace(/\(.*?\)/g, "").trim();
+      if (term == null || term === undefined) {
+        term = ''
+      }
+      term = String(term).trim()
       console.log('search2 is being triggered', term)
-      
+
       this.search2 = term
       if (term == '' && this.$refs.search2) {
         this.$refs.search2.reset()

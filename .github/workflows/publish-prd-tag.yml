@@ -39,7 +39,7 @@ jobs:
       - name: Configure npm auth for @plantquest scope
         run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
       - name: Wait for version to appear on npm
         env:
@@ -62,7 +62,7 @@ jobs:
 
       - name: Move prd dist-tag to new version
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           npm dist-tag add "@plantquest/model-vue@${VERSION}" prd --registry https://registry.npmjs.org

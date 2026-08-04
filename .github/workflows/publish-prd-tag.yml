@@ -1,0 +1,95 @@
+name: Sync prd dist-tag on publish
+
+# Triggered by repo-publish / repo-publish-quick which run:
+#   git tag v{version} && git push --tags
+#   npm publish
+#
+# The git tag fires this workflow. We wait briefly for npm to confirm
+# the version is live, then move the prd dist-tag to the new version.
+# This keeps deploy-production-tag.yml's "Validate package tags" check green.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  sync-prd-tag:
+    name: Move @prd to new version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Tag: ${TAG}  ->  Version: ${VERSION}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure npm auth for @plantquest scope
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Wait for version to appear on npm
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          echo "Waiting for @plantquest/model-vue@${VERSION} to appear on npm..."
+          for i in $(seq 1 18); do
+            if npm view "@plantquest/model-vue@${VERSION}" version --registry https://registry.npmjs.org >/dev/null 2>&1; then
+              echo "Found @plantquest/model-vue@${VERSION} on npm (attempt ${i})"
+              break
+            fi
+            echo "Attempt ${i}/18 - not yet available, retrying in 10s..."
+            sleep 10
+          done
+          if ! npm view "@plantquest/model-vue@${VERSION}" version --registry https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "@plantquest/model-vue@${VERSION} did not appear on npm within 3 minutes."
+            echo "Check that npm publish completed successfully in your local run."
+            exit 1
+          fi
+
+      - name: Move prd dist-tag to new version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          npm dist-tag add "@plantquest/model-vue@${VERSION}" prd --registry https://registry.npmjs.org
+          echo "prd dist-tag -> @plantquest/model-vue@${VERSION}"
+
+      - name: Verify dist-tags
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          TAGS=$(npm view @plantquest/model-vue dist-tags --json --registry https://registry.npmjs.org)
+          echo "Current dist-tags:"
+          echo "${TAGS}" | node -e "
+            const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+            Object.entries(d).forEach(([t,v]) => console.log('  ' + t + ' -> ' + v));
+          "
+          PRD_VER=$(echo "${TAGS}" | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).prd||'')")
+          if [ "${PRD_VER}" = "${VERSION}" ]; then
+            echo "Confirmed: prd = ${VERSION}"
+          else
+            echo "prd is ${PRD_VER}, expected ${VERSION}"
+            exit 1
+          fi
+
+      - name: Summary
+        run: |
+          echo "### @plantquest/model-vue prd tag updated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** \`${{ steps.version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** \`prd\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by:** \`${{ github.ref_name }}\` pushed by \`${{ github.actor }}\`" >> $GITHUB_STEP_SUMMARY

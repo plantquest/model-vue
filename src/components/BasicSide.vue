@@ -260,22 +260,23 @@ function isSearchVisible(v) {
 }
 
 /**
- * Alphabetical suggestions: prefix matches first, then A–Z by full text (case-insensitive).
+ * Alphabetical suggestions: prefix matches first, then locale-aware A–Z by full text
+ * (case-insensitive, pinned to `en` for stable ordering).
  * Typing "M" → M38…, MALE…, MEETING… before mid-string matches like "…Manufacturing…".
  */
 function sortedTagLabels(labels, query) {
-  var q = String(query || '').trim().toLowerCase()
-  var opts = { sensitivity: 'base' }
+  const q = String(query || '').trim().toLowerCase()
+  const opts = { sensitivity: 'base' }
   return (labels || []).slice().sort(function(a, b) {
-    var sa = String(a || '')
-    var sb = String(b || '')
+    const sa = String(a || '')
+    const sb = String(b || '')
     if (q) {
-      var aPrefix = sa.toLowerCase().indexOf(q) === 0
-      var bPrefix = sb.toLowerCase().indexOf(q) === 0
+      const aPrefix = sa.toLowerCase().indexOf(q) === 0
+      const bPrefix = sb.toLowerCase().indexOf(q) === 0
       if (aPrefix && !bPrefix) return -1
       if (!aPrefix && bPrefix) return 1
     }
-    return sa.localeCompare(sb, undefined, opts)
+    return sa.localeCompare(sb, 'en', opts)
   })
 }
 

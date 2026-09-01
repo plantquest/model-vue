@@ -259,6 +259,43 @@ function isSearchVisible(v) {
   return true
 }
 
+/**
+ * Alphabetical suggestions: prefix matches first, then A–Z by full text (case-insensitive).
+ * Typing "M" → M38…, MALE…, MEETING… before mid-string matches like "…Manufacturing…".
+ */
+function sortedTagLabels(labels, query) {
+  var q = String(query || '').trim().toLowerCase()
+  var opts = { sensitivity: 'base' }
+  return (labels || []).slice().sort(function(a, b) {
+    var sa = String(a || '')
+    var sb = String(b || '')
+    if (q) {
+      var aPrefix = sa.toLowerCase().indexOf(q) === 0
+      var bPrefix = sb.toLowerCase().indexOf(q) === 0
+      if (aPrefix && !bPrefix) return -1
+      if (!aPrefix && bPrefix) return 1
+    }
+    return sa.localeCompare(sb, undefined, opts)
+  })
+}
+
+function assetTagLabels(assets, query) {
+  return sortedTagLabels(
+    (assets || []).filter(isSearchVisible).map(tag_alias).filter(function(item) { return item !== null }),
+    query
+  )
+}
+
+function searchHitTagLabels(hits, query) {
+  return sortedTagLabels(
+    (hits || [])
+      .filter(function(v) { return v && v.doc && isSearchVisible(v.doc) })
+      .map(function(v) { return tag_alias(v.doc) })
+      .filter(function(item) { return item !== null }),
+    query
+  )
+}
+
 export default {
 
   components: {
@@ -347,18 +384,18 @@ export default {
       
       if (this.items.length != 0) {
         // Assets for search 1
-        this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
+        this.tag_items = assetTagLabels(this.items)
         
         // Determine how to map search2 items based on data type
         if (this.items2.length > 0 && this.items2[0].email) {
           // User data mapping
-          this.tag_items2 = this.items2
+          this.tag_items2 = sortedTagLabels(this.items2
             .filter(v => v && (v.email || v.name))
             .map(user => user.email || user.name)
-            .filter(item => item !== null)
+            .filter(item => item !== null))
         } else {
           // Asset data mapping
-          this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
+          this.tag_items2 = assetTagLabels(this.items2)
         }
         
         this.setupMiniSearch(this.items)
@@ -405,7 +442,7 @@ export default {
       }
       if (term == '' && this.$refs.search) {
         this.$refs.search.reset()
-        this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
+        this.tag_items = assetTagLabels(this.items)
         console.log('query changes search is being triggerecd')
         // Set pathData to null
         // this.$store.commit('set_path_data', null)
@@ -462,7 +499,7 @@ export default {
       if (term == '' && this.$refs.search2) {
         this.$refs.search2.reset()
         // this.tag_items = this.items.map(v => v.tag)
-        this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
+        this.tag_items2 = assetTagLabels(this.items2)
         //  this.$store.commit('set_path_data', null)
       }
       if (this.showSearch2) {
@@ -811,14 +848,12 @@ export default {
             { query: term, params: this.search_config }
           )
           // this.tag_items = out.data.hits.map(v => v.id)
-          this.tag_items = out.data.hits
-            .filter(v => v && v.doc && isSearchVisible(v.doc))
-            .map(v => tag_alias(v.doc)).filter(item => item !== null)
+          this.tag_items = searchHitTagLabels(out.data.hits, term)
         }
         else {
           // this.tag_items = this.items.map(v => v.tag)
           if (this.items != undefined)
-            this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
+            this.tag_items = assetTagLabels(this.items)
         }
 
       }, 11)
@@ -834,16 +869,13 @@ export default {
           )
 
 
-          this.tag_items2 = out.data.hits
-            .filter(v => v && v.doc && isSearchVisible(v.doc))
-            .map(v => tag_alias(v.doc))
-            .filter(item => item !== null)
+          this.tag_items2 = searchHitTagLabels(out.data.hits, term)
           console.log('tag items are ', this.tag_items2)
         }
         else {
 
           if (this.items2 != undefined)
-            this.tag_items2 = this.items2.filter(isSearchVisible).map(tag_alias).filter(item => item !== null)
+            this.tag_items2 = assetTagLabels(this.items2)
         }
 
 
@@ -1028,11 +1060,8 @@ export default {
             { query: searchTerm, params: this.search_config }
           );
           
-          // Update search results
-          this.tag_items = out.data.hits
-            .filter(v => v && v.doc && isSearchVisible(v.doc))
-            .map(v => tag_alias(v.doc))
-            .filter(item => item !== null);
+          // Prefix matches first, then A–Z by full label (no relevance ranking)
+          this.tag_items = searchHitTagLabels(out.data.hits, searchTerm);
             
           console.log('Asset search results:', this.tag_items);
           
@@ -1052,7 +1081,7 @@ export default {
         } else {
           // Reset to show all items when search is empty
           if (this.items != undefined) {
-            this.tag_items = this.items.filter(isSearchVisible).map(tag_alias).filter(item => item !== null);
+            this.tag_items = assetTagLabels(this.items);
           }
         }
       } catch (error) {

@@ -473,9 +473,11 @@ export default {
       if(search_mode == 'assetsearch'){
         console.log('search_mode is assetsearch')
         
-        // Trigger search when in assetsearch mode
+        // Suggestions only — do not dispatch trigger_asset_search here.
+        // Committing a map search happens on Enter / known-item @change so
+        // partial keystrokes cannot overwrite the combobox via doSearch.
         if(term) {
-          this.performAssetSearch(term);
+          this.refreshAssetSearchSuggestions(term);
         }
       }
     },
@@ -798,18 +800,95 @@ export default {
       this.showIcon = true; // Show the icon when the combobox is blurred
     },
 
+    removeAliasLocal(term) {
+      if (!term && term !== 0) return ''
+      return String(term).replace(/\(.*?\)/g, '').trim()
+    },
+
+    /** Pick the best suggestion label for an explicit Enter/commit. */
+    resolveCommitTerm(typed) {
+      const trimmed = String(typed || '').trim()
+      if (!trimmed) return ''
+      const labels = this.tag_items || []
+      const lower = trimmed.toLowerCase()
+      const self = this
+
+      let hit = labels.find(function(item) {
+        const label = typeof item === 'string' ? item : (item && item.tag)
+        return label && String(label) === trimmed
+      })
+      if (hit) return typeof hit === 'string' ? hit : hit.tag
+
+      hit = labels.find(function(item) {
+        const label = typeof item === 'string' ? item : (item && item.tag)
+        return label && self.removeAliasLocal(label).toLowerCase() === lower
+      })
+      if (hit) return typeof hit === 'string' ? hit : hit.tag
+
+      const prefix = labels.filter(function(item) {
+        const label = typeof item === 'string' ? item : (item && item.tag)
+        if (!label) return false
+        const clean = self.removeAliasLocal(label).toLowerCase()
+        return clean.indexOf(lower) === 0 || String(label).toLowerCase().indexOf(lower) === 0
+      })
+      if (prefix.length === 1) {
+        const only = prefix[0]
+        return typeof only === 'string' ? only : only.tag
+      }
+
+      if (lower.length >= 3) {
+        const includes = labels.filter(function(item) {
+          const label = typeof item === 'string' ? item : (item && item.tag)
+          if (!label) return false
+          return self.removeAliasLocal(label).toLowerCase().indexOf(lower) !== -1
+            || String(label).toLowerCase().indexOf(lower) !== -1
+        })
+        if (includes.length === 1) {
+          const only = includes[0]
+          return typeof only === 'string' ? only : only.tag
+        }
+      }
+
+      return trimmed
+    },
+
     handleChangeSearch(event) {
       if (this.suppressSearchChangeNavigation) {
         return
       }
       if (!this.showSearch2) {
+        // Combobox @change can fire while typing. Only commit a map search when
+        // cleared or when the value is an exact known suggestion / tag label.
+        const raw = event == null ? '' : event
+        const term = typeof raw === 'object' && raw.tag != null ? String(raw.tag) : String(raw)
+        const trimmed = term.trim()
+        if (trimmed) {
+          const labels = this.tag_items || []
+          const self = this
+          const isKnown = labels.some(function(item) {
+            const label = typeof item === 'string' ? item : (item && item.tag)
+            if (!label) return false
+            if (label === trimmed) return true
+            return self.removeAliasLocal(label) === self.removeAliasLocal(trimmed)
+          })
+          if (!isKnown) {
+            return
+          }
+        }
         this.$router.push({
           path: this.$route.path,
           query: {
             mode: 'assetsearch',
-            term: event,
+            term: trimmed,
+          }
+        }).catch(err => {
+          if (err.name !== 'NavigationDuplicated') {
+            console.error('Router navigation error:', err)
           }
         })
+        if (trimmed) {
+          this.performAssetSearch(trimmed)
+        }
       } else {
         this.$router.replace({
           path: this.$route.path,
@@ -827,34 +906,50 @@ export default {
     },
 
     changeSearch(event) {
-      // Handle Enter key submission for assetsearch mode
-      if (event.key === 'Enter' && this.$route.query.mode === 'assetsearch') {
-        const term = event.target?.value?.trim();
-        if (term) {
-          this.performAssetSearch(term);
-          return;
-        }
+      // Commit only on Enter — never push the route / run doSearch on each keystroke.
+      // Keystroke path only refreshes dropdown suggestions (seneca).
+      if (event && event.key === 'Enter') {
+        // Defer so v-combobox can apply a highlighted suggestion to v-model first.
+        const self = this
+        setTimeout(function() {
+          let term = ''
+          if (typeof self.search === 'string') {
+            term = self.search
+          } else if (self.search && self.search.tag) {
+            term = self.search.tag
+          }
+          if (!term && event.target) {
+            term = event.target.value || ''
+          }
+          term = self.resolveCommitTerm(String(term || '').trim())
+          if (!term) return
+          self.search = term
+          self.$router.push({
+            path: self.$route.path,
+            query: {
+              mode: 'assetsearch',
+              term: term,
+            }
+          }).catch(function(err) {
+            if (err.name !== 'NavigationDuplicated') {
+              console.error('Router navigation error:', err)
+            }
+          })
+          self.performAssetSearch(term)
+        }, 0)
+        return
       }
 
       setTimeout(async () => { // wait for input
         let term
         term = event.target ? event.target.value : null
-        this.$router.push({
-          path: this.$route.path,
-          query: {
-            mode: 'assetsearch',
-            term: event.target?.value,
-          }
-        })
         if (term) {
           let out = await this.$seneca.post('sys:search, cmd:search',
             { query: term, params: this.search_config }
           )
-          // this.tag_items = out.data.hits.map(v => v.id)
           this.tag_items = searchHitTagLabels(out.data.hits, term)
         }
         else {
-          // this.tag_items = this.items.map(v => v.tag)
           if (this.items != undefined)
             this.tag_items = assetTagLabels(this.items)
         }
@@ -1052,6 +1147,27 @@ export default {
       // Implementation of handleButtonClick method
     },
 
+    async refreshAssetSearchSuggestions(term) {
+      try {
+        if (!term || !String(term).trim()) {
+          if (this.items != undefined) {
+            this.tag_items = assetTagLabels(this.items);
+          }
+          return [];
+        }
+        const searchTerm = String(term).trim();
+        let out = await this.$seneca.post('sys:search, cmd:search',
+          { query: searchTerm, params: this.search_config }
+        );
+        const hits = (out && out.data && out.data.hits) ? out.data.hits : [];
+        this.tag_items = searchHitTagLabels(hits, searchTerm);
+        return hits;
+      } catch (error) {
+        console.error('Error refreshing asset search suggestions:', error);
+        return [];
+      }
+    },
+
     async performAssetSearch(term) {
       try {
         console.log('Performing asset search for term:', term);
@@ -1059,25 +1175,20 @@ export default {
         if (term && term.trim()) {
           
           const searchTerm = term.trim();
-          let out = await this.$seneca.post('sys:search, cmd:search',
-            { query: searchTerm, params: this.search_config }
-          );
-          
-          // Prefix matches first, then A–Z by full label (no relevance ranking)
-          this.tag_items = searchHitTagLabels(out.data.hits, searchTerm);
+          const hits = await this.refreshAssetSearchSuggestions(searchTerm);
             
           console.log('Asset search results:', this.tag_items);
           
           // Emit search event for other components to listen to
           this.$emit('asset-search-completed', {
             term: searchTerm,
-            results: out.data.hits
+            results: hits
           });
           
-          // Dispatch to trigger system for PqsOneView.vue integration
+          // Dispatch to trigger system for PqsOneView.vue integration (commit only)
           this.$store.dispatch('trigger_asset_search', {
             term: searchTerm,
-            results: out.data.hits,
+            results: hits,
             mode: 'assetsearch'
           });
           

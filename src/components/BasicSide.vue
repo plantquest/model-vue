@@ -331,6 +331,9 @@ export default {
       showIcon: true, // Data property to control icon visibility
       // Skip handleChangeSearch URL updates while handleRoute (or similar) sets search/search2
       suppressSearchChangeNavigation: false,
+      // Monotonic ids so late Seneca suggestion responses cannot overwrite newer results
+      _suggestSeq: 0,
+      _suggestSeq2: 0,
       //  showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
@@ -908,7 +911,9 @@ export default {
     changeSearch(event) {
       // Commit only on Enter — never push the route / run doSearch on each keystroke.
       // Keystroke path only refreshes dropdown suggestions (seneca).
-      if (event && event.key === 'Enter') {
+      // Gate on !showSearch2 so Enter in navigation mode keeps route a/b handling
+      // (always-rendered first combobox must not switch to mode=assetsearch).
+      if (event && event.key === 'Enter' && !this.showSearch2) {
         // Defer so v-combobox can apply a highlighted suggestion to v-model first.
         const self = this
         setTimeout(function() {
@@ -943,10 +948,13 @@ export default {
       setTimeout(async () => { // wait for input
         let term
         term = event.target ? event.target.value : null
+        this._suggestSeq = (this._suggestSeq || 0) + 1
+        const seq = this._suggestSeq
         if (term) {
           let out = await this.$seneca.post('sys:search, cmd:search',
             { query: term, params: this.search_config }
           )
+          if (seq !== this._suggestSeq) return
           this.tag_items = searchHitTagLabels(out.data.hits, term)
         }
         else {
@@ -961,12 +969,14 @@ export default {
       setTimeout(async () => { // wait for input
         let term
         term = event.target ? event.target.value : null
+        this._suggestSeq2 = (this._suggestSeq2 || 0) + 1
+        const seq = this._suggestSeq2
         if (term) {
           let out = await this.$seneca.post('sys:search, cmd:search',
             { query: term, params: this.search_config }
           )
 
-
+          if (seq !== this._suggestSeq2) return
           this.tag_items2 = searchHitTagLabels(out.data.hits, term)
           console.log('tag items are ', this.tag_items2)
         }
@@ -1149,6 +1159,8 @@ export default {
 
     async refreshAssetSearchSuggestions(term) {
       try {
+        this._suggestSeq = (this._suggestSeq || 0) + 1
+        const seq = this._suggestSeq
         if (!term || !String(term).trim()) {
           if (this.items != undefined) {
             this.tag_items = assetTagLabels(this.items);
@@ -1160,7 +1172,11 @@ export default {
           { query: searchTerm, params: this.search_config }
         );
         const hits = (out && out.data && out.data.hits) ? out.data.hits : [];
-        this.tag_items = searchHitTagLabels(hits, searchTerm);
+        // Ignore late responses for the dropdown only; callers (e.g. performAssetSearch)
+        // still need the hits for this query.
+        if (seq === this._suggestSeq) {
+          this.tag_items = searchHitTagLabels(hits, searchTerm);
+        }
         return hits;
       } catch (error) {
         console.error('Error refreshing asset search suggestions:', error);

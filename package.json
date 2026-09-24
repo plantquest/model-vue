@@ -1,6 +1,6 @@
 {
   "name": "@plantquest/model-vue",
-  "version": "0.18.660-demo-dev",
+  "version": "0.18.665-demo-dev",
   "main": "./dist/Vxg.umd.js",
   "scripts": {
     "serve": "vue-cli-service serve",

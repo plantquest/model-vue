@@ -354,8 +354,8 @@ export default {
       // Skip handleChangeSearch URL updates while handleRoute (or similar) sets search/search2
       suppressSearchChangeNavigation: false,
       // Monotonic ids so late Seneca suggestion responses cannot overwrite newer results
-      _suggestSeq: 0,
-      _suggestSeq2: 0,
+      suggestSeq: 0,
+      suggestSeq2: 0,
       //  showSearch2: false, // Control the visibility of search2 combobox and Layer_5 icon
     }
   },
@@ -970,13 +970,13 @@ export default {
       setTimeout(async () => { // wait for input
         let term
         term = event.target ? event.target.value : null
-        this._suggestSeq = (this._suggestSeq || 0) + 1
-        const seq = this._suggestSeq
+        this.suggestSeq = (this.suggestSeq || 0) + 1
+        const seq = this.suggestSeq
         if (term) {
           let out = await this.$seneca.post('sys:search, cmd:search',
             { query: term, params: this.search_config }
           )
-          if (seq !== this._suggestSeq) return
+          if (seq !== this.suggestSeq) return
           this.tag_items = searchHitTagLabels(out.data.hits, term)
         }
         else {
@@ -991,14 +991,14 @@ export default {
       setTimeout(async () => { // wait for input
         let term
         term = event.target ? event.target.value : null
-        this._suggestSeq2 = (this._suggestSeq2 || 0) + 1
-        const seq = this._suggestSeq2
+        this.suggestSeq2 = (this.suggestSeq2 || 0) + 1
+        const seq = this.suggestSeq2
         if (term) {
           let out = await this.$seneca.post('sys:search, cmd:search',
             { query: term, params: this.search_config }
           )
 
-          if (seq !== this._suggestSeq2) return
+          if (seq !== this.suggestSeq2) return
           this.tag_items2 = searchHitTagLabels(out.data.hits, term)
           console.log('tag items are ', this.tag_items2)
         }
@@ -1181,8 +1181,8 @@ export default {
 
     async refreshAssetSearchSuggestions(term) {
       try {
-        this._suggestSeq = (this._suggestSeq || 0) + 1
-        const seq = this._suggestSeq
+        this.suggestSeq = (this.suggestSeq || 0) + 1
+        const seq = this.suggestSeq
         if (!term || !String(term).trim()) {
           if (this.items != undefined) {
             this.tag_items = assetTagLabels(this.items);
@@ -1196,7 +1196,7 @@ export default {
         const hits = (out && out.data && out.data.hits) ? out.data.hits : [];
         // Ignore late responses for the dropdown only; callers (e.g. performAssetSearch)
         // still need the hits for this query.
-        if (seq === this._suggestSeq) {
+        if (seq === this.suggestSeq) {
           this.tag_items = searchHitTagLabels(hits, searchTerm);
         }
         return hits;

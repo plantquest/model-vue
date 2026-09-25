@@ -260,21 +260,43 @@ function isSearchVisible(v) {
 }
 
 /**
- * Alphabetical suggestions: prefix matches first, then locale-aware A–Z by full text
- * (case-insensitive, pinned to `en` for stable ordering).
- * Typing "M" → M38…, MALE…, MEETING… before mid-string matches like "…Manufacturing…".
+ * Match quality of a suggestion label against the query (lower = better):
+ * 0 exact, 1 prefix, 2 whole trailing segment ("WTL01-COLO3-CE3-AHU07" for "CE3-AHU07"),
+ * 3 starts at a separator, 4 substring, 5 alias-only substring, 6 fuzzy-only backend hit.
+ */
+function matchRank(label, q) {
+  const full = String(label || '').toLowerCase()
+  const clean = full.replace(/\(.*?\)/g, '').trim()
+  if (!q) return 0
+  if (clean === q || full === q) return 0
+  const idx = clean.indexOf(q)
+  if (idx === 0) return 1
+  if (idx !== -1) {
+    const atBoundary = /[\s\-_./]/.test(clean.charAt(idx - 1))
+    const endsHere = idx + q.length === clean.length
+    if (atBoundary && endsHere) return 2
+    if (atBoundary) return 3
+    return 4
+  }
+  if (full.indexOf(q) !== -1) return 5
+  return 6
+}
+
+/**
+ * Suggestions ranked by match quality, then shorter labels, then locale-aware
+ * natural A–Z (case-insensitive, pinned to `en` for stable ordering).
  */
 function sortedTagLabels(labels, query) {
   const q = String(query || '').trim().toLowerCase()
-  const opts = { sensitivity: 'base' }
+  const opts = { sensitivity: 'base', numeric: true }
   return (labels || []).slice().sort(function(a, b) {
     const sa = String(a || '')
     const sb = String(b || '')
     if (q) {
-      const aPrefix = sa.toLowerCase().indexOf(q) === 0
-      const bPrefix = sb.toLowerCase().indexOf(q) === 0
-      if (aPrefix && !bPrefix) return -1
-      if (!aPrefix && bPrefix) return 1
+      const ra = matchRank(sa, q)
+      const rb = matchRank(sb, q)
+      if (ra !== rb) return ra - rb
+      if (ra < 6 && sa.length !== sb.length) return sa.length - sb.length
     }
     return sa.localeCompare(sb, 'en', opts)
   })
